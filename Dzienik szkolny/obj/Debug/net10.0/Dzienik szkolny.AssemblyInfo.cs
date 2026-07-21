@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Dzienik szkolny")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e12332229d1bbc14121311803c9dd25fad0ebe78")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2d653317c3d0fe6b923ded8122f16b034359f12b")]
 [assembly: System.Reflection.AssemblyProductAttribute("Dzienik szkolny")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Dzienik szkolny")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

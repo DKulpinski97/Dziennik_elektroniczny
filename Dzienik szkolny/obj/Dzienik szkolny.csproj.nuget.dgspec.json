@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\dkulp\\Desktop\\Projekt do cv\\Dzienik_elektroniczny\\Dzienik szkolny\\Dzienik szkolny.csproj": {}
+    "D:\\Projekt do cv\\Dzienik_elektroniczny\\Dzienik szkolny\\Dzienik szkolny.csproj": {}
   },
   "projects": {
-    "C:\\Users\\dkulp\\Desktop\\Projekt do cv\\Dzienik_elektroniczny\\Dzienik szkolny\\Dzienik szkolny.csproj": {
+    "D:\\Projekt do cv\\Dzienik_elektroniczny\\Dzienik szkolny\\Dzienik szkolny.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dkulp\\Desktop\\Projekt do cv\\Dzienik_elektroniczny\\Dzienik szkolny\\Dzienik szkolny.csproj",
+        "projectUniqueName": "D:\\Projekt do cv\\Dzienik_elektroniczny\\Dzienik szkolny\\Dzienik szkolny.csproj",
         "projectName": "Dzienik szkolny",
-        "projectPath": "C:\\Users\\dkulp\\Desktop\\Projekt do cv\\Dzienik_elektroniczny\\Dzienik szkolny\\Dzienik szkolny.csproj",
+        "projectPath": "D:\\Projekt do cv\\Dzienik_elektroniczny\\Dzienik szkolny\\Dzienik szkolny.csproj",
         "packagesPath": "C:\\Users\\dkulp\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dkulp\\Desktop\\Projekt do cv\\Dzienik_elektroniczny\\Dzienik szkolny\\obj\\",
+        "outputPath": "D:\\Projekt do cv\\Dzienik_elektroniczny\\Dzienik szkolny\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -52,6 +52,14 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Identity": {
+              "target": "Package",
+              "version": "[2.3.11, )"
+            },
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.18, )"
+            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[9.0.18, )"

@@ -16,7 +16,6 @@ namespace Dzienik_szkolny.Models
         [MaxLength(11)]
         public string Pesel { get; set; }
 
-        public long IdUzytkownika { get; set; }
 
         // Referencja (właściwość nawigacyjna)
         public LoginUzytkownika Login { get; set; }

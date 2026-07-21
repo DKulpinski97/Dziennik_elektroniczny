@@ -9,6 +9,10 @@
 
   <ItemGroup>
 
+  <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.11" />
+
+  <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.18" />
+
   <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.18" />
 
   <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.18">
@@ -22,6 +26,10 @@
 
   <ItemGroup>
     <Folder Include="Services\Interfaces\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\images\logo.png" />
   </ItemGroup>
 
 </Project>

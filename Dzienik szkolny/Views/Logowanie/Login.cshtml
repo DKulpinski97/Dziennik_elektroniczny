@@ -1,0 +1,27 @@
+﻿@model Dzienik_szkolny.Models.Login
+
+@{
+    Layout = "~/Views/Shared/_LogowanieLayout.cshtml";
+}
+
+<div class="login-page">
+    <div class="login-container">
+        <div style="color:red">
+            @Html.ValidationSummary()
+        </div>
+        @using (Html.BeginForm("Login", "Logowanie", FormMethod.Post))
+        {
+            @Html.ValidationMessageFor(m => m.LoginUzytkownika, "", new { @class = "validation-error" })
+            <label>Login</label><br />
+            @Html.TextBoxFor(m => m.LoginUzytkownika, new { @class = "form-control" })
+            <br />
+
+            @Html.ValidationMessageFor(m => m.HasloUzytkownika, "", new { @class = "validation-error" })
+            <label>Hasło</label><br />
+            @Html.PasswordFor(m => m.HasloUzytkownika, new { @class = "form-control" })
+            <br />
+
+            <button type="submit" class="btn-login">Zaloguj</button>
+        }
+    </div>
+</div>

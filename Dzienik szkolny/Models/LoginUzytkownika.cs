@@ -1,16 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace Dzienik_szkolny.Models
 {
-    public class LoginUzytkownika
+    public class LoginUzytkownika :IdentityUser
     {
-        [Key]
-        public long IdUzytkownika { get; set; }
-        [Required]
-        [MaxLength(20)]
-        public string Login { get; set; }
-        [Required]
-        public string ZaszyfrowaneHaslo { get; set; }
-
+       
     }
 }
