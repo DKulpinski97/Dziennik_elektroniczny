@@ -62,7 +62,7 @@ namespace Dzienik_szkolny.Controllers
            
 
         }
-        [HttpGet]
+        [HttpPost]
         public async Task<IActionResult> Wyloguj()
         {
             await _signInManager.SignOutAsync();

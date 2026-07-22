@@ -13,8 +13,6 @@ namespace Dzienik_szkolny.Data
         public DbSet<InformacjeRodzic> InformacjeUzytkownik { get; set; }
         public DbSet<AdresUzytkownika> AdresUzytkownika { get; set; }
         public DbSet<InformacjePracownik> InformacjePracownik { get; set; }
-        public DbSet<LoczenieRoli> LoczenieRoli { get; set; }
-        public DbSet<ListaRole> ListaRole { get; set; }
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {
             base.ConfigureConventions(configurationBuilder);

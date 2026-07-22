@@ -1,26 +1,15 @@
 using Dzienik_szkolny.Data;
 using Dzienik_szkolny.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// MVC
 builder.Services.AddControllersWithViews();
 
 
-builder.Services.AddIdentityCore<LoginUzytkownika>(Options =>
-{
-    Options.Password.RequireDigit = false;
-    Options.Password.RequiredLength = 6;
-    Options.Password.RequireNonAlphanumeric = false;
-    Options.Password.RequireUppercase = false;
-    Options.Password.RequireLowercase = false;
-});
-
-
-// Połączenie z MySQL (XAMPP)
+// Baza danych MySQL
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -29,16 +18,33 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         )
     ));
 
-// Konfiguracja Identity i rejestracja magazynu użytkowników (Entity Framework)
+
+// Identity
 builder.Services.AddIdentity<LoginUzytkownika, IdentityRole>(options =>
 {
-    options.Password.RequiredLength = 10;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireDigit = false;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireLowercase = false;
 })
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
+.AddEntityFrameworkStores<AppDbContext>()
+.AddDefaultTokenProviders();
+
+
+// Konfiguracja przekierowania niezalogowanego użytkownika
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Logowanie/Login";
+    options.AccessDeniedPath = "/Logowanie/BrakDostepu";
+
+    // Automatyczne wylogowanie po bezczynności
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+
+    // Odświeżaj czas wygaśnięcia przy aktywności użytkownika
+    options.SlidingExpiration = true;
+});
+
 
 var app = builder.Build();
 
@@ -46,22 +52,25 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
+
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
+
 app.UseRouting();
 
+
+// Kolejność jest poprawna
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Logowanie}/{action=Login}")
-    .WithStaticAssets();
+    pattern: "{controller=Logowanie}/{action=Login}/{id?}");
 
 
 app.Run();
