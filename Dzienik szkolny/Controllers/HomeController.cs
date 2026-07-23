@@ -11,9 +11,7 @@ namespace Dzienik_szkolny.Controllers
     {
         public IActionResult Index()
         {
-            var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            Console.WriteLine(id);
             return View();
         }
 

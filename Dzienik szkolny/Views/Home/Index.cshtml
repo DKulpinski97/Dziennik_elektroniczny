@@ -1,8 +1,72 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@using Microsoft.AspNetCore.Identity
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-5">
+    <div class="row g-4" style="min-height: 75vh;">
+
+        <div class="col d-flex">
+            <div class="border rounded p-4 w-100">
+                <h2 class="text-center">Admin</h2>
+
+                @using (Html.BeginForm("ZarzadzajRolami", "Admin", FormMethod.Post))
+                {
+                    <button type="submit" class="btn btn-primary w-100 mb-3">
+                        Zarządzaj rolami
+                    </button>
+                }
+
+                @using (Html.BeginForm("ZarzadzajUzytkownikami", "Admin", FormMethod.Post))
+                {
+                    <button type="submit" class="btn btn-primary w-100 mb-3">
+                        Zarządzaj użytkownikami
+                    </button>
+                }
+
+                @using (Html.BeginForm("ZarzadzajPrzedmiotami", "Admin", FormMethod.Post))
+                {
+                    <button type="submit" class="btn btn-primary w-100">
+                        Zarządzaj przedmiotami
+                    </button>
+                }
+            </div>
+        </div>
+
+
+        <div class="col d-flex">
+            <div class="border rounded p-4 w-100">
+                <h2 class="text-center">Rodzic</h2>
+
+                @using (Html.BeginForm("Akcja1", "Nauczyciel", FormMethod.Post))
+                {
+                    <button type="submit" class="btn btn-success w-100 mb-3">
+                        Przycisk 1
+                    </button>
+                }
+
+                @using (Html.BeginForm("Akcja2", "Nauczyciel", FormMethod.Post))
+                {
+                    <button type="submit" class="btn btn-success w-100">
+                        Przycisk 2
+                    </button>
+                }
+            </div>
+        </div>
+
+
+        @if (User.IsInRole("Rodzic"))
+        {
+            <div class="col d-flex">
+                <div class="border rounded p-4 w-100">
+                    <h2 class="text-center">Rodzic</h2>
+
+                    @using (Html.BeginForm("Akcja1", "Rodzic", FormMethod.Post))
+                    {
+                        <button type="submit" class="btn btn-warning w-100">
+                            Przycisk 1
+                        </button>
+                    }
+                </div>
+            </div>
+        }
+
+    </div>
 </div>
