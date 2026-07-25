@@ -1,49 +1,91 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using Dzienik_szkolny.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
-[Authorize]
-public class AdminController : Controller
+namespace Dzienik_szkolny.Controllers
 {
-    private readonly RoleManager<IdentityRole> _roleManager;
-
-    public AdminController(RoleManager<IdentityRole> roleManager)
+    public class AdminController : Controller
     {
-        _roleManager = roleManager;
-    }
+        private readonly IRoleService _roleService;
 
-
-    [HttpGet]
-    public async Task<IActionResult> ZarzadzajRolami()
-    {
-        var role = await _roleManager.Roles.ToListAsync();
-        return View(role);
-    }
-
-
-    [ValidateAntiForgeryToken]
-    [HttpPost]
-    public async Task<IActionResult> DodajRole(string nazwaRoli)
-    {
-        if (string.IsNullOrWhiteSpace(nazwaRoli))
+        public AdminController(IRoleService roleService)
         {
-            ViewBag.Komunikat = "Nazwa roli nie może być pusta.";
-            ViewBag.NazwaRoli = nazwaRoli;
-            return View("ZarzadzajRolami", await _roleManager.Roles.ToListAsync());
+            _roleService = roleService;
         }
 
-        nazwaRoli = nazwaRoli.Trim();
-        var role = await _roleManager.Roles.ToListAsync();
-        if (await _roleManager.RoleExistsAsync(nazwaRoli))
+
+        [HttpGet]
+        public async Task<IActionResult> ZarzadzajRolami()
         {
-            ViewBag.Komunikat = "Taka rola już istnieje.";
-            ViewBag.NazwaRoli = nazwaRoli;
-            return View("ZarzadzajRolami", await _roleManager.Roles.ToListAsync());
+            var role = await _roleService.PobierzRole();
+
+            return View(role);
         }
 
-        await _roleManager.CreateAsync(new IdentityRole(nazwaRoli));
 
-        return RedirectToAction("ZarzadzajRolami");
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DodajRole(string nazwaRoli)
+        {
+            if (string.IsNullOrWhiteSpace(nazwaRoli))
+            {
+                ViewBag.Komunikat = "Nazwa roli nie może być pusta.";
+
+                var role = await _roleService.PobierzRole();
+
+                return View("ZarzadzajRolami", role);
+            }
+
+
+            var wynik = await _roleService.DodajRole(nazwaRoli.Trim());
+
+
+            if (!wynik)
+            {
+                ViewBag.Komunikat = "Taka rola już istnieje.";
+
+                var role = await _roleService.PobierzRole();
+
+                return View("ZarzadzajRolami", role);
+            }
+
+
+            return RedirectToAction(nameof(ZarzadzajRolami));
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ZmienNazweRoli(string RoleId, string NowaNazwaRoli,string StaraNazwaRoli)
+        {
+            if (string.IsNullOrWhiteSpace(NowaNazwaRoli))
+            {
+                ViewBag.Komunikat = "Nowa nazwa roli nie może być pusta.";
+
+                var role = await _roleService.PobierzRole();
+
+                return View("ZarzadzajRolami", role);
+            }
+
+
+            var wynik = await _roleService.ZmienNazweRoli(
+                RoleId,
+                NowaNazwaRoli.Trim(),
+                StaraNazwaRoli
+            );
+
+
+            if (!wynik)
+            {
+                ViewBag.Komunikat = "Nie udało się zmienić nazwy roli.";
+
+                var role = await _roleService.PobierzRole();
+
+                return View("ZarzadzajRolami", role);
+            }
+
+
+            return RedirectToAction(nameof(ZarzadzajRolami));
+        }
     }
 }

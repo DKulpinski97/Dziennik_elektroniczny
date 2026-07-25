@@ -1,9 +1,13 @@
 using Dzienik_szkolny.Data;
 using Dzienik_szkolny.Models;
+using Dzienik_szkolny.Services;
+using Dzienik_szkolny.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
+
 var builder = WebApplication.CreateBuilder(args);
+
 
 // MVC
 builder.Services.AddControllersWithViews();
@@ -32,16 +36,17 @@ builder.Services.AddIdentity<LoginUzytkownika, IdentityRole>(options =>
 .AddDefaultTokenProviders();
 
 
-// Konfiguracja przekierowania niezalogowanego użytkownika
+// Własne serwisy
+builder.Services.AddScoped<IRoleService, RoleService>();
+
+
+// Konfiguracja ciasteczka Identity
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Logowanie/Login";
     options.AccessDeniedPath = "/Logowanie/BrakDostepu";
 
-    // Automatyczne wylogowanie po bezczynności
     options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-
-    // Odświeżaj czas wygaśnięcia przy aktywności użytkownika
     options.SlidingExpiration = true;
 });
 
@@ -49,6 +54,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 var app = builder.Build();
 
 
+// Obsługa błędów
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -63,14 +69,15 @@ app.UseStaticFiles();
 app.UseRouting();
 
 
-// Kolejność jest poprawna
+// Identity
 app.UseAuthentication();
 app.UseAuthorization();
 
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Logowanie}/{action=Login}/{id?}");
+    pattern: "{controller=Logowanie}/{action=Login}/{id?}"
+);
 
 
 app.Run();

@@ -2,7 +2,6 @@ using Dzienik_szkolny.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using System.Security.Claims;
 
 namespace Dzienik_szkolny.Controllers
 {

@@ -25,10 +25,6 @@
 </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\Interfaces\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="wwwroot\images\logo.png" />
   </ItemGroup>
 

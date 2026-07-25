@@ -6,8 +6,8 @@ namespace Dzienik_szkolny.Controllers
 {
     public class LogowanieController : Controller
     {
-      private readonly UserManager<LoginUzytkownika> _userManager;
-      private readonly SignInManager<LoginUzytkownika> _signInManager;
+        private readonly UserManager<LoginUzytkownika> _userManager;
+        private readonly SignInManager<LoginUzytkownika> _signInManager;
         public LogowanieController(UserManager<LoginUzytkownika> userManager, SignInManager<LoginUzytkownika> signInManager)
         {
             _userManager = userManager;
@@ -59,7 +59,7 @@ namespace Dzienik_szkolny.Controllers
             {
                 return View(loginUzytkownika);
             }
-           
+
 
         }
         [HttpPost]

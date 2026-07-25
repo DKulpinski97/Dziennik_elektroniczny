@@ -6,7 +6,7 @@ namespace Dzienik_szkolny.Models
     {
         [Required]
         public string LoginUzytkownika { get; set; }
-        
+
         [Required]
         public string HasloUzytkownika { get; set; }
     }

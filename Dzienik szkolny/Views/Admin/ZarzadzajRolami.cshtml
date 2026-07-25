@@ -2,45 +2,88 @@
 @{
     ViewData["Title"] = "Zarządzanie rolami";
 }
+
 <div class="container mt-5">
     <div class="row g-4" style="min-height: 75vh;">
 
         <div class="col d-flex">
             <div class="border rounded p-4 w-100">
-                <h2 class="text-center">Admin</h2>
+
+                <h2 class="text-center">Menu dodawania roli</h2>
+
                 @if (ViewBag.Komunikat != null)
                 {
                     <div class="alert alert-danger">
                         @ViewBag.Komunikat
                     </div>
                 }
+
                 @using (Html.BeginForm("DodajRole", "Admin", FormMethod.Post))
                 {
-                    @Html.TextBox("NazwaRoli","",new{@class = "form-control",placeholder = "np. Nauczyciel"})
-                  
+                    @Html.TextBox("NazwaRoli", "", new { @class = "form-control", id = "NazwaRoli", placeholder = "np. Nauczyciel" })
 
                     @Html.AntiForgeryToken()
 
-                    <button type="submit">
+                    <button type="submit" class="btn btn-primary mt-3">
                         Dodaj rolę
                     </button>
                 }
+
+
+                <hr />
+
+                <h2 class="text-center">Zmiana nazwy roli</h2>
+
+                @using (Html.BeginForm("ZmienNazweRoli", "Admin", FormMethod.Post))
+                {
+                    @Html.Hidden("StaraNazwaRoli", "", new { id = "StaraNazwaRoli" })
+
+                    @Html.TextBox("NowaNazwaRoli", "", new { @class = "form-control", id = "NowaNazwaRoli", placeholder = "Nowa nazwa roli" })
+
+                    @Html.Hidden("RoleId", "", new { id = "WybranaRolaId" })
+
+                    <button type="submit" class="btn btn-warning mt-3">
+                        Zmień nazwę
+                    </button>
+                }
+
             </div>
         </div>
 
 
         <div class="col d-flex">
             <div class="border rounded p-4 w-100">
-                <h2 class="text-center">Rodzic</h2>
+
+                <h2 class="text-center">Lista wszystkich roli</h2>
 
                 @model List<IdentityRole>
 
                 @Html.ListBox(
-                    "RoleId",
+                    "RoleList",
                     new SelectList(Model, "Id", "Name"),
-                    new { @class = "form-select", size = 5 }
+                    new { @class = "form-select", size = 10, id = "ListaRol" }
                 )
+
             </div>
         </div>
+
     </div>
 </div>
+
+
+<script>
+    document.getElementById("ListaRol").addEventListener("change", function() {
+
+        let wybranaOpcja = this.options[this.selectedIndex];
+
+        // zapamiętanie starej nazwy
+        document.getElementById("StaraNazwaRoli").value = wybranaOpcja.text;
+
+        // ustawienie nowej nazwy początkowo jako starej
+        document.getElementById("NowaNazwaRoli").value = wybranaOpcja.text;
+
+        // zapis ID roli
+        document.getElementById("WybranaRolaId").value = wybranaOpcja.value;
+
+    });
+</script>
