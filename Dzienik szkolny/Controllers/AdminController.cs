@@ -87,5 +87,22 @@ namespace Dzienik_szkolny.Controllers
 
             return RedirectToAction(nameof(ZarzadzajRolami));
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UsunRole(string RoleId)
+        {
+            var wynik = await _roleService.UsunRole(RoleId);
+
+            if (!wynik)
+            {
+                ViewBag.Komunikat = "Nie udało się usunąć roli.";
+
+                var role = await _roleService.PobierzRole();
+
+                return View("ZarzadzajRolami", role);
+            }
+
+            return RedirectToAction(nameof(ZarzadzajRolami));
+        }
     }
 }

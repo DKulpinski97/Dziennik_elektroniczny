@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Identity;
+
 @{
     ViewData["Title"] = "Zarządzanie rolami";
 }
@@ -24,7 +25,7 @@
 
                     @Html.AntiForgeryToken()
 
-                    <button type="submit" class="btn btn-primary mt-3">
+                    <button type="submit" class="btn btn-warning mt-3 w-100">
                         Dodaj rolę
                     </button>
                 }
@@ -40,10 +41,28 @@
 
                     @Html.TextBox("NowaNazwaRoli", "", new { @class = "form-control", id = "NowaNazwaRoli", placeholder = "Nowa nazwa roli" })
 
-                    @Html.Hidden("RoleId", "", new { id = "WybranaRolaId" })
+                    @Html.Hidden("RoleId", "", new { id = "RoleIdZmiana" })
 
-                    <button type="submit" class="btn btn-warning mt-3">
+                    <button type="submit" class="btn btn-warning mt-3 w-100">
                         Zmień nazwę
+                    </button>
+                }
+
+
+                <h2 class="text-center mt-4">Usuń</h2>
+
+                @using (Html.BeginForm("UsunRole", "Admin", FormMethod.Post))
+                {
+                    <label id="NazwaDoUsuniecia">
+                        Brak wybranej roli
+                    </label>
+
+                    <br />
+
+                    @Html.Hidden("RoleId", "", new { id = "RoleIdUsun" })
+
+                    <button type="submit" class="btn btn-warning mt-3 w-100">
+                        Usuń
                     </button>
                 }
 
@@ -54,7 +73,7 @@
         <div class="col d-flex">
             <div class="border rounded p-4 w-100">
 
-                <h2 class="text-center">Lista wszystkich roli</h2>
+                <h2 class="text-center">Lista wszystkich ról</h2>
 
                 @model List<IdentityRole>
 
@@ -76,14 +95,22 @@
 
         let wybranaOpcja = this.options[this.selectedIndex];
 
-        // zapamiętanie starej nazwy
-        document.getElementById("StaraNazwaRoli").value = wybranaOpcja.text;
+        let nazwaRoli = wybranaOpcja.text;
+        let idRoli = wybranaOpcja.value;
 
-        // ustawienie nowej nazwy początkowo jako starej
-        document.getElementById("NowaNazwaRoli").value = wybranaOpcja.text;
 
-        // zapis ID roli
-        document.getElementById("WybranaRolaId").value = wybranaOpcja.value;
+        // etykieta usuwania
+        document.getElementById("NazwaDoUsuniecia").textContent = nazwaRoli;
+
+
+        // formularz zmiany nazwy
+        document.getElementById("StaraNazwaRoli").value = nazwaRoli;
+        document.getElementById("NowaNazwaRoli").value = nazwaRoli;
+        document.getElementById("RoleIdZmiana").value = idRoli;
+
+
+        // formularz usuwania
+        document.getElementById("RoleIdUsun").value = idRoli;
 
     });
 </script>
