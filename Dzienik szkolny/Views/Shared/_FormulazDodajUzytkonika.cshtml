@@ -1,0 +1,61 @@
+﻿@model Dzienik_szkolny.ViewModels.DodajUzytkownikaViewModel
+<div class="mb-3">
+    @Html.LabelFor(x => x.Login, new { @class = "form-label" })
+    @Html.TextBoxFor(x => x.Login, new { @class = "form-control" })
+    @Html.ValidationMessageFor(x => x.Login, "", new { @class = "text-danger" })
+</div>
+<div class="mb-3">
+    @Html.LabelFor(x => x.Email, new { @class = "form-label" })
+    @Html.TextBoxFor(x => x.Email, new { @class = "form-control" })
+    @Html.ValidationMessageFor(x => x.Email, "", new { @class = "text-danger" })
+</div>
+
+<div class="mb-3">
+    @Html.LabelFor(x => x.Haslo, new { @class = "form-label" })
+    @Html.PasswordFor(x => x.Haslo, new { @class = "form-control" })
+    @Html.ValidationMessageFor(x => x.Haslo, "", new { @class = "text-danger" })
+</div>
+
+<hr />
+
+<div class="mb-3">
+    @Html.LabelFor(x => x.Imie, new { @class = "form-label" })
+    @Html.TextBoxFor(x => x.Imie, new { @class = "form-control" })
+    @Html.ValidationMessageFor(x => x.Imie, "", new { @class = "text-danger" })
+</div>
+
+<div class="mb-3">
+    @Html.LabelFor(x => x.Nazwisko, new { @class = "form-label" })
+    @Html.TextBoxFor(x => x.Nazwisko, new { @class = "form-control" })
+    @Html.ValidationMessageFor(x => x.Nazwisko, "", new { @class = "text-danger" })
+</div>
+
+<div class="mb-3">
+    @Html.LabelFor(x => x.Pesel, new { @class = "form-label" })
+    @Html.TextBoxFor(x => x.Pesel, new { @class = "form-control" })
+    @Html.ValidationMessageFor(x => x.Pesel, "", new { @class = "text-danger" })
+</div>
+
+<div class="mb-3">
+    @Html.LabelFor(x => x.Telefon, new { @class = "form-label" })
+    @Html.TextBoxFor(x => x.Telefon, new { @class = "form-control" })
+    @Html.ValidationMessageFor(x => x.Telefon, "", new { @class = "text-danger" })
+</div>
+
+<div class="mb-3">
+    @Html.LabelFor(x => x.Miasto, new { @class = "form-label" })
+    @Html.TextBoxFor(x => x.Miasto, new { @class = "form-control" })
+    @Html.ValidationMessageFor(x => x.Miasto, "", new { @class = "text-danger" })
+</div>
+
+<div class="mb-3">
+    @Html.LabelFor(x => x.Ulica, new { @class = "form-label" })
+    @Html.TextBoxFor(x => x.Ulica, new { @class = "form-control" })
+    @Html.ValidationMessageFor(x => x.Ulica, "", new { @class = "text-danger" })
+</div>
+
+<div class="mb-3">
+    @Html.LabelFor(x => x.NrMieszkania, new { @class = "form-label" })
+    @Html.TextBoxFor(x => x.NrMieszkania, new { @class = "form-control" })
+    @Html.ValidationMessageFor(x => x.NrMieszkania, "", new { @class = "text-danger" })
+</div>

@@ -1,0 +1,106 @@
+﻿@model Dzienik_szkolny.ViewModels.DodajUzytkownikaViewModel
+
+@{
+    ViewData["Title"] = "Dodaj użytkownika";
+}
+
+<div class="container mt-5">
+    @if (ViewBag.Komunikat != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.Komunikat
+        </div>
+    }
+    @if (ViewBag.Wiadomość != null)
+    {
+        if (ViewBag.Wiadomość == "Użytkownik dodany")
+        {
+            <div class="alert alert-success">
+                @ViewBag.Wiadomość
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-danger">
+                @ViewBag.Wiadomość
+            </div>
+        }
+    }
+    <div class="row">
+
+        <!-- Formularz użytkownika -->
+        <div class="col-md-6 d-flex">
+            <div class="border rounded p-4 w-100">
+
+                <h3 class="text-center">Dodaj użytkownika</h3>
+
+                @using (Html.BeginForm("DodajUzytkownika", "Admin", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                    <partial name="_FormulazDodajUzytkonika" model="Model" />
+
+                    <div id="UkryteRole"></div>
+
+                    <button type="submit" class="btn btn-primary w-100 mt-3">
+                        Dodaj użytkownika
+                    </button>
+                }
+
+            </div>
+        </div>
+
+
+        <!-- Lista ról -->
+        <div class="col-md-6 d-flex">
+            <div class="border rounded p-4 w-100">
+
+                <h3 class="text-center">Lista wszystkich ról</h3>
+
+                @Html.ListBoxFor(
+                    x => x.IdRoli,
+                    new MultiSelectList(Model.Role, "Id", "Name"),
+                    new
+                    {
+                        @class = "form-select",
+                        size = 10,
+                        id = "ListaRol"
+                    }
+                )
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const listaRol = document.getElementById("ListaRol");
+        const ukryteRole = document.getElementById("UkryteRole");
+
+        listaRol.addEventListener("change", function() {
+
+            ukryteRole.innerHTML = "";
+
+            Array.from(this.selectedOptions).forEach(option => {
+
+                let input = document.createElement("input");
+
+                input.type = "hidden";
+                input.name = "IdRoli";
+                input.value = option.value;
+
+                ukryteRole.appendChild(input);
+
+            });
+
+        });
+
+    });
+</script>

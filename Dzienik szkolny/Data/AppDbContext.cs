@@ -10,9 +10,7 @@ namespace Dzienik_szkolny.Data
             : base(options)
         {
         }
-        public DbSet<InformacjeRodzic> InformacjeUzytkownik { get; set; }
-        public DbSet<AdresUzytkownika> AdresUzytkownika { get; set; }
-        public DbSet<InformacjePracownik> InformacjePracownik { get; set; }
+        public DbSet<InformacjeUzytkownik> InformacjeUzytkownik { get; set; }
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {
             base.ConfigureConventions(configurationBuilder);

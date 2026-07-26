@@ -4,6 +4,7 @@ using Dzienik_szkolny.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dzienik_szkolny.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260726071824_PoprawionoTabeleUzytkownicy")]
+    partial class PoprawionoTabeleUzytkownicy
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,9 +33,8 @@ namespace Dzienik_szkolny.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("IdOsoby"));
 
-                    b.Property<string>("IdUzytkownika")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                    b.Property<long>("IdUzytkownika")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Imie")
                         .IsRequired()
@@ -69,9 +71,12 @@ namespace Dzienik_szkolny.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
+                    b.Property<string>("loginUzytkownikaId")
+                        .HasColumnType("varchar(255)");
+
                     b.HasKey("IdOsoby");
 
-                    b.HasIndex("IdUzytkownika");
+                    b.HasIndex("loginUzytkownikaId");
 
                     b.ToTable("InformacjeUzytkownik");
                 });
@@ -274,13 +279,11 @@ namespace Dzienik_szkolny.Migrations
 
             modelBuilder.Entity("Dzienik_szkolny.Models.InformacjeUzytkownik", b =>
                 {
-                    b.HasOne("Dzienik_szkolny.Models.LoginUzytkownika", "LoginUzytkownika")
+                    b.HasOne("Dzienik_szkolny.Models.LoginUzytkownika", "loginUzytkownika")
                         .WithMany()
-                        .HasForeignKey("IdUzytkownika")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("loginUzytkownikaId");
 
-                    b.Navigation("LoginUzytkownika");
+                    b.Navigation("loginUzytkownika");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

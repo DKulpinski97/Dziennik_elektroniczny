@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Dzienik_szkolny.ViewModels;
+using Microsoft.AspNetCore.Identity;
 
 namespace Dzienik_szkolny.Services.Interfaces
 {

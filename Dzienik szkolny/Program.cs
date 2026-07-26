@@ -38,6 +38,7 @@ builder.Services.AddIdentity<LoginUzytkownika, IdentityRole>(options =>
 
 // Własne serwisy
 builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IUzytkownikService, UzytkownikService>();
 
 
 // Konfiguracja ciasteczka Identity

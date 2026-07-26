@@ -1,19 +1,31 @@
-﻿using Dzienik_szkolny.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+﻿using Dzienik_szkolny.Data;
+using Dzienik_szkolny.Models;
+using Dzienik_szkolny.Services;
+using Dzienik_szkolny.Services.Interfaces;
+using Dzienik_szkolny.ViewModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace Dzienik_szkolny.Controllers
 {
     public class AdminController : Controller
     {
         private readonly IRoleService _roleService;
+        private readonly IUzytkownikService _UzytkownikService;
+        private readonly AppDbContext _context;
+        private readonly UserManager<LoginUzytkownika> _userManager;
 
-        public AdminController(IRoleService roleService)
+        public AdminController(IRoleService roleService, AppDbContext appDbContext, UserManager<LoginUzytkownika> userManager, IUzytkownikService uzytkownikService )
         {
             _roleService = roleService;
+            _context = appDbContext;
+            _userManager = userManager;
+            _UzytkownikService = uzytkownikService;
         }
 
-
+        /*=================Zarządzanie Rolami==================*/
         [HttpGet]
         public async Task<IActionResult> ZarzadzajRolami()
         {
@@ -56,7 +68,7 @@ namespace Dzienik_szkolny.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ZmienNazweRoli(string RoleId, string NowaNazwaRoli,string StaraNazwaRoli)
+        public async Task<IActionResult> ZmienNazweRoli(string RoleId, string NowaNazwaRoli, string StaraNazwaRoli)
         {
             if (string.IsNullOrWhiteSpace(NowaNazwaRoli))
             {
@@ -103,6 +115,37 @@ namespace Dzienik_szkolny.Controllers
             }
 
             return RedirectToAction(nameof(ZarzadzajRolami));
+        }
+
+        /*=================Zarządzanie Użytkownikami==================*/
+        [HttpGet]
+        public async Task<IActionResult> DodajUzytkownika()
+        {
+            var model = new DodajUzytkownikaViewModel
+            {
+                Role = await _roleService.PobierzRole()
+            };
+
+            return View(model);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DodajUzytkownika(DodajUzytkownikaViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.Role = await _roleService.PobierzRole();
+                return View(model);
+            }
+            if(model.Role.Count==0)
+            {
+                ViewBag.Komunikat = "Musisz wybrać przynajmiej jedną role";
+                model.Role = await _roleService.PobierzRole();
+                return View(model);
+            }
+            ViewBag.Wiadomość =  _UzytkownikService.DodajUzytkownikaAsync(model);
+            
+            return View();
         }
     }
 }
