@@ -137,15 +137,22 @@ namespace Dzienik_szkolny.Controllers
                 model.Role = await _roleService.PobierzRole();
                 return View(model);
             }
-            if(model.Role.Count==0)
+            if (model.IdRoli.Count == 0)
             {
-                ViewBag.Komunikat = "Musisz wybrać przynajmiej jedną role";
+                TempData["Wiadomosc"] = "Musisz wybrać przynajmiej jedną role";
                 model.Role = await _roleService.PobierzRole();
                 return View(model);
             }
-            ViewBag.Wiadomość =  _UzytkownikService.DodajUzytkownikaAsync(model);
-            
-            return View();
+            TempData["Wiadomosc"] = _UzytkownikService.DodajUzytkownikaAsync(model).Result.Komunikat;
+            if (TempData["Wiadomosc"].ToString() == "Użytkownik dodany")
+            {
+                return RedirectToAction("DodajUzytkownika");
+            }
+            else
+            {
+                model.Role = await _roleService.PobierzRole();
+                return View(model);
+            }
         }
     }
 }

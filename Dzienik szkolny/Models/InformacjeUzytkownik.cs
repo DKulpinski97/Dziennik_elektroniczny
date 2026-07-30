@@ -7,6 +7,7 @@ namespace Dzienik_szkolny.Models
     {
 
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long IdOsoby { get; set; }
         [Required]
         [MaxLength(20)]

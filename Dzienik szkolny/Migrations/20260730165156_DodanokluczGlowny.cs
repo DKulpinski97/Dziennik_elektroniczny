@@ -5,7 +5,7 @@
 namespace Dzienik_szkolny.Migrations
 {
     /// <inheritdoc />
-    public partial class DodanoKluczObcy : Migration
+    public partial class DodanokluczGlowny : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

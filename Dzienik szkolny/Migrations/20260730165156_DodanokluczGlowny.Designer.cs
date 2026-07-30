@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dzienik_szkolny.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260726072217_DodanoKluczObcy")]
-    partial class DodanoKluczObcy
+    [Migration("20260730165156_DodanokluczGlowny")]
+    partial class DodanokluczGlowny
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

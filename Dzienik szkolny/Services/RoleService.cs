@@ -16,9 +16,10 @@ namespace Dzienik_szkolny.Services
         public async Task<List<IdentityRole>> PobierzRole()
         {
             return await _roleManager.Roles
-                .Where(x => !string.Equals(x.Name, "Brak roli"))
-                .OrderBy(x => x.Name)
-                .ToListAsync();
+    .Where(x => x.Name != "Brak roli" &&
+                x.Name != "Uczeń")
+    .OrderBy(x => x.Name)
+    .ToListAsync();
         }
         public async Task<bool> ZmienNazweRoli(string roleId, string nowaNazwa, string staraNazwa)
         {
