@@ -1,12 +1,9 @@
 ﻿using Dzienik_szkolny.Data;
 using Dzienik_szkolny.Models;
-using Dzienik_szkolny.Services;
 using Dzienik_szkolny.Services.Interfaces;
 using Dzienik_szkolny.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Data;
 
 namespace Dzienik_szkolny.Controllers
 {
@@ -17,7 +14,7 @@ namespace Dzienik_szkolny.Controllers
         private readonly AppDbContext _context;
         private readonly UserManager<LoginUzytkownika> _userManager;
 
-        public AdminController(IRoleService roleService, AppDbContext appDbContext, UserManager<LoginUzytkownika> userManager, IUzytkownikService uzytkownikService )
+        public AdminController(IRoleService roleService, AppDbContext appDbContext, UserManager<LoginUzytkownika> userManager, IUzytkownikService uzytkownikService)
         {
             _roleService = roleService;
             _context = appDbContext;
@@ -144,6 +141,19 @@ namespace Dzienik_szkolny.Controllers
                 return View(model);
             }
             TempData["Wiadomosc"] = _UzytkownikService.DodajUzytkownikaAsync(model).Result.Komunikat;
+            if (TempData["Wiadomosc"].ToString() == "Użytkownik dodany")
+            {
+                return RedirectToAction("DodajUzytkownika");
+            }
+            else
+            {
+                model.Role = await _roleService.PobierzRole();
+                return View(model);
+            }
+        }
+        public async Task<IActionResult> PriperStartUzytkownika(DodajUzytkownikaViewModel model)
+        {
+
             if (TempData["Wiadomosc"].ToString() == "Użytkownik dodany")
             {
                 return RedirectToAction("DodajUzytkownika");

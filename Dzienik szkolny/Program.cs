@@ -2,6 +2,8 @@ using Dzienik_szkolny.Data;
 using Dzienik_szkolny.Models;
 using Dzienik_szkolny.Services;
 using Dzienik_szkolny.Services.Interfaces;
+using Dziennik_szkolny.Services;
+using Dziennik_szkolny.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,6 +41,7 @@ builder.Services.AddIdentity<LoginUzytkownika, IdentityRole>(options =>
 // Własne serwisy
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUzytkownikService, UzytkownikService>();
+builder.Services.AddScoped<IDodajDaneStartowe, DodajDaneStartowe>();
 
 
 // Konfiguracja ciasteczka Identity
@@ -51,8 +54,12 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 });
 
-
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<IDodajDaneStartowe>();
+    await seeder.DodajDaneStartoweAsync();
+}
 
 
 // Obsługa błędów

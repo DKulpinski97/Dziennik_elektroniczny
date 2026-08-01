@@ -10,7 +10,7 @@ namespace Dzienik_szkolny.Controllers
     {
         public IActionResult Index()
         {
-            
+
             return View();
         }
 
