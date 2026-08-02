@@ -1,0 +1,157 @@
+﻿@{
+    ViewData["Title"] = "Edycja użytkowników";
+}
+
+<div class="container mt-5">
+
+    <h2 class="mb-4 text-center">
+        Edycja danych użytkowników
+    </h2>
+
+
+    <div class="row g-4">
+
+        <!-- Rodzice -->
+        <div class="col-md-4">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header bg-primary text-white">
+                    Rodzice
+                </div>
+
+                <div class="card-body">
+
+                    <select class="form-select"
+                            id="Rodzice"
+                            name="RodzicId"
+                            size="12">
+
+                        @foreach (var rodzic in ViewBag.Rodzice)
+                        {
+                            <option value="@rodzic.Value">
+                                @rodzic.Text
+                            </option>
+                        }
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Pracownicy -->
+        <div class="col-md-4">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header bg-success text-white">
+                    Pracownicy
+                </div>
+
+                <div class="card-body">
+
+                    <select class="form-select"
+                            id="Pracownicy"
+                            name="PracownikId"
+                            size="12">
+
+                        @foreach (var pracownik in ViewBag.Pracownicy)
+                        {
+                            <option value="@pracownik.Value">
+                                @pracownik.Text
+                            </option>
+                        }
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Panel edycji -->
+        <div class="col-md-4">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header bg-warning">
+                    Operacje
+                </div>
+
+
+                <div class="card-body">
+
+                    <p>
+                        Wybierz użytkownika z jednej z list,
+                        aby rozpocząć edycję.
+                    </p>
+
+
+                    <!-- Ukryte pole z ID użytkownika -->
+                    <input type="hidden" id="WybranyUzytkownikId" name="IdUzytkownika" />
+
+
+                    <form asp-controller="Admin" asp-action="EdytujUzytkownika" method="get">
+
+                        <input type="hidden" id="EdytujId" name="id" />
+
+                        <button type="submit"
+                                class="btn btn-primary w-100 mb-2">
+                            Edytuj dane
+                        </button>
+
+                    </form>
+
+
+                    <form asp-controller="Admin" asp-action="UsunUzytkownika" method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" id="UsunId" name="id" />
+
+                        <button type="submit"
+                                class="btn btn-danger w-100">
+                            Usuń użytkownika
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+<script>
+
+    function ustawIdUzytkownika(id) {
+        document.getElementById("WybranyUzytkownikId").value = id;
+        document.getElementById("EdytujId").value = id;
+        document.getElementById("UsunId").value = id;
+    }
+
+
+    document.getElementById("Rodzice")
+        .addEventListener("change", function() {
+            ustawIdUzytkownika(this.value);
+        });
+
+
+    document.getElementById("Pracownicy")
+        .addEventListener("change", function() {
+            ustawIdUzytkownika(this.value);
+        });
+
+</script>

@@ -4,6 +4,8 @@ using Dzienik_szkolny.Services.Interfaces;
 using Dzienik_szkolny.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dzienik_szkolny.Controllers
 {
@@ -114,7 +116,7 @@ namespace Dzienik_szkolny.Controllers
             return RedirectToAction(nameof(ZarzadzajRolami));
         }
 
-        /*=================Zarządzanie Użytkownikami==================*/
+        /*=================Dodawanie Użytkownikami==================*/
         [HttpGet]
         public async Task<IActionResult> DodajUzytkownika()
         {
@@ -163,6 +165,167 @@ namespace Dzienik_szkolny.Controllers
                 model.Role = await _roleService.PobierzRole();
                 return View(model);
             }
+        }
+        /*=================Wybór Użytkownikami==================*/
+        [HttpGet]
+        public async Task<IActionResult> EdytujDaneUzytkownika()
+        {
+            DodajUzytkownikaViewModel dodajUzytkownikaViewModel = null; 
+            var uzytkownicy = await _userManager.Users.ToListAsync();
+
+            var informacje = await _context.InformacjeUzytkownik
+                .ToListAsync();
+
+
+            List<SelectListItem> rodzice = new();
+            List<SelectListItem> pracownicy = new();
+
+
+            // Role, które traktujemy jako pracowników szkoły
+            var rolePracownikow = new List<string>
+    {
+        "Admin",
+        "Nauczyciel",
+        "Dyrektor",
+        "ViceDyrektor",
+        "Sekretarka"
+    };
+
+
+            foreach (var uzytkownik in uzytkownicy)
+            {
+                var roleUzytkownika = await _userManager.GetRolesAsync(uzytkownik);
+
+
+                var dane = informacje
+                    .FirstOrDefault(x => x.IdUzytkownika == uzytkownik.Id);
+
+
+                if (dane == null)
+                {
+                    continue;
+                }
+
+
+                var element = new SelectListItem
+                {
+                    Value = uzytkownik.Id,
+                    Text = $"{dane.Imie} {dane.Nazwisko}"
+                };
+
+
+                bool jestPracownikiem = roleUzytkownika.Any(r => rolePracownikow.Contains(r));
+
+
+                bool jestRodzicem = roleUzytkownika.Any(r => r == "Rodzić");
+
+
+                // Pracownik jest piorytetem
+                if (jestPracownikiem)
+                {
+                    pracownicy.Add(element);
+                }
+                else if (jestRodzicem)
+                {
+                    rodzice.Add(element);
+                }
+            }
+
+
+            ViewBag.Rodzice = rodzice;
+            ViewBag.Pracownicy = pracownicy;
+
+
+            return View();
+        }
+        /*=================Edycja konkretnego Użytkownika==================*/
+        [HttpGet]
+        public async Task<IActionResult> EdytujUzytkownika(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction(nameof(EdytujDaneUzytkownika));
+            }
+
+
+            // Pobranie użytkownika z Identity
+            var uzytkownik = await _userManager.FindByIdAsync(id);
+
+
+            if (uzytkownik == null)
+            {
+                TempData["Wiadomosc"] = "Nie znaleziono użytkownika.";
+                return RedirectToAction(nameof(EdytujDaneUzytkownika));
+            }
+
+
+            // Pobranie danych osobowych
+            var informacje = await _context.InformacjeUzytkownik
+                .FirstOrDefaultAsync(x => x.IdUzytkownika == id);
+
+
+            if (informacje == null)
+            {
+                TempData["Wiadomosc"] = "Brak danych osobowych użytkownika.";
+                return RedirectToAction(nameof(EdytujDaneUzytkownika));
+            }
+
+
+            // Pobranie ról użytkownika
+            var role = await _userManager.GetRolesAsync(uzytkownik);
+            return View();
+        }
+        /*=================usuwanie konkretnego Użytkownika==================*/
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UsunUzytkownika(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                TempData["Wiadomosc"] = "Nie wybrano użytkownika.";
+                return RedirectToAction(nameof(EdytujDaneUzytkownika));
+            }
+
+
+            // Pobranie użytkownika Identity
+            var uzytkownik = await _userManager.FindByIdAsync(id);
+
+
+            if (uzytkownik == null)
+            {
+                TempData["Wiadomosc"] = "Nie znaleziono użytkownika.";
+                return RedirectToAction(nameof(EdytujDaneUzytkownika));
+            }
+
+
+            // Usunięcie danych osobowych
+            var informacje = await _context.InformacjeUzytkownik
+                .FirstOrDefaultAsync(x => x.IdUzytkownika == id);
+
+
+            if (informacje != null)
+            {
+                _context.InformacjeUzytkownik.Remove(informacje);
+                await _context.SaveChangesAsync();
+            }
+
+
+            // Usunięcie konta Identity
+            var wynik = await _userManager.DeleteAsync(uzytkownik);
+
+
+            if (!wynik.Succeeded)
+            {
+                TempData["Wiadomosc"] = "Nie udało się usunąć użytkownika.";
+
+                return RedirectToAction(nameof(EdytujDaneUzytkownika));
+            }
+
+
+            TempData["Wiadomosc"] = "Użytkownik został usunięty.";
+
+
+            return RedirectToAction(nameof(EdytujDaneUzytkownika));
         }
     }
 }

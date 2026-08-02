@@ -6,11 +6,9 @@ namespace Dzienik_szkolny.Controllers
 {
     public class LogowanieController : Controller
     {
-        private readonly UserManager<LoginUzytkownika> _userManager;
         private readonly SignInManager<LoginUzytkownika> _signInManager;
-        public LogowanieController(UserManager<LoginUzytkownika> userManager, SignInManager<LoginUzytkownika> signInManager)
+        public LogowanieController(SignInManager<LoginUzytkownika> signInManager)
         {
-            _userManager = userManager;
             _signInManager = signInManager;
         }
         [HttpGet]
@@ -42,30 +40,7 @@ namespace Dzienik_szkolny.Controllers
             return View(Login);
 
         }
-        [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
-        [HttpPost]
-        public async Task<IActionResult> Register(LoginUzytkownika loginUzytkownika)
-        {
-            var result = await _userManager.CreateAsync(
-        loginUzytkownika,
-        loginUzytkownika.PasswordHash
-    );
-
-            if (result.Succeeded)
-            {
-                return RedirectToAction("Index", "Home");
-            }
-            else
-            {
-                return View(loginUzytkownika);
-            }
-
-
-        }
+ 
         [HttpPost]
         public async Task<IActionResult> Wyloguj()
         {

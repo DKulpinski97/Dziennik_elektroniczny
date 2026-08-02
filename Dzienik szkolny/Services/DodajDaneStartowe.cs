@@ -24,7 +24,7 @@ namespace Dziennik_szkolny.Services
         public async Task DodajDaneStartoweAsync()
         {
             //przypisywanie roli 
-            List<string> role = new List<string> { "Admin", "Nauczyciel", "Uczen", "Brak roli", "Dyrektor", "Vice derektor", "Sekretarka", "Rodzić" };
+            List<string> role = new List<string> { "Admin", "Nauczyciel", "Uczen", "Brak roli", "Dyrektor", "ViceDerektor", "Sekretarka", "Rodzić" };
             await DodajRoleStartowe(role);
 
             //lista logionów
