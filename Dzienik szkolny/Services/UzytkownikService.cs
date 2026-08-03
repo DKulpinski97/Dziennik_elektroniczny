@@ -353,5 +353,42 @@ namespace Dzienik_szkolny.Services
 
             return kontrolna == pesel[10] - '0';
         }
+
+        public async Task<DodajUzytkownikaViewModel> PrzygotujDaneDoEdycjiAsync(InformacjeUzytkownik informacjeUzytkownik, string iDUser)
+        {
+            var login = await _userManager.FindByIdAsync(iDUser);
+
+
+            var nazwyRol = await _userManager.GetRolesAsync(login);
+
+            var roleUzytkownika = new List<IdentityRole>();
+
+            foreach (var nazwaRoli in nazwyRol)
+            {
+                var rola = await _roleManager.FindByNameAsync(nazwaRoli);
+
+                if (rola != null)
+                {
+                    roleUzytkownika.Add(rola);
+                }
+            }
+
+            DodajUzytkownikaViewModel dodajUzytkownikaViewModel = new DodajUzytkownikaViewModel
+            {
+                Login = login.UserName,
+                Email = login.Email,
+                Haslo = null, // Hasło nie jest przechowywane w jawnej postaci.
+                Imie = informacjeUzytkownik.Imie,
+                Nazwisko = informacjeUzytkownik.Nazwisko,
+                Pesel = informacjeUzytkownik.Pesel,
+                Telefon = informacjeUzytkownik.Telefon,
+                Miasto = informacjeUzytkownik.Miasto,
+                Ulica = informacjeUzytkownik.Ulica,
+                NrMieszkania = informacjeUzytkownik.NrMieszkania,
+                Role = roleUzytkownika
+            };
+
+            return dodajUzytkownikaViewModel;
+        }
     }
 }

@@ -12,7 +12,7 @@ namespace Dzienik_szkolny.Controllers
     public class AdminController : Controller
     {
         private readonly IRoleService _roleService;
-        private readonly IUzytkownikService _UzytkownikService;
+        private readonly IUzytkownikService _uzytkownikService;
         private readonly AppDbContext _context;
         private readonly UserManager<LoginUzytkownika> _userManager;
 
@@ -21,7 +21,7 @@ namespace Dzienik_szkolny.Controllers
             _roleService = roleService;
             _context = appDbContext;
             _userManager = userManager;
-            _UzytkownikService = uzytkownikService;
+            _uzytkownikService = uzytkownikService;
         }
 
         /*=================Zarządzanie Rolami==================*/
@@ -142,7 +142,7 @@ namespace Dzienik_szkolny.Controllers
                 model.Role = await _roleService.PobierzRole();
                 return View(model);
             }
-            TempData["Wiadomosc"] = _UzytkownikService.DodajUzytkownikaAsync(model).Result.Komunikat;
+            TempData["Wiadomosc"] = _uzytkownikService.DodajUzytkownikaAsync(model).Result.Komunikat;
             if (TempData["Wiadomosc"].ToString() == "Użytkownik dodany")
             {
                 return RedirectToAction("DodajUzytkownika");
@@ -238,61 +238,68 @@ namespace Dzienik_szkolny.Controllers
 
             return View();
         }
-        /*=================Edycja konkretnego Użytkownika==================*/
+        /*=================Przygotuj dane do edycji==================*/
         [HttpGet]
-        public async Task<IActionResult> EdytujUzytkownika(string id)
+        public async Task<IActionResult> PrzygotujUżytkonikaDoEdycji(string idUzytkownika)
         {
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(idUzytkownika))
             {
+                TempData["TypWiadomosci"] = "info";
+                TempData["Wiadomosc"] = "Nie wybrano użytkownika.";
                 return RedirectToAction(nameof(EdytujDaneUzytkownika));
             }
 
 
             // Pobranie użytkownika z Identity
-            var uzytkownik = await _userManager.FindByIdAsync(id);
+            var uzytkownik = await _userManager.FindByIdAsync(idUzytkownika);
 
 
             if (uzytkownik == null)
             {
+                TempData["TypWiadomosci"] = "info";
                 TempData["Wiadomosc"] = "Nie znaleziono użytkownika.";
                 return RedirectToAction(nameof(EdytujDaneUzytkownika));
             }
 
 
             // Pobranie danych osobowych
-            var informacje = await _context.InformacjeUzytkownik
-                .FirstOrDefaultAsync(x => x.IdUzytkownika == id);
+            var informacjeUzytkownik = await _context.InformacjeUzytkownik.FirstOrDefaultAsync(x => x.IdUzytkownika == idUzytkownika);
 
 
-            if (informacje == null)
+            if (informacjeUzytkownik == null)
             {
+                TempData["TypWiadomosci"] = "info";
                 TempData["Wiadomosc"] = "Brak danych osobowych użytkownika.";
                 return RedirectToAction(nameof(EdytujDaneUzytkownika));
             }
 
 
-            // Pobranie ról użytkownika
-            var role = await _userManager.GetRolesAsync(uzytkownik);
-            return View();
+            // Przygotowanie danych do formularza edycji
+            var viewModel = await _uzytkownikService.PrzygotujDaneDoEdycjiAsync(informacjeUzytkownik, idUzytkownika);
+            var role = await _roleService.PobierzRole();
+            
+            return View("WidokEdycjiUzytkownika", viewModel);
         }
         /*=================usuwanie konkretnego Użytkownika==================*/
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UsunUzytkownika(string id)
+        public async Task<IActionResult> UsunUzytkownika(string IdUzytkownika)
         {
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(IdUzytkownika))
             {
+                TempData["TypWiadomosci"] = "info";
                 TempData["Wiadomosc"] = "Nie wybrano użytkownika.";
                 return RedirectToAction(nameof(EdytujDaneUzytkownika));
             }
 
 
             // Pobranie użytkownika Identity
-            var uzytkownik = await _userManager.FindByIdAsync(id);
+            var uzytkownik = await _userManager.FindByIdAsync(IdUzytkownika);
 
 
             if (uzytkownik == null)
             {
+                TempData["TypWiadomosci"] = "info";
                 TempData["Wiadomosc"] = "Nie znaleziono użytkownika.";
                 return RedirectToAction(nameof(EdytujDaneUzytkownika));
             }
@@ -300,7 +307,7 @@ namespace Dzienik_szkolny.Controllers
 
             // Usunięcie danych osobowych
             var informacje = await _context.InformacjeUzytkownik
-                .FirstOrDefaultAsync(x => x.IdUzytkownika == id);
+                .FirstOrDefaultAsync(x => x.IdUzytkownika == IdUzytkownika);
 
 
             if (informacje != null)
@@ -316,12 +323,13 @@ namespace Dzienik_szkolny.Controllers
 
             if (!wynik.Succeeded)
             {
+                TempData["TypWiadomosci"] = "danger";
                 TempData["Wiadomosc"] = "Nie udało się usunąć użytkownika.";
 
                 return RedirectToAction(nameof(EdytujDaneUzytkownika));
             }
 
-
+            TempData["TypWiadomosci"] = "success";
             TempData["Wiadomosc"] = "Użytkownik został usunięty.";
 
 

@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Edycja użytkowników";
+    ViewData["Title"] = "Zarządzaj użytkownikami";
 }
 
 <div class="container mt-5">
@@ -7,11 +7,68 @@
     <h2 class="mb-4 text-center">
         Edycja danych użytkowników
     </h2>
-
+    @if (TempData["Wiadomosc"] != null)
+    {
+        <div class="alert alert-@TempData["TypWiadomosci"]">
+            @TempData["Wiadomosc"]
+        </div>
+    }
 
     <div class="row g-4">
+        <!-- Panel edycji -->
+        <div class="col-md-4">
 
-        <!-- Rodzice -->
+            <div class="card shadow-sm">
+
+                <div class="card-header bg-warning">
+                    Operacje
+                </div>
+
+
+                <div class="card-body">
+
+                    <p>
+                        Wybierz użytkownika z jednej z list,
+                        aby rozpocząć edycję lub usuwanie użytkownika.
+                    </p>
+
+
+                    <!-- Ukryte pole z ID użytkownika -->
+                    @Html.Hidden("IdUzytkownika", null, new { id = "WybranyUzytkownikId" })
+
+
+                    @using (Html.BeginForm("PrzygotujUżytkonikaDoEdycji", "Admin", FormMethod.Get))
+                    {
+                        @Html.Hidden("IdUzytkownika", null, new { id = "EdytujId" })
+
+                        <button type="submit" class="btn btn-primary w-100 mb-2">
+                            Edytuj dane
+                        </button>
+                    }
+
+
+                    @using (Html.BeginForm("UsunUzytkownika", "Admin", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        @Html.Hidden("IdUzytkownika", null, new { id = "UsunId" })
+
+                        <button type="submit"
+                                class="btn btn-danger w-100"
+                                onclick="return confirm('Czy na pewno chcesz usunąć użytkownika: ' + wybranyUzytkownik + '?');">
+                            Usuń użytkownika
+                        </button>
+                    }
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-warning mt-3 w-100">
+                        Powróć do poprzedniego menu
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+        <!-- Rodzice  -->
         <div class="col-md-4">
 
             <div class="card shadow-sm">
@@ -26,7 +83,7 @@
                             id="Rodzice"
                             name="RodzicId"
                             size="12">
-
+                        <!-- ViewBag zamiast VievModel bo to projekt pokazowy i nie ma potrzeby nadmiernie komplikować systemu  -->
                         @foreach (var rodzic in ViewBag.Rodzice)
                         {
                             <option value="@rodzic.Value">
@@ -59,7 +116,7 @@
                             id="Pracownicy"
                             name="PracownikId"
                             size="12">
-
+                        <!-- ViewBag zamiast VievModel bo to projekt pokazowy i nie ma potrzeby nadmiernie komplikować systemu  -->
                         @foreach (var pracownik in ViewBag.Pracownicy)
                         {
                             <option value="@pracownik.Value">
@@ -74,69 +131,20 @@
             </div>
 
         </div>
-
-
-
-        <!-- Panel edycji -->
-        <div class="col-md-4">
-
-            <div class="card shadow-sm">
-
-                <div class="card-header bg-warning">
-                    Operacje
-                </div>
-
-
-                <div class="card-body">
-
-                    <p>
-                        Wybierz użytkownika z jednej z list,
-                        aby rozpocząć edycję.
-                    </p>
-
-
-                    <!-- Ukryte pole z ID użytkownika -->
-                    <input type="hidden" id="WybranyUzytkownikId" name="IdUzytkownika" />
-
-
-                    <form asp-controller="Admin" asp-action="EdytujUzytkownika" method="get">
-
-                        <input type="hidden" id="EdytujId" name="id" />
-
-                        <button type="submit"
-                                class="btn btn-primary w-100 mb-2">
-                            Edytuj dane
-                        </button>
-
-                    </form>
-
-
-                    <form asp-controller="Admin" asp-action="UsunUzytkownika" method="post">
-
-                        @Html.AntiForgeryToken()
-
-                        <input type="hidden" id="UsunId" name="id" />
-
-                        <button type="submit"
-                                class="btn btn-danger w-100">
-                            Usuń użytkownika
-                        </button>
-
-                    </form>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
     </div>
 
 </div>
 <script>
 
-    function ustawIdUzytkownika(id) {
+    let wybranyUzytkownik = "";
+
+
+    function ustawIdUzytkownika(id, nazwa) {
+
+      
+
+        wybranyUzytkownik = nazwa;
+
         document.getElementById("WybranyUzytkownikId").value = id;
         document.getElementById("EdytujId").value = id;
         document.getElementById("UsunId").value = id;
@@ -145,13 +153,30 @@
 
     document.getElementById("Rodzice")
         .addEventListener("change", function() {
-            ustawIdUzytkownika(this.value);
+
+            let option = this.options[this.selectedIndex];
+
+            ustawIdUzytkownika(
+                this.value,
+                option.text
+            );
+
+            document.getElementById("Pracownicy").selectedIndex = -1;
         });
 
 
     document.getElementById("Pracownicy")
         .addEventListener("change", function() {
-            ustawIdUzytkownika(this.value);
+
+            let option = this.options[this.selectedIndex];
+
+            ustawIdUzytkownika(
+                this.value,
+                option.text
+            );
+
+            document.getElementById("Rodzice").selectedIndex = -1;
         });
+
 
 </script>
