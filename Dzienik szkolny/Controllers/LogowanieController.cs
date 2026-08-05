@@ -1,8 +1,8 @@
-﻿using Dzienik_szkolny.Models;
+﻿using Dziennik_szkolny.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Dzienik_szkolny.Controllers
+namespace Dziennik_szkolny.Controllers
 {
     public class LogowanieController : Controller
     {

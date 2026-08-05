@@ -1,4 +1,4 @@
-namespace Dzienik_szkolny.Models
+namespace Dziennik_szkolny.Models
 {
     public class ErrorViewModel
     {

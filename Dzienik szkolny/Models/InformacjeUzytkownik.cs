@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Dzienik_szkolny.Models
+namespace Dziennik_szkolny.Models
 {
     public class InformacjeUzytkownik
     {

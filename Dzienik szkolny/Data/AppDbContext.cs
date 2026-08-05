@@ -1,8 +1,8 @@
-﻿using Dzienik_szkolny.Models;
+﻿using Dziennik_szkolny.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Dzienik_szkolny.Data
+namespace Dziennik_szkolny.Data
 {
     public class AppDbContext : IdentityDbContext<LoginUzytkownika>
     {

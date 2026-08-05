@@ -1,12 +1,12 @@
-﻿using Dzienik_szkolny.Data;
-using Dzienik_szkolny.Models;
-using Dzienik_szkolny.Services.Interfaces;
-using Dzienik_szkolny.ViewModels;
+﻿using Dziennik_szkolny.Data;
+using Dziennik_szkolny.Models;
+using Dziennik_szkolny.Services.Interfaces;
+using Dziennik_szkolny.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 
-namespace Dzienik_szkolny.Services
+namespace Dziennik_szkolny.Services
 {
     public class UzytkownikService : IUzytkownikService
     {
@@ -26,15 +26,16 @@ namespace Dzienik_szkolny.Services
         }
 
 
-        public async Task<(string Komunikat, DodajUzytkownikaViewModel Uzytkownik)> DodajUzytkownikaAsync(
-            DodajUzytkownikaViewModel model)
+        public async Task<(string Komunikat, UzytkownikaViewModel Uzytkownik,bool CzyUdane)> DodajUzytkownikaAsync(
+            UzytkownikaViewModel model)
         {
             // Walidacja telefonu
             if (string.IsNullOrWhiteSpace(model.Telefon) || !Regex.IsMatch(model.Telefon, @"^\d{9}$"))
             {
                 return (
                     "Telefon musi zawierać dokładnie 9 cyfr.",
-                    model);
+                    model,
+                    false);
             }
 
 
@@ -43,7 +44,8 @@ namespace Dzienik_szkolny.Services
             {
                 return (
                     "Podany numer PESEL jest niepoprawny.",
-                    model);
+                    model,
+                    false);
             }
 
 
@@ -52,7 +54,8 @@ namespace Dzienik_szkolny.Services
             {
                 return (
                     "Użytkownik o takim loginie już istnieje.",
-                    model);
+                    model,
+                    false);
             }
 
 
@@ -61,16 +64,17 @@ namespace Dzienik_szkolny.Services
             {
                 return (
                     "Użytkownik o takim emailu już istnieje.",
-                    model);
+                    model,
+                    false);
             }
 
 
-            // Sprawdzenie ról
-            if (!await CzyIstniejaRoleAsync(model.IdRoli))
+            if (!await CzyIstniejaRoleAsync(model.WybraneRole))
             {
                 return (
                     "Nie znaleziono jednej lub więcej wybranych ról.",
-                    model);
+                    model,
+                    false);
             }
 
 
@@ -85,23 +89,22 @@ namespace Dzienik_szkolny.Services
 
                 if (wynikKonta.Uzytkownik == null)
                 {
-                    return (wynikKonta.Komunikat, model);
+                    return (wynikKonta.Komunikat, model, false);
                 }
 
 
                 var nowyLogin = wynikKonta.Uzytkownik;
 
-
-                // Dodanie ról
+                // Dodanie wybranych ról użytkownikowi
                 if (!await DodajRoleUzytkownikowiAsync(
                     nowyLogin,
-                    model.IdRoli))
+                    model.WybraneRole))
                 {
                     await _userManager.DeleteAsync(nowyLogin);
 
                     await transakcja.RollbackAsync();
 
-                    return ("Nie udało się przypisać ról.", model);
+                    return ("Nie udało się przypisać ról.", model, false);
                 }
 
 
@@ -114,19 +117,19 @@ namespace Dzienik_szkolny.Services
                 await transakcja.CommitAsync();
 
 
-                return ("Użytkownik dodany", model);
+                return ("Użytkownik dodany", model, true);
             }
             catch (Exception ex)
             {
                 await transakcja.RollbackAsync();
 
-                return ($"Błąd: {ex.Message} Inner: {ex.InnerException?.Message}", model);
+                return ($"Błąd: {ex.Message} Inner: {ex.InnerException?.Message}", model, false);
             }
         }
 
 
 
-        private async Task<(string Komunikat, LoginUzytkownika Uzytkownik)> DodajUzytkownikaDoBazyAsync(DodajUzytkownikaViewModel model)
+        private async Task<(string Komunikat, LoginUzytkownika Uzytkownik, bool CzyUdane)> DodajUzytkownikaDoBazyAsync(UzytkownikaViewModel model)
         {
             var nowyLogin = new LoginUzytkownika
             {
@@ -146,11 +149,11 @@ namespace Dzienik_szkolny.Services
                     wynik.Errors.Select(x => x.Description));
 
 
-                return ($"Nie udało się utworzyć użytkownika: {bledy}", null);
+                return ($"Nie udało się utworzyć użytkownika: {bledy}", null,false);
             }
 
 
-            return ("OK", nowyLogin);
+            return ("OK", nowyLogin, true);
         }
 
 
@@ -191,7 +194,7 @@ namespace Dzienik_szkolny.Services
 
         private async Task DodajInformacjeUzytkownikaAsync(
             LoginUzytkownika uzytkownik,
-            DodajUzytkownikaViewModel model)
+            UzytkownikaViewModel model)
         {
             long ostatniId = await _context.InformacjeUzytkownik
     .Select(x => (long?)x.IdOsoby)
@@ -354,7 +357,7 @@ namespace Dzienik_szkolny.Services
             return kontrolna == pesel[10] - '0';
         }
 
-        public async Task<DodajUzytkownikaViewModel> PrzygotujDaneDoEdycjiAsync(InformacjeUzytkownik informacjeUzytkownik, string iDUser)
+        public async Task<UzytkownikaViewModel> PrzygotujDaneDoEdycjiAsync(InformacjeUzytkownik informacjeUzytkownik, string iDUser)
         {
             var login = await _userManager.FindByIdAsync(iDUser);
 
@@ -373,7 +376,7 @@ namespace Dzienik_szkolny.Services
                 }
             }
 
-            DodajUzytkownikaViewModel dodajUzytkownikaViewModel = new DodajUzytkownikaViewModel
+            UzytkownikaViewModel dodajUzytkownikaViewModel = new UzytkownikaViewModel
             {
                 Login = login.UserName,
                 Email = login.Email,
@@ -385,7 +388,6 @@ namespace Dzienik_szkolny.Services
                 Miasto = informacjeUzytkownik.Miasto,
                 Ulica = informacjeUzytkownik.Ulica,
                 NrMieszkania = informacjeUzytkownik.NrMieszkania,
-                Role = roleUzytkownika
             };
 
             return dodajUzytkownikaViewModel;

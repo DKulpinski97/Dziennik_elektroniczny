@@ -1,5 +1,4 @@
-﻿using Dzienik_szkolny.Models;
-using Dzienik_szkolny.ViewModels;
+﻿using Dziennik_szkolny.Models;
 
 namespace Dziennik_szkolny.Services.Interfaces
 {

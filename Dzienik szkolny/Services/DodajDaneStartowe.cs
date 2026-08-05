@@ -1,6 +1,6 @@
-﻿using Dzienik_szkolny.Data;
-using Dzienik_szkolny.Models;
-using Dzienik_szkolny.ViewModels;
+﻿using Dziennik_szkolny.Data;
+using Dziennik_szkolny.Models;
+using Dziennik_szkolny.ViewModel;
 using Dziennik_szkolny.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

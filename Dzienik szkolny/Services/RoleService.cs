@@ -1,26 +1,35 @@
-﻿using Dzienik_szkolny.Services.Interfaces;
+﻿using Dziennik_szkolny.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
-namespace Dzienik_szkolny.Services
+using System.Data;
+using Dziennik_szkolny.DTOs;
+namespace Dziennik_szkolny.Services
 {
     public class RoleService : IRoleService
     {
         private readonly RoleManager<IdentityRole> _roleManager;
+
+  
 
         public RoleService(RoleManager<IdentityRole> roleManager)
         {
             _roleManager = roleManager;
         }
 
-        public async Task<List<IdentityRole>> PobierzRole()
+        public async Task<List<RoleDto>> PobierzRole()
         {
             return await _roleManager.Roles
-    .Where(x => x.Name != "Brak roli" &&
-                x.Name != "Uczeń")
-    .OrderBy(x => x.Name)
-    .ToListAsync();
+                .Where(x => x.Name != "Brak roli" &&
+                            x.Name != "Uczeń")
+                .OrderBy(x => x.Name)
+                .Select(x => new RoleDto
+                {
+                    Id = x.Id,
+                    Nazwa = x.Name
+                })
+                .ToListAsync();
         }
+      
         public async Task<bool> ZmienNazweRoli(string roleId, string nowaNazwa, string staraNazwa)
         {
             var rola = await _roleManager.FindByIdAsync(roleId);
@@ -34,7 +43,7 @@ namespace Dzienik_szkolny.Services
                 return false;
             }
             rola.Name = nowaNazwa;
-            rola.NormalizedName = nowaNazwa.ToUpper();
+            rola.NormalizedName = nowaNazwa.ToUpperInvariant();
 
             var wynik = await _roleManager.UpdateAsync(rola);
 
@@ -72,5 +81,6 @@ namespace Dzienik_szkolny.Services
 
             return wynik.Succeeded;
         }
+        
     }
 }

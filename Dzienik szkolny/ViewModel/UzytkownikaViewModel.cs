@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
-namespace Dzienik_szkolny.ViewModels
+namespace Dziennik_szkolny.ViewModel
 {
-    public class DodajUzytkownikaViewModel
+    public class UzytkownikaViewModel
     {
         [Required(ErrorMessage = "Login jest wymagane.")]
         [MaxLength(20, ErrorMessage = "Login może mieć maksymalnie 20 znaków.")]
@@ -15,7 +17,7 @@ namespace Dzienik_szkolny.ViewModels
 
 
         [Required(ErrorMessage = "Hasło jest wymagane.")]
-        [MinLength(6, ErrorMessage = "Hasło musi mieć minimum 6 znaków.")]
+        [MinLength(3, ErrorMessage = "Hasło musi mieć minimum 6 znaków.")]
         public string Haslo { get; set; }
 
 
@@ -48,10 +50,10 @@ namespace Dzienik_szkolny.ViewModels
 
         [Required(ErrorMessage = "Numer mieszkania jest wymagany.")]
         public string NrMieszkania { get; set; }
+        [ValidateNever]
+        public List<SelectListItem> DostepneRole { get; set; }
 
-        public List<IdentityRole> Role { get; set; } = new();
-
-        public List<string> IdRoli { get; set; } = new();
+        public List<string> WybraneRole { get; set; }
 
     }
 }

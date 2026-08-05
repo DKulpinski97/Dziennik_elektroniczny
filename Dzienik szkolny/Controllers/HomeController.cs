@@ -1,9 +1,9 @@
-using Dzienik_szkolny.Models;
+using Dziennik_szkolny.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace Dzienik_szkolny.Controllers
+namespace Dziennik_szkolny.Controllers
 {
     [Authorize]
     public class HomeController : Controller
