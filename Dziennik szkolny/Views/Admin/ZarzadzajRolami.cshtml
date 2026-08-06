@@ -1,0 +1,139 @@
+﻿@model List<Dziennik_szkolny.DTOs.RoleDto>
+
+@{
+    ViewData["Title"] = "Zarządzanie rolami";
+}
+
+<div class="container mt-5">
+    <div class="row g-4" style="min-height: 75vh;">
+
+        <div class="col d-flex">
+            <div class="border rounded p-4 w-100">
+
+                <h2 class="text-center">Menu dodawania roli</h2>
+
+               @if (TempData["Wiadomosc"] != null)
+                {
+                    <div class="alert alert-@TempData["TypWiadomosci"]">
+                        @TempData["Wiadomosc"]
+                    </div>
+                }
+
+
+                @using (Html.BeginForm("DodajRole", "Admin", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    @Html.TextBox("NazwaRoli","",new{@class = "form-control",id = "NazwaRoli",placeholder = "np. Nauczyciel"})
+
+                    <button type="submit" class="btn btn-warning mt-3 w-100">
+                        Dodaj rolę
+                    </button>
+                }
+
+
+
+                <hr />
+
+                <h2 class="text-center">Zmiana nazwy roli</h2>
+
+
+                @using (Html.BeginForm("ZmienNazweRoli", "Admin", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    @Html.Hidden("StaraNazwaRoli","",new { id = "StaraNazwaRoli" })
+
+                    @Html.TextBox("NowaNazwaRoli","",new{ @class = "form-control",id = "NowaNazwaRoli",placeholder = "Nowa nazwa roli"})
+
+                    @Html.Hidden("RoleId","",new { id = "RoleIdZmiana" })
+
+                    <button type="submit" class="btn btn-warning mt-3 w-100">
+                        Zmień nazwę
+                    </button>
+                }
+
+
+
+                <h2 class="text-center mt-4">Usuń</h2>
+
+
+                @using (Html.BeginForm("UsunRole", "Admin", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <label id="NazwaDoUsuniecia">
+                        Brak wybranej roli
+                    </label>
+
+
+                    <br />
+
+
+                    @Html.Hidden("RoleId","",new { id = "RoleIdUsun" })
+
+                    <button type="submit" class="btn btn-warning mt-3 w-100">
+                        Usuń
+                    </button>
+
+
+                    <a asp-controller="Home" asp-action="Index"class="btn btn-warning mt-3 w-100">
+                        Powrót do poprzedniego menu
+                    </a>
+                }
+            </div>
+        </div>
+
+
+
+        <div class="col d-flex">
+            <div class="border rounded p-4 w-100">
+
+                <h2 class="text-center">
+                    Lista wszystkich ról
+                </h2>
+
+                @Html.ListBox("RoleList",new SelectList(Model, "Id", "Nazwa"),new{@class = "form-select",size = 10,id = "ListaRol"})
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<script>
+
+    document.getElementById("ListaRol")
+    .addEventListener("change", function () {
+
+        let wybranaOpcja = this.options[this.selectedIndex];
+
+            let nazwaRoli = wybranaOpcja.text;
+            let idRoli = wybranaOpcja.value;
+
+
+            // etykieta usuwania
+            document.getElementById("NazwaDoUsuniecia")
+            .textContent = nazwaRoli;
+
+
+        // formularz zmiany nazwy
+            document.getElementById("StaraNazwaRoli")
+                .value = nazwaRoli;
+
+        document.getElementById("NowaNazwaRoli")
+                .value = nazwaRoli;
+
+            document.getElementById("RoleIdZmiana")
+                .value = idRoli;
+
+
+            // formularz usuwania
+            document.getElementById("RoleIdUsun")
+                .value = idRoli;
+
+        });
+
+</script>
