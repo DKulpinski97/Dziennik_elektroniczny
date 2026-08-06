@@ -16,8 +16,7 @@ namespace Dziennik_szkolny.ViewModel
         public string Email { get; set; }
 
 
-        [Required(ErrorMessage = "Hasło jest wymagane.")]
-        [MinLength(3, ErrorMessage = "Hasło musi mieć minimum 6 znaków.")]
+        
         public string Haslo { get; set; }
 
 
@@ -54,6 +53,10 @@ namespace Dziennik_szkolny.ViewModel
         public List<SelectListItem> DostepneRole { get; set; }
 
         public List<string> WybraneRole { get; set; }
+        [ValidateNever]
+        public string idUzytkownika { get; set; }
+        [ValidateNever]
+        public long IdDanych { get; set; }
 
     }
 }

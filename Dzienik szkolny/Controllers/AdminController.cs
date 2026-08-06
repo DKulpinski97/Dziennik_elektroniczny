@@ -159,7 +159,7 @@ namespace Dziennik_szkolny.Controllers
             var model = new UzytkownikaViewModel();
 
             await UzupelnijRole(model);
-
+            ViewBag.TrybDodawania = true;
             return View("DaneUżytkonikaKontrola", model);
         }
 
@@ -168,6 +168,7 @@ namespace Dziennik_szkolny.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DodajUzytkownika(UzytkownikaViewModel model)
         {
+            ViewBag.TrybDodawania = true;
             if (model.WybraneRole == null || model.WybraneRole.Count == 0)
             {
                 TempData["TypWiadomosci"] = "info";
@@ -223,7 +224,7 @@ namespace Dziennik_szkolny.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> EdytujDaneUzytkownika()
+        public async Task<IActionResult> ZarządzajUżytkownikem()
         {
             var uzytkownicy = await _userManager.Users.ToListAsync();
 
@@ -248,13 +249,10 @@ namespace Dziennik_szkolny.Controllers
 
             foreach (var uzytkownik in uzytkownicy)
             {
-                var roleUzytkownika =
-                    await _userManager.GetRolesAsync(uzytkownik);
+                var roleUzytkownika =await _userManager.GetRolesAsync(uzytkownik);
 
 
-                var dane = informacje
-                    .FirstOrDefault(x =>
-                        x.IdUzytkownika == uzytkownik.Id);
+                var dane = informacje.FirstOrDefault(x =>x.IdUzytkownika == uzytkownik.Id);
 
 
                 if (dane == null)
@@ -270,14 +268,10 @@ namespace Dziennik_szkolny.Controllers
                 };
 
 
-                bool jestPracownikiem =
-                    roleUzytkownika.Any(r =>
-                        rolePracownikow.Contains(r));
+                bool jestPracownikiem =roleUzytkownika.Any(r =>rolePracownikow.Contains(r));
 
 
-                bool jestRodzicem =
-                    roleUzytkownika.Any(r =>
-                        r == "Rodzic");
+                bool jestRodzicem = roleUzytkownika.Any(r =>r == "Rodzić");
 
 
                 // pracownik ma pierwszeństwo
@@ -306,16 +300,14 @@ namespace Dziennik_szkolny.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> PrzygotujUzytkownikaDoEdycji(
-            string idUzytkownika)
+        public async Task<IActionResult> PrzygotujUzytkownikaDoEdycji(string idUzytkownika)
         {
             if (string.IsNullOrEmpty(idUzytkownika))
             {
                 TempData["TypWiadomosci"] = "info";
                 TempData["Wiadomosc"] ="Nie wybrano użytkownika.";
 
-                return RedirectToAction(
-                    nameof(EdytujDaneUzytkownika));
+                return RedirectToAction(nameof(ZarządzajUżytkownikem));
             }
 
 
@@ -329,49 +321,54 @@ namespace Dziennik_szkolny.Controllers
                 TempData["TypWiadomosci"] = "info";
                 TempData["Wiadomosc"] ="Nie znaleziono użytkownika.";
 
-                return RedirectToAction(
-                    nameof(EdytujDaneUzytkownika));
+                return RedirectToAction(nameof(ZarządzajUżytkownikem));
             }
 
 
 
-            var informacjeUzytkownik =
-                await _context.InformacjeUzytkownik
-                .FirstOrDefaultAsync(x =>
-                    x.IdUzytkownika == idUzytkownika);
+            var informacjeUzytkownik =await _context.InformacjeUzytkownik.FirstOrDefaultAsync(x => x.IdUzytkownika == idUzytkownika);
 
 
 
             if (informacjeUzytkownik == null)
             {
                 TempData["TypWiadomosci"] = "info";
-                TempData["Wiadomosc"] =
-                    "Brak danych osobowych użytkownika.";
+                TempData["Wiadomosc"] ="Brak danych osobowych użytkownika.";
 
-                return RedirectToAction(
-                    nameof(EdytujDaneUzytkownika));
+                return RedirectToAction(nameof(ZarządzajUżytkownikem));
             }
 
+            var viewModelUzytkownika = await _uzytkownikService.PrzygotujDaneDoEdycjiAsync(informacjeUzytkownik,idUzytkownika);
 
-
-            var viewModel =
-                await _uzytkownikService
-                .PrzygotujDaneDoEdycjiAsync(
-                    informacjeUzytkownik,
-                    idUzytkownika);
-
-
-
-            await UzupelnijRole(viewModel);
-
-
-            return View(
-                "WidokEdycjiUzytkownika",
-                viewModel);
+            ViewBag.TrybDodawania = false;
+            return View("DaneUżytkonikaKontrola", viewModelUzytkownika);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EdytujDaneUzytkownika(UzytkownikaViewModel viewModelUzytkownika)
+        {
+            if (viewModelUzytkownika == null)
+            {
+                TempData["TypWiadomosci"] = "info";
+                TempData["Wiadomosc"] = "Błąd podczas próby edycji danych użytkownika.";
+                return RedirectToAction(nameof(ZarządzajUżytkownikem));
+               
+            }
+            UzupelnijRole(viewModelUzytkownika);
+            var wynik = await _uzytkownikService.EdytujUzytkownikaAsync(viewModelUzytkownika);
 
-
+            TempData["TypWiadomosci"] = wynik.Sukces ? "success" : "danger";
+            TempData["Wiadomosc"] = wynik.Komunikat;
+            if (wynik.Sukces)
+            {
+                return RedirectToAction(nameof(ZarządzajUżytkownikem));
+            }
+            else
+            {
+                return View("DaneUżytkonikaKontrola", viewModelUzytkownika);
+            }
+        }
 
         /*=================Usuwanie użytkownika==================*/
 
@@ -384,11 +381,9 @@ namespace Dziennik_szkolny.Controllers
             if (string.IsNullOrEmpty(IdUzytkownika))
             {
                 TempData["TypWiadomosci"] = "info";
-                TempData["Wiadomosc"] =
-                    "Nie wybrano użytkownika.";
+                TempData["Wiadomosc"] ="Nie wybrano użytkownika.";
 
-                return RedirectToAction(
-                    nameof(EdytujDaneUzytkownika));
+                return RedirectToAction(nameof(ZarządzajUżytkownikem));
             }
 
 
@@ -401,19 +396,14 @@ namespace Dziennik_szkolny.Controllers
             if (uzytkownik == null)
             {
                 TempData["TypWiadomosci"] = "info";
-                TempData["Wiadomosc"] =
-                    "Nie znaleziono użytkownika.";
+                TempData["Wiadomosc"] ="Nie znaleziono użytkownika.";
 
-                return RedirectToAction(
-                    nameof(EdytujDaneUzytkownika));
+                return RedirectToAction(nameof(ZarządzajUżytkownikem));
             }
 
 
 
-            var informacje =
-                await _context.InformacjeUzytkownik
-                .FirstOrDefaultAsync(x =>
-                    x.IdUzytkownika == IdUzytkownika);
+            var informacje =await _context.InformacjeUzytkownik.FirstOrDefaultAsync(x => x.IdUzytkownika == IdUzytkownika);
 
 
 
@@ -434,22 +424,19 @@ namespace Dziennik_szkolny.Controllers
             if (!wynik.Succeeded)
             {
                 TempData["TypWiadomosci"] = "danger";
-                TempData["Wiadomosc"] =
-                    "Nie udało się usunąć użytkownika.";
+                TempData["Wiadomosc"] ="Nie udało się usunąć użytkownika.";
 
                 return RedirectToAction(
-                    nameof(EdytujDaneUzytkownika));
+                    nameof(ZarządzajUżytkownikem));
             }
 
 
 
             TempData["TypWiadomosci"] = "success";
-            TempData["Wiadomosc"] =
-                "Użytkownik został usunięty.";
+            TempData["Wiadomosc"] ="Użytkownik został usunięty.";
 
 
-            return RedirectToAction(
-                nameof(EdytujDaneUzytkownika));
+            return RedirectToAction(nameof(ZarządzajUżytkownikem));
         }
     }
 }

@@ -3,6 +3,7 @@ using Dziennik_szkolny.Models;
 using Dziennik_szkolny.Services.Interfaces;
 using Dziennik_szkolny.ViewModel;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 
@@ -13,20 +14,23 @@ namespace Dziennik_szkolny.Services
         private readonly AppDbContext _context;
         private readonly UserManager<LoginUzytkownika> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IRoleService _roleService;
 
 
         public UzytkownikService(
             AppDbContext appDbContext,
             UserManager<LoginUzytkownika> userManager,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            IRoleService roleService)
         {
             _context = appDbContext;
             _userManager = userManager;
             _roleManager = roleManager;
+            _roleService = roleService;
         }
 
 
-        public async Task<(string Komunikat, UzytkownikaViewModel Uzytkownik,bool CzyUdane)> DodajUzytkownikaAsync(
+        public async Task<(string Komunikat, UzytkownikaViewModel Uzytkownik, bool CzyUdane)> DodajUzytkownikaAsync(
             UzytkownikaViewModel model)
         {
             // Walidacja telefonu
@@ -149,7 +153,7 @@ namespace Dziennik_szkolny.Services
                     wynik.Errors.Select(x => x.Description));
 
 
-                return ($"Nie udało się utworzyć użytkownika: {bledy}", null,false);
+                return ($"Nie udało się utworzyć użytkownika: {bledy}", null, false);
             }
 
 
@@ -192,13 +196,9 @@ namespace Dziennik_szkolny.Services
 
 
 
-        private async Task DodajInformacjeUzytkownikaAsync(
-            LoginUzytkownika uzytkownik,
-            UzytkownikaViewModel model)
+        private async Task DodajInformacjeUzytkownikaAsync(LoginUzytkownika uzytkownik, UzytkownikaViewModel model)
         {
-            long ostatniId = await _context.InformacjeUzytkownik
-    .Select(x => (long?)x.IdOsoby)
-    .MaxAsync() ?? 0;
+            long ostatniId = await _context.InformacjeUzytkownik.Select(x => (long?)x.IdOsoby).MaxAsync() ?? 0;
 
             long nowyId = ostatniId + 1;
             var informacje = new InformacjeUzytkownik
@@ -222,26 +222,20 @@ namespace Dziennik_szkolny.Services
 
         private async Task<bool> CzyIstniejeLoginAsync(string login)
         {
-            var znormalizowanyLogin =
-                _userManager.NormalizeName(login);
+            var znormalizowanyLogin = _userManager.NormalizeName(login);
 
 
-            return await _userManager.Users
-                .AnyAsync(x =>
-                    x.NormalizedUserName == znormalizowanyLogin);
+            return await _userManager.Users.AnyAsync(x => x.NormalizedUserName == znormalizowanyLogin);
         }
 
 
 
         private async Task<bool> CzyIstniejeEmailAsync(string email)
         {
-            var znormalizowanyEmail =
-                _userManager.NormalizeEmail(email);
+            var znormalizowanyEmail = _userManager.NormalizeEmail(email);
 
 
-            return await _userManager.Users
-                .AnyAsync(x =>
-                    x.NormalizedEmail == znormalizowanyEmail);
+            return await _userManager.Users.AnyAsync(x => x.NormalizedEmail == znormalizowanyEmail);
         }
 
 
@@ -256,8 +250,7 @@ namespace Dziennik_szkolny.Services
 
             foreach (var idRoliItem in idRoli)
             {
-                var rola =
-                    await _roleManager.FindByIdAsync(idRoliItem);
+                var rola = await _roleManager.FindByIdAsync(idRoliItem);
 
 
                 if (rola == null)
@@ -274,9 +267,7 @@ namespace Dziennik_szkolny.Services
 
         private bool CzyPoprawnyPesel(string pesel)
         {
-            if (string.IsNullOrWhiteSpace(pesel) ||
-                pesel.Length != 11 ||
-                !pesel.All(char.IsDigit))
+            if (string.IsNullOrWhiteSpace(pesel) || pesel.Length != 11 || !pesel.All(char.IsDigit))
             {
                 return false;
             }
@@ -364,7 +355,8 @@ namespace Dziennik_szkolny.Services
 
             var nazwyRol = await _userManager.GetRolesAsync(login);
 
-            var roleUzytkownika = new List<IdentityRole>();
+
+            List<string> roleUzytkownika = new();
 
             foreach (var nazwaRoli in nazwyRol)
             {
@@ -372,11 +364,10 @@ namespace Dziennik_szkolny.Services
 
                 if (rola != null)
                 {
-                    roleUzytkownika.Add(rola);
+                    roleUzytkownika.Add(rola.Id);
                 }
             }
-
-            UzytkownikaViewModel dodajUzytkownikaViewModel = new UzytkownikaViewModel
+            UzytkownikaViewModel uzytkownikaViewModel = new UzytkownikaViewModel
             {
                 Login = login.UserName,
                 Email = login.Email,
@@ -388,9 +379,168 @@ namespace Dziennik_szkolny.Services
                 Miasto = informacjeUzytkownik.Miasto,
                 Ulica = informacjeUzytkownik.Ulica,
                 NrMieszkania = informacjeUzytkownik.NrMieszkania,
+                DostepneRole = (await _roleService.PobierzRole()).Select(x => new SelectListItem
+                {
+                    Value = x.Id,
+                    Text = x.Nazwa
+                }).ToList(),
+                WybraneRole = roleUzytkownika,
+                idUzytkownika = login.Id,
+                IdDanych = informacjeUzytkownik.IdOsoby
             };
 
-            return dodajUzytkownikaViewModel;
+            return uzytkownikaViewModel;
+        }
+        public async Task<(bool Sukces, string Komunikat)> EdytujUzytkownikaAsync(UzytkownikaViewModel uzytkownikaViewModel)
+        {
+            var login = await _userManager.FindByIdAsync(uzytkownikaViewModel.idUzytkownika);
+
+            if (login == null)
+            {
+                return (false, "Nie znaleziono użytkownika.");
+            }
+
+
+            // Sprawdzenie podstawowych danych
+            if (string.IsNullOrWhiteSpace(uzytkownikaViewModel.Login))
+            {
+                return (false, "Login jest wymagany.");
+            }
+
+
+            // Sprawdzenie czy login nie należy do innego użytkownika
+            var istniejeLogin = await _userManager.FindByNameAsync(uzytkownikaViewModel .Login);
+
+            if (istniejeLogin != null && istniejeLogin.Id != login.Id)
+            {
+                return (false, "Podany login jest już zajęty.");
+            }
+
+
+            using var transakcja = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                // =====================
+                // Aktualizacja Identity
+                // =====================
+
+                login.UserName = uzytkownikaViewModel.Login;
+                login.NormalizedUserName = uzytkownikaViewModel.Login.ToUpper();
+
+                login.Email = uzytkownikaViewModel.Email;
+                login.NormalizedEmail = uzytkownikaViewModel.Email.ToUpper();
+
+
+                // jeżeli podano nowe hasło
+                if (!string.IsNullOrWhiteSpace(uzytkownikaViewModel.Haslo))
+                {
+                    var hasher = new PasswordHasher<LoginUzytkownika>();
+
+                    login.PasswordHash = hasher.HashPassword(
+                        login,
+                        uzytkownikaViewModel.Haslo
+                    );
+                }
+
+
+                var wynikIdentity = await _userManager.UpdateAsync(login);
+
+                if (!wynikIdentity.Succeeded)
+                {
+                    await transakcja.RollbackAsync();
+                    return (false, "Nie udało się zaktualizować konta.");
+                }
+
+
+
+                // =====================
+                // Aktualizacja danych osobowych
+                // =====================
+
+                var informacje = await _context.InformacjeUzytkownik
+                    .FirstOrDefaultAsync(x => x.IdUzytkownika == login.Id);
+
+
+                if (informacje == null)
+                {
+                    await transakcja.RollbackAsync();
+                    return (false, "Nie znaleziono danych użytkownika.");
+                }
+
+
+                informacje.Imie = uzytkownikaViewModel.Imie;
+                informacje.Nazwisko = uzytkownikaViewModel.Nazwisko;
+                informacje.Pesel = uzytkownikaViewModel.Pesel;
+                informacje.Telefon = uzytkownikaViewModel.Telefon;
+                informacje.Miasto = uzytkownikaViewModel.Miasto;
+                informacje.Ulica = uzytkownikaViewModel.Ulica;
+                informacje.NrMieszkania = uzytkownikaViewModel.NrMieszkania;
+
+
+                _context.InformacjeUzytkownik.Update(informacje);
+
+                await _context.SaveChangesAsync();
+
+
+
+                // =====================
+                // Aktualizacja ról
+                // =====================
+
+                var obecneRole = await _userManager.GetRolesAsync(login);
+
+
+                var usunRole = await _userManager.RemoveFromRolesAsync(
+                    login,
+                    obecneRole);
+
+
+                if (!usunRole.Succeeded)
+                {
+                    await transakcja.RollbackAsync();
+                    return (false, "Nie udało się usunąć starych ról.");
+                }
+
+
+                var noweRole = await PobierzNazwyRolAsync(uzytkownikaViewModel.WybraneRole);
+
+
+                var dodajRole = await _userManager.AddToRolesAsync(
+                    login,
+                    noweRole);
+
+
+                if (!dodajRole.Succeeded)
+                {
+                    await transakcja.RollbackAsync();
+                    return (false, "Nie udało się przypisać nowych ról.");
+                }
+
+
+
+                await transakcja.CommitAsync();
+
+                return (true, "Dane użytkownika zostały zmienione.");
+            }
+            catch
+            {
+                await transakcja.RollbackAsync();
+
+                return (false, "Wystąpił błąd podczas edycji użytkownika.");
+            }
+        }
+        private async Task<List<string>> PobierzNazwyRolAsync(List<string> idRol)
+        {
+            if (idRol == null || idRol.Count == 0)
+            {
+                return new List<string>();
+            }
+
+            return await _roleManager.Roles
+                .Where(x => idRol.Contains(x.Id))
+                .Select(x => x.Name)
+                .ToListAsync();
         }
     }
 }

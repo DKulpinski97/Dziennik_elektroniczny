@@ -49,7 +49,7 @@ namespace Dziennik_szkolny.Services
                 new List<string> { "Admin" },
                 new List<string> { "Dyrektor" },
                 new List<string> { "Sekretarka" },
-                new List<string> { "Nauczyciel","Rodzic" },
+                new List<string> { "Nauczyciel","Rodzić" },
                 new List<string> { "Nauczyciel" },
                 new List<string> { "Nauczyciel" },
                 new List<string> { "Rodzić" },
