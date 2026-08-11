@@ -1,6 +1,6 @@
-﻿namespace Dziennik_szkolny.DTOs
+﻿namespace Dziennik_szkolny.Application.ObiektyTransferuDanych
 {
-    public class RoleDto
+    public class DaneRoli
     {
         public string Id { get; set; }
 

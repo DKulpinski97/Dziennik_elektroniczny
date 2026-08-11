@@ -1,12 +1,12 @@
-﻿using Dziennik_szkolny.DTOs;
+﻿using Dziennik_szkolny.Application.ObiektyTransferuDanych;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Dziennik_szkolny.Services.Interfaces
+namespace Dziennik_szkolny.Application.Interfejsy
 {
     public interface IRoleService
     {
-        Task<List<RoleDto>> PobierzRole();
+        Task<List<DaneRoli>> PobierzRole();
 
         Task<bool> ZmienNazweRoli(string roleId, string nowaNazwa, string staraNazwa);
 

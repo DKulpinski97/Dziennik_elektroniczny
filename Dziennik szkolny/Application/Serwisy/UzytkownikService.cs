@@ -1,13 +1,14 @@
-﻿using Dziennik_szkolny.Data;
+﻿using Dziennik_szkolny.Application.Interfejsy;
+using Dziennik_szkolny.Infrastructure;
+using Dziennik_szkolny.Domain.Entities;
 using Dziennik_szkolny.Models;
-using Dziennik_szkolny.Services.Interfaces;
 using Dziennik_szkolny.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 
-namespace Dziennik_szkolny.Services
+namespace Dziennik_szkolny.Application.Serwisy
 {
     public class UzytkownikService : IUzytkownikService
     {

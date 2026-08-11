@@ -1,6 +1,6 @@
-﻿using Dziennik_szkolny.Data;
+﻿using Dziennik_szkolny.Application.Interfejsy;
+using Dziennik_szkolny.Infrastructure;
 using Dziennik_szkolny.Models;
-using Dziennik_szkolny.Services.Interfaces;
 using Dziennik_szkolny.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -271,7 +271,7 @@ namespace Dziennik_szkolny.Controllers
                 bool jestPracownikiem =roleUzytkownika.Any(r =>rolePracownikow.Contains(r));
 
 
-                bool jestRodzicem = roleUzytkownika.Any(r =>r == "Rodzić");
+                bool jestRodzicem = roleUzytkownika.Any(r =>r == "Rodzic");
 
 
                 // pracownik ma pierwszeństwo

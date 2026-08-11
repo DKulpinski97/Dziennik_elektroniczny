@@ -1,9 +1,9 @@
-﻿using Dziennik_szkolny.Services.Interfaces;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using Dziennik_szkolny.DTOs;
-namespace Dziennik_szkolny.Services
+using Dziennik_szkolny.Application.ObiektyTransferuDanych;
+using Dziennik_szkolny.Application.Interfejsy;
+namespace Dziennik_szkolny.Application.Serwisy
 {
     public class RoleService : IRoleService
     {
@@ -16,13 +16,13 @@ namespace Dziennik_szkolny.Services
             _roleManager = roleManager;
         }
 
-        public async Task<List<RoleDto>> PobierzRole()
+        public async Task<List<DaneRoli>> PobierzRole()
         {
             return await _roleManager.Roles
                 .Where(x => x.Name != "Brak roli" &&
                             x.Name != "Uczeń")
                 .OrderBy(x => x.Name)
-                .Select(x => new RoleDto
+                .Select(x => new DaneRoli
                 {
                     Id = x.Id,
                     Nazwa = x.Name

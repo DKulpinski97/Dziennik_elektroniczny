@@ -1,7 +1,7 @@
-﻿using Dziennik_szkolny.Models;
+﻿using Dziennik_szkolny.Domain.Entities;
 using Dziennik_szkolny.ViewModel;
 
-namespace Dziennik_szkolny.Services.Interfaces
+namespace Dziennik_szkolny.Application.Interfejsy
 {
     public interface IUzytkownikService
     {

@@ -1,7 +1,8 @@
-using Dziennik_szkolny.Data;
+using Dziennik_szkolny.Application.Interfejsy;
+using Dziennik_szkolny.Application.Serwisy;
+using Dziennik_szkolny.Infrastructure;
+using Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy;
 using Dziennik_szkolny.Models;
-using Dziennik_szkolny.Services;
-using Dziennik_szkolny.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -55,8 +56,18 @@ builder.Services.ConfigureApplicationCookie(options =>
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
-    var seeder = scope.ServiceProvider.GetRequiredService<IDodajDaneStartowe>();
-    await seeder.DodajDaneStartoweAsync();
+    try
+    {
+        var seeder = scope.ServiceProvider
+            .GetRequiredService<IDodajDaneStartowe>();
+
+        await seeder.DodajDaneStartoweAsync();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"BŁĄD DANYCH STARTOWYCH: {ex.Message}");
+        throw;
+    }
 }
 
 

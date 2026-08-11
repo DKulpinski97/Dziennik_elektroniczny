@@ -1,7 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Dziennik_szkolny.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Dziennik_szkolny.Models
+namespace Dziennik_szkolny.Domain.Entities
 {
     public class InformacjeUzytkownik
     {
