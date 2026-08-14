@@ -27,5 +27,15 @@ namespace Dziennik_szkolny.Application.Mapery
                 IdDanych = informacjeUzytkownik.IdOsoby
             };
         }
+        public void MapujNaInformacjeUzytkownika(InformacjeUzytkownik informacjeUzytkownik,UzytkownikaViewModel uzytkownikaViewModel)
+        {
+            informacjeUzytkownik.Imie = uzytkownikaViewModel.Imie;
+            informacjeUzytkownik.Nazwisko = uzytkownikaViewModel.Nazwisko;
+            informacjeUzytkownik.Pesel = uzytkownikaViewModel.Pesel;
+            informacjeUzytkownik.Telefon = uzytkownikaViewModel.Telefon;
+            informacjeUzytkownik.Miasto = uzytkownikaViewModel.Miasto;
+            informacjeUzytkownik.Ulica = uzytkownikaViewModel.Ulica;
+            informacjeUzytkownik.NrMieszkania = uzytkownikaViewModel.NrMieszkania;
+        }
     }
 }

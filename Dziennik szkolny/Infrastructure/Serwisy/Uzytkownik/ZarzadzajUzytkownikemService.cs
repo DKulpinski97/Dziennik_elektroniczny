@@ -34,11 +34,35 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
 
             return wynik.Succeeded;
         }
+        public async Task<bool> EdytujUzytkownikaAsync(UzytkownikaViewModel model,bool zmienHaslo)
+        {
+            var uzytkownik = await _userManager.FindByIdAsync(model.idUzytkownika);
+
+            if (uzytkownik == null)
+            {
+                return false;
+            }
+
+            uzytkownik.UserName = model.Login;
+            uzytkownik.Email = model.Email;
+
+            if (zmienHaslo)
+            {
+                uzytkownik.PasswordHash =
+                    _userManager.PasswordHasher.HashPassword(
+                        uzytkownik,
+                        model.Haslo);
+            }
+
+            var wynik = await _userManager.UpdateAsync(uzytkownik);
+
+            return wynik.Succeeded;
+        }
         public async Task<bool> DodajRoleUzytkownikowiAsync(LoginUzytkownika uzytkownik,List<string> idRoli)
         {
             if (idRoli == null || !idRoli.Any())
             {
-                return true;
+                return false;
             }
 
             foreach (var idRoliItem in idRoli)
@@ -85,6 +109,36 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
             return wynik > 0;
 
 
+        }
+
+        public async Task<bool> EdytujInformacjeUzytkownikaAsync(InformacjeUzytkownik informacjeUzytkownika)
+        {
+            _dbContext.InformacjeUzytkownik.Update(informacjeUzytkownika);
+
+            var wynik = await _dbContext.SaveChangesAsync();
+            return wynik > 0;
+        }
+        public async Task<bool> UsunWszystkieRoleUzytkownikowiAsync(string login)
+        {
+            var uzytkownik = await _userManager.FindByNameAsync(login);
+
+            if (uzytkownik == null)
+            {
+                return false;
+            }
+
+            var obecneRole = await _userManager.GetRolesAsync(uzytkownik);
+
+            if (!obecneRole.Any())
+            {
+                return true;
+            }
+
+            var wynik = await _userManager.RemoveFromRolesAsync(
+                uzytkownik,
+                obecneRole);
+
+            return wynik.Succeeded;
         }
     }
 }

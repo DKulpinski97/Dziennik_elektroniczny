@@ -35,5 +35,13 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
             bool istnieje = await _userManager.Users.AnyAsync(x => x.NormalizedEmail == znormalizowanyEmail);
             return istnieje;
         }
+        public async Task<bool> CzyIstniejeInnyLoginAsync(string login,string idUzytkownika)
+        {
+            return await _userManager.Users.AnyAsync(x =>x.UserName == login &&x.Id != idUzytkownika);
+        }
+        public async Task<bool> CzyIstniejeInnyEmailAsync(string email,string idUzytkownika)
+        {
+            return await _userManager.Users.AnyAsync(x =>x.Email == email &&x.Id != idUzytkownika);
+        }
     }
 }

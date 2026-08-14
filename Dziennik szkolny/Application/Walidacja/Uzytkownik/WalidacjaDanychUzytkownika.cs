@@ -9,6 +9,11 @@ namespace Dziennik_szkolny.Application.Walidacja.Uzytkownik
             return !string.IsNullOrWhiteSpace(telefon)
                 && Regex.IsMatch(telefon, @"^\d{9}$");
         }
+        public bool CzyHasloPrawidlowe(string haslo)
+        {
+            return !string.IsNullOrWhiteSpace(haslo)
+                && haslo.Length >= 3;
+        }
         public bool CzyPoprawnyPesel(string pesel)
         {
             if (string.IsNullOrWhiteSpace(pesel) || pesel.Length != 11 || !pesel.All(char.IsDigit))
