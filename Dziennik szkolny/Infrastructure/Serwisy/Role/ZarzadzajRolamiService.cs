@@ -2,33 +2,18 @@
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using Dziennik_szkolny.Application.ObiektyTransferuDanych;
-using Dziennik_szkolny.Application.Interfejsy;
-namespace Dziennik_szkolny.Application.Serwisy
+using Dziennik_szkolny.Application.Interfejsy.Role;
+namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
 {
-    public class RoleService : IRoleService
+    public class ZarzadzajRolamiService : IZarzadzajRolami
     {
         private readonly RoleManager<IdentityRole> _roleManager;
-
-  
-
-        public RoleService(RoleManager<IdentityRole> roleManager)
+        public ZarzadzajRolamiService(RoleManager<IdentityRole> roleManager)
         {
             _roleManager = roleManager;
         }
 
-        public async Task<List<DaneRoli>> PobierzRole()
-        {
-            return await _roleManager.Roles
-                .Where(x => x.Name != "Brak roli" &&
-                            x.Name != "Uczeń")
-                .OrderBy(x => x.Name)
-                .Select(x => new DaneRoli
-                {
-                    Id = x.Id,
-                    Nazwa = x.Name
-                })
-                .ToListAsync();
-        }
+       
       
         public async Task<bool> ZmienNazweRoli(string roleId, string nowaNazwa, string staraNazwa)
         {

@@ -1,4 +1,4 @@
-﻿using Dziennik_szkolny.Models;
+﻿using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

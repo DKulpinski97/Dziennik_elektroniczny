@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Dziennik_szkolny.Models
+namespace Dziennik_szkolny.Application.Modele
 {
     public class Login
     {

@@ -28,9 +28,4 @@
     <None Include="wwwroot\images\logo.png" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Application\Mapery\" />
-    <Folder Include="Application\Walidatory\" />
-  </ItemGroup>
-
 </Project>

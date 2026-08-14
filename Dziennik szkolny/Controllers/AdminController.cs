@@ -1,6 +1,7 @@
-﻿using Dziennik_szkolny.Application.Interfejsy;
+﻿using Dziennik_szkolny.Application.Interfejsy.Role;
+using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
 using Dziennik_szkolny.Infrastructure;
-using Dziennik_szkolny.Models;
+using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Dziennik_szkolny.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,13 +12,13 @@ namespace Dziennik_szkolny.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly IRoleService _roleService;
-        private readonly IUzytkownikService _uzytkownikService;
+        private readonly IZarzadzajRolami _roleService;
+        private readonly IZarzadzajUzytkownikem _uzytkownikService;
         private readonly AppDbContext _context;
         private readonly UserManager<LoginUzytkownika> _userManager;
 
 
-        public AdminController(IRoleService roleService,AppDbContext appDbContext,UserManager<LoginUzytkownika> userManager,IUzytkownikService uzytkownikService)
+        public AdminController(IZarzadzajRolami roleService,AppDbContext appDbContext,UserManager<LoginUzytkownika> userManager,IZarzadzajUzytkownikem uzytkownikService)
         {
             _roleService = roleService;
             _context = appDbContext;

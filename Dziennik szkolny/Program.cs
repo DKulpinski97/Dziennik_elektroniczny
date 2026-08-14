@@ -1,8 +1,12 @@
-using Dziennik_szkolny.Application.Interfejsy;
-using Dziennik_szkolny.Application.Serwisy;
+using Dziennik_szkolny.Application.Interfejsy.DaneStartowe;
+using Dziennik_szkolny.Application.Interfejsy.Role;
+using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
+using Dziennik_szkolny.Application.Serwisy.Uzytkownik;
 using Dziennik_szkolny.Infrastructure;
 using Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy;
-using Dziennik_szkolny.Models;
+using Dziennik_szkolny.Infrastructure.Identyfikatory;
+using Dziennik_szkolny.Infrastructure.Serwisy.Role;
+using Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,9 +42,12 @@ builder.Services.AddIdentity<LoginUzytkownika, IdentityRole>(options =>
 
 
 // Własne serwisy
-builder.Services.AddScoped<IRoleService, RoleService>();
-builder.Services.AddScoped<IUzytkownikService, UzytkownikService>();
+builder.Services.AddScoped<IZarzadzajRolami, ZarzadzajRolamiService>();
+builder.Services.AddScoped<IZarzadzajUzytkownikem, ZarzadzajUzytkownikemService>();
 builder.Services.AddScoped<IDodajDaneStartowe, DodajDaneStartowe>();
+builder.Services.AddScoped<IWeryfikacjaDanychLogowania, WeryfikacjaDanychLogowaniaService>();
+builder.Services.AddScoped<IPobierajRole, PobierajRoleService>();
+builder.Services.AddScoped<IPobierajUzytkownika, PobierajUzytkownikaService>();
 
 
 // Konfiguracja ciasteczka Identity

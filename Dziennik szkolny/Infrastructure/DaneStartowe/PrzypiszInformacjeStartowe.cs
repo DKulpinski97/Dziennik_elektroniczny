@@ -1,5 +1,5 @@
 ﻿using Dziennik_szkolny.Domain.Entities;
-using Dziennik_szkolny.Models;
+using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

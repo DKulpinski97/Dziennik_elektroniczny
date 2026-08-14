@@ -1,4 +1,4 @@
-﻿using Dziennik_szkolny.Models;
+﻿using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Microsoft.AspNetCore.Identity;
 
 namespace Dziennik_szkolny.Infrastructure.DaneStartowe

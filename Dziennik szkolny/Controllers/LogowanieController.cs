@@ -1,4 +1,5 @@
-﻿using Dziennik_szkolny.Models;
+﻿using Dziennik_szkolny.Application.Modele;
+using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 

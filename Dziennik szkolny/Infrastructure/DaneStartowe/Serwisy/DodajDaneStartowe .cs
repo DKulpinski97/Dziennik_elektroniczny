@@ -1,4 +1,4 @@
-﻿using Dziennik_szkolny.Application.Interfejsy;
+﻿using Dziennik_szkolny.Application.Interfejsy.DaneStartowe;
 
 namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
 {
