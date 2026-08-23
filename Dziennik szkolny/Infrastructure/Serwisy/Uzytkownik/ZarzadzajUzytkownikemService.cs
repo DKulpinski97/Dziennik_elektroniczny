@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
 {
+
     public class ZarzadzajUzytkownikemService : IZarzadzajUzytkownikem
     {
 
@@ -137,6 +138,20 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
             var wynik = await _userManager.RemoveFromRolesAsync(
                 uzytkownik,
                 obecneRole);
+
+            return wynik.Succeeded;
+        }
+
+        public async Task<bool> UsunUzytkownika(string idUzytkownika)
+        {
+            var uzytkownik = await _userManager.FindByIdAsync(idUzytkownika);
+
+            if (uzytkownik == null)
+            {
+                return false;
+            }
+
+            var wynik = await _userManager.DeleteAsync(uzytkownik);
 
             return wynik.Succeeded;
         }

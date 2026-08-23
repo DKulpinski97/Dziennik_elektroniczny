@@ -1,4 +1,4 @@
-﻿@model List<Dziennik_szkolny.DTOs.RoleDto>
+﻿@model List<Dziennik_szkolny.Application.ObiektyTransferuDanych.DaneRoli>
 
 @{
     ViewData["Title"] = "Zarządzanie rolami";
@@ -61,26 +61,20 @@
                 @using (Html.BeginForm("UsunRole", "Admin", FormMethod.Post))
                 {
                     @Html.AntiForgeryToken()
-
                     <label id="NazwaDoUsuniecia">
                         Brak wybranej roli
                     </label>
-
-
                     <br />
-
-
                     @Html.Hidden("RoleId","",new { id = "RoleIdUsun" })
 
                     <button type="submit" class="btn btn-warning mt-3 w-100">
                         Usuń
                     </button>
 
-
-                    <a asp-controller="Home" asp-action="Index"class="btn btn-warning mt-3 w-100">
-                        Powrót do poprzedniego menu
-                    </a>
                 }
+                <a asp-controller="Home" asp-action="Index" class="btn btn-warning mt-3 w-100">
+                    Powrót do poprzedniego menu
+                </a>
             </div>
         </div>
 

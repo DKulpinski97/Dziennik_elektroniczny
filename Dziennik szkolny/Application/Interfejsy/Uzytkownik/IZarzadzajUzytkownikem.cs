@@ -12,5 +12,6 @@ namespace Dziennik_szkolny.Application.Interfejsy.Uzytkownik
         Task<bool> DodajRoleUzytkownikowiAsync(LoginUzytkownika uzytkownik, List<string> idRoli);
         Task<bool >DodajInformacjeUzytkownikaAsync(LoginUzytkownika uzytkownik, UzytkownikaViewModel model);
         Task<bool> UsunWszystkieRoleUzytkownikowiAsync(string login);
+        Task<bool> UsunUzytkownika(string idUzytkownika);
     }
 }

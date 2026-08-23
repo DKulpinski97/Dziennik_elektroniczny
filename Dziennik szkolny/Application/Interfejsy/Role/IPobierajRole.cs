@@ -9,6 +9,6 @@ namespace Dziennik_szkolny.Application.Interfejsy.Role
         Task<bool> CzyIstniejaRoleAsync(List<string> idRoli);
         Task<IdentityRole?> PobierzRolePoIdAsync(string idRoli);
         Task<IList<string>> PobierzRoleUzytkownikaPoLoginieAsync(string login);
-        Task<List<string>> PobierzNazwyRolPoIdAsync(List<string> idRol)
+        Task<List<string>> PobierzNazwyRolPoIdAsync(List<string> idRol);
     }
 }

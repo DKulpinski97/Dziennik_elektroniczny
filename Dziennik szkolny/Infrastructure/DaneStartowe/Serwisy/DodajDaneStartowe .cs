@@ -27,14 +27,11 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
             {
                 await _dodajRoleStartowe.DodajRoleStartoweAsync();
 
-                await _dodajLoginyStartowe
-                    .DodajLoginyStartoweAsync();
+                await _dodajLoginyStartowe.DodajLoginyStartoweAsync();
 
-                await _przypiszRoleStartowe
-                    .PrzypiszRoleStartoweAsync();
+                await _przypiszRoleStartowe.PrzypiszRoleStartoweAsync();
 
-                await _przypiszInformacjeStartowe
-                    .PrzypiszInformacjeDodatkoweAsync();
+                await _przypiszInformacjeStartowe.PrzypiszInformacjeDodatkoweAsync();
             }
             catch (Exception ex)
             {

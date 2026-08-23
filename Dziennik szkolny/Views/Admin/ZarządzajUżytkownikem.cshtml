@@ -32,10 +32,12 @@
                         aby rozpocząć edycję lub usuwanie użytkownika.
                     </p>
 
-
-                    <!-- Ukryte pole z ID użytkownika -->
-                    @Html.Hidden("IdUzytkownika", null, new { id = "WybranyUzytkownikId" })
-
+                    @using (Html.BeginForm("DodajUzytkownika", "Admin", FormMethod.Get))
+                    {
+                        <button type="submit" class="btn btn-primary w-100 mb-2">
+                            Dodaj użytkownika
+                        </button>
+                    }
 
                     @using (Html.BeginForm("PrzygotujUzytkownikaDoEdycji", "Admin", FormMethod.Get))
                     {
@@ -138,12 +140,7 @@
 
 
     function ustawIdUzytkownika(id, nazwa) {
-
-      
-
         wybranyUzytkownik = nazwa;
-
-        document.getElementById("WybranyUzytkownikId").value = id;
         document.getElementById("EdytujId").value = id;
         document.getElementById("UsunId").value = id;
     }

@@ -2,6 +2,7 @@
 using Dziennik_szkolny.Application.Interfejsy.Role;
 using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
 using Dziennik_szkolny.Application.Mapery;
+using Dziennik_szkolny.Application.Modele.Uzytkownik;
 using Dziennik_szkolny.Application.Walidacja.Uzytkownik;
 using Dziennik_szkolny.Domain.Entities;
 using Dziennik_szkolny.Infrastructure;
@@ -14,7 +15,7 @@ using System.Text.RegularExpressions;
 
 namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
 {
-    public class KontrolaUzytkownika
+    public class ObslugaUzytkownika : IObslugaUzytkownika
     {
         private readonly IWeryfikacjaDanychLogowania _weryfikacjaDanychLogowania;
         private readonly IPobierajRole _pobierajRole;
@@ -22,17 +23,16 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
         private readonly IZarzadzajUzytkownikem _zarzadzajUzytkownikema;
         private readonly IPobierajUzytkownika _pobierajUzytkownika;
         private readonly IJednostkaPracy _jednostkaPracy;
-        private readonly MapowanieUzytkownika _mapowanieUzytkownika;
+        private readonly MapowanieUzytkownika _mapowanieUzytkownika = new MapowanieUzytkownika();
 
 
-        public KontrolaUzytkownika(
+        public ObslugaUzytkownika(
             IWeryfikacjaDanychLogowania weryfikacjaDanychLogowania,
             IPobierajRole pobierajRole,
             IZarzadzajUzytkownikem zarzadzajUzytkownikema,
             IPobierajUzytkownika pobierajUzytkownika,
             WalidacjaDanychUzytkownika walidacjaDanychUzytkownika,
-            IJednostkaPracy jednostkaPracy,
-            MapowanieUzytkownika mapowanieUzytkownika)
+            IJednostkaPracy jednostkaPracy)
         {
             _weryfikacjaDanychLogowania = weryfikacjaDanychLogowania;
             _pobierajRole = pobierajRole;
@@ -40,7 +40,6 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             _zarzadzajUzytkownikema = zarzadzajUzytkownikema;
             _pobierajUzytkownika = pobierajUzytkownika;
             _jednostkaPracy = jednostkaPracy;
-            _mapowanieUzytkownika = mapowanieUzytkownika;
         }
 
 
@@ -240,5 +239,57 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             }
         }
 
+        public async Task<ListaUzytkownikow> PodzielUzytkownikowNaRodzicowIPracownikowAsync()
+        {
+            var wynik = new ListaUzytkownikow();
+
+            var uzytkownicy = await _pobierajUzytkownika.PobierzWszystkichUzytkownikow();
+            var informacje = await _pobierajUzytkownika.PobierzWszystkieInformacjeOUzrzytkownikach();
+
+            var rolePracownikow = new List<string>
+            {
+                "Admin",
+                "Nauczyciel",
+                "Dyrektor",
+                "ViceDyrektor",
+                "Sekretarka"
+            };
+
+            foreach (var uzytkownik in uzytkownicy)
+            {
+                var roleUzytkownika =
+                    await _pobierajRole.PobierzRoleUzytkownikaPoLoginieAsync(uzytkownik.UserName);
+
+                var dane = informacje.FirstOrDefault(x => x.IdUzytkownika == uzytkownik.Id);
+
+                if (dane == null)
+                {
+                    continue;
+                }
+
+                var element = new SelectListItem
+                {
+                    Value = uzytkownik.Id,
+                    Text = $"{dane.Imie} {dane.Nazwisko}"
+                };
+
+                bool jestPracownikiem =
+                    roleUzytkownika.Any(r => rolePracownikow.Contains(r));
+
+                bool jestRodzicem =
+                    roleUzytkownika.Any(r => r == "Rodzic");
+
+                if (jestPracownikiem)
+                {
+                    wynik.Pracownicy.Add(element);
+                }
+                else if (jestRodzicem)
+                {
+                    wynik.Rodzice.Add(element);
+                }
+            }
+
+            return wynik;
+        }
     }
 }
