@@ -23,7 +23,7 @@
                 @using (Html.BeginForm(ViewBag.TrybDodawania == true ? "DodajUzytkownika" : "EdytujDaneUzytkownika", "Admin", FormMethod.Post, new { id = "FormDodajUzytkownika" }))
                 {
                     @Html.AntiForgeryToken()
-                    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                    //@Html.ValidationSummary(false, "", new { @class = "text-danger" })
                     @Html.HiddenFor(x => x.IdDanych)
                     @Html.HiddenFor(x => x.idUzytkownika)
                     <partial name="_FormulazDodajUzytkonika" model="Model" />
@@ -39,9 +39,7 @@
                             Zapisz zmiany
                         </button>
                     }
-                    <a asp-controller="Home" asp-action="Index" class="btn btn-warning mt-3 w-100">
-                        Powróć do poprzedniego menu
-                    </a>
+                    @Html.ActionLink("Powróć do poprzedniego menu", "ZarządzajUżytkownikem", "Admin", null, new { @class = "btn btn-primary w-100 mb-3" })
                 }
 
             </div>

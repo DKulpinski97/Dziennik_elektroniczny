@@ -17,7 +17,7 @@ namespace Dziennik_szkolny.ViewModel
 
 
         
-        public string Haslo { get; set; }
+        public string? Haslo { get; set; }
 
 
         [Required(ErrorMessage = "Imię jest wymagane.")]

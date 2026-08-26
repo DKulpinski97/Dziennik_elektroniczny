@@ -47,10 +47,10 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
         {
             // TODO: W wersji wdrożeniowej zastosować wymagania silnego hasła
             // zgodne z konfiguracją ASP.NET Core Identity.
-            if (!_walidacjaDanychUzytkownika.CzyHasloPrawidlowe(model.Haslo))
+           /* if (!_walidacjaDanychUzytkownika.CzyHasloPrawidlowe(model.Haslo))
             {
                 return ("Hasło musi zawierać co najmniej 3 znaki.", model, false);
-            }
+            }*/
             // Walidacja telefonu
             if (!_walidacjaDanychUzytkownika.CzyPoprawnyTelefon(model.Telefon))
             {
@@ -126,11 +126,11 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             // TODO: W wersji wdrożeniowej zastosować wymagania silnego hasła
             // zgodne z konfiguracją ASP.NET Core Identity.
             bool zmianaHasla = !string.IsNullOrWhiteSpace(uzytkownikaViewModel.Haslo);
-            if (zmianaHasla && !_walidacjaDanychUzytkownika.CzyHasloPrawidlowe(uzytkownikaViewModel.Haslo))
+            /*if (zmianaHasla && !_walidacjaDanychUzytkownika.CzyHasloPrawidlowe(uzytkownikaViewModel.Haslo))
             {
                 return ("Hasło musi zawierać co najmniej 3 znaki.", uzytkownikaViewModel, false);
 
-            }
+            }*/
 
             // Walidacja telefonu
             if (!_walidacjaDanychUzytkownika.CzyPoprawnyTelefon(uzytkownikaViewModel.Telefon))

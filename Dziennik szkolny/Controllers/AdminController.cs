@@ -6,8 +6,6 @@ using Dziennik_szkolny.Infrastructure;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Dziennik_szkolny.ViewModel;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 
 namespace Dziennik_szkolny.Controllers
 {
@@ -22,15 +20,14 @@ namespace Dziennik_szkolny.Controllers
         private readonly IPobierajUzytkownika _pobierajUzytkownika;
 
 
-        public AdminController(IZarzadzajRolami roleService, AppDbContext appDbContext, IZarzadzajUzytkownikem uzytkownikService,
-            MapowanieRoli mapowanieRoli, MapowanieUzytkownika mapowanieUzytkownika, IPobierajRole pobierajRole, 
+        public AdminController(IZarzadzajRolami roleService, IZarzadzajUzytkownikem uzytkownikService,IPobierajRole pobierajRole, 
             IObslugaUzytkownika obslugaUzytkownika, IPobierajUzytkownika pobierajUzytkownika)
         {
             _roleService = roleService;
             _uzytkownikService = uzytkownikService;
-            _mapowanieRoli = mapowanieRoli;
+            _mapowanieRoli = new MapowanieRoli(); ;
             _pobierajRole = pobierajRole;
-            _mapowanieUzytkownika = mapowanieUzytkownika;
+            _mapowanieUzytkownika = new MapowanieUzytkownika();
             _obslugaUzytkownika = obslugaUzytkownika;
             _pobierajUzytkownika = pobierajUzytkownika;
         }
@@ -41,9 +38,7 @@ namespace Dziennik_szkolny.Controllers
         {
             var role = await _pobierajRole.PobierzRole();
 
-            UzytkownikaViewModel uzytkownikaViewModel = _mapowanieUzytkownika.MapujDostepneRoleVievModel(role);
-
-            return View(uzytkownikaViewModel);
+            return View(role);
         }
 
 
@@ -128,6 +123,15 @@ namespace Dziennik_szkolny.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UsunRole(string RoleId)
         {
+            if (string.IsNullOrWhiteSpace(RoleId))
+            {
+                TempData["TypWiadomosci"] = "danger";
+                TempData["Wiadomosc"] = "Należy wybrać rolę do usunięcia.";
+
+                var role = await _pobierajRole.PobierzRole();
+                return View("ZarzadzajRolami", role);
+            }
+
             var wynik = await _roleService.UsunRole(RoleId);
 
 
@@ -171,6 +175,18 @@ namespace Dziennik_szkolny.Controllers
             {
                 TempData["TypWiadomosci"] = "info";
                 TempData["Wiadomosc"] = "Musisz wybrać przynajmniej jedną rolę.";
+                var role = await _pobierajRole.PobierzRole();
+                _mapowanieUzytkownika.MapujDostepneRoleDoIStniejacegoVievModel(uzytkownikaViewModel, role);
+                return View("DaneUżytkonikaKontrola", uzytkownikaViewModel);
+            }
+            if (string.IsNullOrWhiteSpace(uzytkownikaViewModel.Haslo))
+            {
+                ModelState.AddModelError(
+                    nameof(uzytkownikaViewModel.Haslo),
+                    "Hasło jest nie prawidłowe.");
+
+                TempData["TypWiadomosci"] = "danger";
+                TempData["Wiadomosc"] = "Hasło jest nie prawidłowe.";
                 var role = await _pobierajRole.PobierzRole();
                 _mapowanieUzytkownika.MapujDostepneRoleDoIStniejacegoVievModel(uzytkownikaViewModel, role);
                 return View("DaneUżytkonikaKontrola", uzytkownikaViewModel);
