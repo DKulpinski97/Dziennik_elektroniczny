@@ -62,6 +62,7 @@ builder.Services.AddScoped<DodajRoleStartowe>();
 builder.Services.AddScoped<DodajLoginyStartowe>();
 builder.Services.AddScoped<PrzypiszRoleStartowe>();
 builder.Services.AddScoped<PrzypiszInformacjeStartowe>();
+builder.Services.AddScoped<DodajUprawnieniaZarzadzaniaRoli>();
 
 //zażądzanie użytkownikami
 builder.Services.AddScoped<IZarzadzajRolami, ZarzadzajRolamiService>();
@@ -76,6 +77,7 @@ builder.Services.AddScoped<WalidacjaDanychUzytkownika>();
 builder.Services.AddScoped<IPobierajRole, PobierajRoleService>();
 builder.Services.AddScoped<IPobierajUzytkownika, PobierajUzytkownikaService>();
 builder.Services.AddScoped<IJednostkaPracy, JednostkaPracy>();
+builder.Services.AddScoped<IPobierajUprawnieniaRoli, PobierajUprawnieniaRoli>();
 
 
 

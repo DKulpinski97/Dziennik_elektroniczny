@@ -2,21 +2,62 @@
 {
     public class DaneStartowe
     {
+        //Lista ról pracowników w systemie
+        public List<string> RolePracownika { get; } =
+        [
+        "Admin",
+        "SuperAdmin",
+        "Nauczyciel",
+        "Dyrektor",
+        "ViceDyrektor",
+        "Sekretarka",
+
+        ];
+        //Lista ról w systemie
         public List<string> Role { get; } =
         [
         "Admin",
+        "SuperAdmin",
         "Nauczyciel",
         "Uczen",
         "Brak roli",
         "Dyrektor",
         "ViceDyrektor",
         "Sekretarka",
-        "Rodzic",
-        "SuperAdmin"
+        "Rodzic"
+
         ];
+        //Połączenia w rolach w systemie
+        public List<(string RolaZarzadzajaca, string RolaZarzadzana)> UprawnieniaRoli { get; } =
+[
+    // SuperAdmin
+    ("SuperAdmin", "Admin"),
+
+    // Admin
+    ("Admin", "Dyrektor"),
+    ("Admin", "ViceDyrektor"),
+    ("Admin", "Sekretarka"),
+    ("Admin", "Nauczyciel"),
+    ("Admin", "Rodzic"),
+
+    // Dyrektor
+    ("Dyrektor", "Sekretarka"),
+    ("Dyrektor", "Nauczyciel"),
+    ("Dyrektor", "Rodzic"),
+            // Dyrektor
+    ("ViceDyrektor", "Sekretarka"),
+    ("ViceDyrektor", "Nauczyciel"),
+    ("ViceDyrektor", "Rodzic"),
+
+    // Sekretarka
+    ("Sekretarka", "Uczen"),
+    ("Sekretarka", "Rodzic")
+];
+        //Lista ról przypisanych do użytkowników w systemie
         public List<List<string>> PrzypisanieRoli { get; } =
    [
-       ["Admin"],
+        ["Admin"],
+        ["SuperAdmin"],
         ["Dyrektor"],
         ["Sekretarka"],
         ["Nauczyciel", "Rodzic"],
@@ -26,10 +67,11 @@
         ["Rodzic"],
         ["Rodzic"]
    ];
-
+        //Lista loginów i haseł użytkowników w systemie
         public List<string[]> Loginy { get; } =
         [
         new[] { "Admin", "Admin@gmail.com", "Admin" },
+        new[] { "SuperAdmin", "SuperAdmin@gmail.com", "SuperAdmin" },
         new[] { "Dyrektor", "Dyrektor@gmail.com", "Dyrektor" },
         new[] { "Sekretarka", "Sekretarka@gmail.com", "Sekretarka" },
 
@@ -41,9 +83,11 @@
         new[] { "Rodzic2", "Rodzic2@gmail.com", "Rodzic2" },
         new[] { "Rodzic3", "Rodzic3@gmail.com", "Rodzic3" }
         ];
+        //Informacje o użytkownikach w systemie: Imię, Nazwisko, PESEL, Telefon, Miasto, Ulica, Numer domu/mieszkania
         public List<string[]> Informacje { get; } =
         [
         ["Admin", "Admin@gmail.com", "Admin", "AdminImie", "AdminNaz", "85010112345", "500100100", "Warszawa", "Marszałkowska", "11"],
+        ["SuperAdmin", "SuperAdmin@gmail.com", "SuperAdmin", "SuperAdminImie", "SuperAdminNaz", "92031512347", "500100100", "Warszawa", "Marszałkowska", "11"],
         ["Dyrektor", "Dyrektor@gmail.com", "Dyrektor", "DyrektorImie", "DyrektorNaz", "82020223456", "500200200", "Warszawa", "Puławska", "14"],
         ["Sekretarka", "Sekretarka@gmail.com", "Sekretarka", "SekretarkaImie", "SekretarkaNaz", "90030334567", "500300300", "Warszawa", "Grochowska", "24"],
 

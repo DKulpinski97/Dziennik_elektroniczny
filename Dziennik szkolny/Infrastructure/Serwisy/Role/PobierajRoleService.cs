@@ -79,6 +79,10 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
         {
             return await _roleManager.FindByIdAsync(idRoli);
         }
+        public async Task<IdentityRole?> PobierzRolePoNazwie(string nazwa)
+        {
+            return await _roleManager.FindByNameAsync(nazwa);
+        }
         public async Task<IList<string>> PobierzRoleUzytkownikaPoLoginieAsync(string login)
         {
             var uzytkownik = await _userManager.FindByNameAsync(login);
@@ -99,6 +103,26 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
 
             return await _roleManager.Roles.Where(x => idRol.Contains(x.Id)).Select(x => x.Name).ToListAsync();
         }
+
+        public async Task<List<string>> PobierzRoleZalogowanegoUzytkownikaAsync(ClaimsPrincipal user)
+        {
+            var uzytkownik = await _userManager.GetUserAsync(user);
+
+            if (uzytkownik == null)
+            {
+                return [];
+            }
+
+            return (await _userManager.GetRolesAsync(uzytkownik)).ToList();
+        }
+        public async Task<string?> PobierzIdRoliPoNazwieAsync(string nazwaRoli)
+        {
+            var rola = await _roleManager.FindByNameAsync(nazwaRoli);
+
+            return rola?.Id;
+        }
+
+
     }
 
 }

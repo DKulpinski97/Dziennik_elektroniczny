@@ -11,6 +11,8 @@ namespace Dziennik_szkolny.Application.Interfejsy.Role
 
         Task<bool> DodajRole(string nazwaRoli);
 
-        Task<bool> UsunRole(string roleId);
+        Task<(bool Sukces, string Komunikat)> UsunRole(string roleId);
+
+
     }
 }

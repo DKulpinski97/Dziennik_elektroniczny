@@ -8,17 +8,20 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
         private readonly DodajLoginyStartowe _dodajLoginyStartowe;
         private readonly PrzypiszRoleStartowe _przypiszRoleStartowe;
         private readonly PrzypiszInformacjeStartowe _przypiszInformacjeStartowe;
+        private readonly DodajUprawnieniaZarzadzaniaRoli _przypiszUprawnieniaZarzadzaniaRoli;
 
         public DodajDaneStartowe(
             DodajRoleStartowe dodajRoleStartowe,
             DodajLoginyStartowe dodajLoginyStartowe,
             PrzypiszRoleStartowe przypiszRoleStartowe,
-            PrzypiszInformacjeStartowe przypiszInformacjeStartowe)
+            PrzypiszInformacjeStartowe przypiszInformacjeStartowe,
+            DodajUprawnieniaZarzadzaniaRoli przypiszUprawnieniaZarzadzaniaRoli)
         {
             _dodajRoleStartowe = dodajRoleStartowe;
             _dodajLoginyStartowe = dodajLoginyStartowe;
             _przypiszRoleStartowe = przypiszRoleStartowe;
             _przypiszInformacjeStartowe = przypiszInformacjeStartowe;
+            _przypiszUprawnieniaZarzadzaniaRoli = przypiszUprawnieniaZarzadzaniaRoli;
         }
 
         public async Task DodajDaneStartoweAsync()
@@ -32,6 +35,8 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
                 await _przypiszRoleStartowe.PrzypiszRoleStartoweAsync();
 
                 await _przypiszInformacjeStartowe.PrzypiszInformacjeDodatkoweAsync();
+
+                await _przypiszUprawnieniaZarzadzaniaRoli.DodajUprawnieniaZarzadzaniaRoliAsync();
             }
             catch (Exception ex)
             {

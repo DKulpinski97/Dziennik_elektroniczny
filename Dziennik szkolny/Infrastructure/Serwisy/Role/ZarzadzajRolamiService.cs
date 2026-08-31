@@ -60,18 +60,25 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
         }
 
 
-        public async Task<bool> UsunRole(string roleId)
+        public async Task<(bool Sukces, string Komunikat)> UsunRole(string roleId)
         {
             var rola = await _roleManager.FindByIdAsync(roleId);
 
             if (rola == null)
             {
-                return false;
+                return (false, "Rola nie została znaleziona.");
+            }
+
+            if (_daneStartowe.Role.Contains(rola.Name))
+            {
+                return (false, "Nie można usunąć roli, która jest systemowa.");
             }
 
             var wynik = await _roleManager.DeleteAsync(rola);
 
-            return wynik.Succeeded;
+            return (
+                wynik.Succeeded,wynik.Succeeded? "Rola usunięta pomyślnie.": "Nie udało się usunąć roli."
+            );
         }
 
     }

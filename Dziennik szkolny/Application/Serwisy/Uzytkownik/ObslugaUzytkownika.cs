@@ -6,11 +6,13 @@ using Dziennik_szkolny.Application.Modele.Uzytkownik;
 using Dziennik_szkolny.Application.Walidacja.Uzytkownik;
 using Dziennik_szkolny.Domain.Entities;
 using Dziennik_szkolny.Infrastructure;
+using Dziennik_szkolny.Infrastructure.DaneStartowe;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Dziennik_szkolny.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 
 namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
@@ -24,6 +26,8 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
         private readonly IPobierajUzytkownika _pobierajUzytkownika;
         private readonly IJednostkaPracy _jednostkaPracy;
         private readonly MapowanieUzytkownika _mapowanieUzytkownika = new MapowanieUzytkownika();
+        private readonly DaneStartowe _daneStartowe;
+        private readonly IPobierajUprawnieniaRoli _pobierajUprawnieniaRoli;
 
 
         public ObslugaUzytkownika(
@@ -32,7 +36,9 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             IZarzadzajUzytkownikem zarzadzajUzytkownikema,
             IPobierajUzytkownika pobierajUzytkownika,
             WalidacjaDanychUzytkownika walidacjaDanychUzytkownika,
-            IJednostkaPracy jednostkaPracy)
+            IJednostkaPracy jednostkaPracy,
+            DaneStartowe daneStartowe,
+            IPobierajUprawnieniaRoli pobierajUprawnieniaRoli)
         {
             _weryfikacjaDanychLogowania = weryfikacjaDanychLogowania;
             _pobierajRole = pobierajRole;
@@ -40,6 +46,8 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             _zarzadzajUzytkownikema = zarzadzajUzytkownikema;
             _pobierajUzytkownika = pobierajUzytkownika;
             _jednostkaPracy = jednostkaPracy;
+            _daneStartowe = daneStartowe;
+            _pobierajUprawnieniaRoli = pobierajUprawnieniaRoli;
         }
 
 
@@ -239,30 +247,23 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             }
         }
 
-        public async Task<ListaUzytkownikow> PodzielUzytkownikowNaRodzicowIPracownikowAsync()
+        public async Task<ListaUzytkownikow> PodzielUzytkownikowNaRodzicowIPracownikowAsync(ClaimsPrincipal user)
         {
             var wynik = new ListaUzytkownikow();
 
-            var uzytkownicy = await _pobierajUzytkownika.PobierzWszystkichUzytkownikow();
-            var informacje = await _pobierajUzytkownika.PobierzWszystkieInformacjeOUzrzytkownikach();
+            var roleUzytkownika = await _pobierajRole.PobierzRoleZalogowanegoUzytkownikaAsync(user);
 
-            var rolePracownikow = new List<string>
-            {
-                "Admin",
-                "Nauczyciel",
-                "Dyrektor",
-                "ViceDyrektor",
-                "Sekretarka"
-            };
+            var roleDoZarzadzania = await _pobierajUprawnieniaRoli.PobierzRoleKtorymiMozeZarzadzacAsync(roleUzytkownika);
+
+            var uzytkownicy =await _pobierajUzytkownika.PobierzUzytkownikowPoRolachAsync(roleDoZarzadzania);
+
+            var informacje =await _pobierajUzytkownika.PobierzWszystkieInformacjeOUzrzytkownikach();
+
+            var informacjePoId =informacje.ToDictionary(x => x.IdUzytkownika);
 
             foreach (var uzytkownik in uzytkownicy)
             {
-                var roleUzytkownika =
-                    await _pobierajRole.PobierzRoleUzytkownikaPoLoginieAsync(uzytkownik.UserName);
-
-                var dane = informacje.FirstOrDefault(x => x.IdUzytkownika == uzytkownik.Id);
-
-                if (dane == null)
+                if (!informacjePoId.TryGetValue(uzytkownik.Id, out var dane))
                 {
                     continue;
                 }
@@ -273,17 +274,12 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
                     Text = $"{dane.Imie} {dane.Nazwisko}"
                 };
 
-                bool jestPracownikiem =
-                    roleUzytkownika.Any(r => rolePracownikow.Contains(r));
-
-                bool jestRodzicem =
-                    roleUzytkownika.Any(r => r == "Rodzic");
-
-                if (jestPracownikiem)
+                if (uzytkownik.Role.Any(r =>
+                    _daneStartowe.RolePracownika.Contains(r)))
                 {
                     wynik.Pracownicy.Add(element);
                 }
-                else if (jestRodzicem)
+                else if (uzytkownik.Role.Contains("Rodzic"))
                 {
                     wynik.Rodzice.Add(element);
                 }
