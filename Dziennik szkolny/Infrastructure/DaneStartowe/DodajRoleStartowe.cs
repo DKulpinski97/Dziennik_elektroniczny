@@ -6,27 +6,19 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
     public class DodajRoleStartowe
     {
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly DaneStartowe _daneStartowe;
 
-        public DodajRoleStartowe(RoleManager<IdentityRole> roleManager)
+        public DodajRoleStartowe(RoleManager<IdentityRole> roleManager, DaneStartowe daneStartowe)
         {
             _roleManager = roleManager;
+            _daneStartowe = daneStartowe;
         }
 
         public async Task DodajRoleStartoweAsync()
         {
-            List<string> role = new()
-        {
-            "Admin",
-            "Nauczyciel",
-            "Uczen",
-            "Brak roli",
-            "Dyrektor",
-            "ViceDyrektor",
-            "Sekretarka",
-            "Rodzic"
-        };
+          
 
-            foreach (string nazwaRoli in role)
+            foreach (string nazwaRoli in _daneStartowe.Role)
             {
                 var istnieje = await _roleManager.RoleExistsAsync(nazwaRoli);
 

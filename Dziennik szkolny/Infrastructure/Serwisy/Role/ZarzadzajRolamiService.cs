@@ -1,38 +1,45 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.Data;
-using Dziennik_szkolny.Application.ObiektyTransferuDanych;
 using Dziennik_szkolny.Application.Interfejsy.Role;
+using Dziennik_szkolny.Infrastructure.DaneStartowe;
 namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
 {
     public class ZarzadzajRolamiService : IZarzadzajRolami
     {
         private readonly RoleManager<IdentityRole> _roleManager;
-        public ZarzadzajRolamiService(RoleManager<IdentityRole> roleManager)
+        private readonly Dziennik_szkolny.Infrastructure.DaneStartowe.DaneStartowe _daneStartowe;
+        public ZarzadzajRolamiService(RoleManager<IdentityRole> roleManager, Dziennik_szkolny.Infrastructure.DaneStartowe.DaneStartowe daneStartowe)
         {
             _roleManager = roleManager;
+            _daneStartowe = daneStartowe;
         }
 
-       
-      
-        public async Task<bool> ZmienNazweRoli(string roleId, string nowaNazwa, string staraNazwa)
+
+
+        public async Task<(bool Sukces, string Komunikat)> ZmienNazweRoli(string roleId, string nowaNazwa, string staraNazwa)
         {
             var rola = await _roleManager.FindByIdAsync(roleId);
 
             if (rola == null)
             {
-                return false;
+                return (false, "Rola nie została znaleziona.");
             }
+
+            if (_daneStartowe.Role.Contains(rola.Name))
+            {
+                return (false, "Nie można zmienić nazwy roli, która jest systemowa.");
+            }
+
             if (rola.Name != staraNazwa)
             {
-                return false;
+                return (false, "Rola została wcześniej zmieniona. Odśwież stronę i spróbuj ponownie.");
             }
+
             rola.Name = nowaNazwa;
             rola.NormalizedName = nowaNazwa.ToUpperInvariant();
 
             var wynik = await _roleManager.UpdateAsync(rola);
 
-            return wynik.Succeeded;
+            return (wynik.Succeeded, wynik.Succeeded ? "Nazwa roli zmieniona pomyślnie." : "Nie udało się zmienić nazwy roli.");
         }
 
 
@@ -66,6 +73,6 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
 
             return wynik.Succeeded;
         }
-        
+
     }
 }

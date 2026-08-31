@@ -56,6 +56,7 @@ builder.Services.AddIdentity<LoginUzytkownika, IdentityRole>(options =>
 
 // Własne serwisy
 //Generowanie danych startowych
+builder.Services.AddSingleton<DaneStartowe>();
 builder.Services.AddScoped<IDodajDaneStartowe, DodajDaneStartowe>();
 builder.Services.AddScoped<DodajRoleStartowe>();
 builder.Services.AddScoped<DodajLoginyStartowe>();

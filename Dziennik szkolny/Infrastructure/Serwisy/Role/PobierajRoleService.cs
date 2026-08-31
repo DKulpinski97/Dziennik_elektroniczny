@@ -5,10 +5,11 @@ using Dziennik_szkolny.Application.ObiektyTransferuDanych;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
 {
-    public class PobierajRoleService:IPobierajRole
+    public class PobierajRoleService : IPobierajRole
 
     {
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -18,11 +19,32 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
             _roleManager = roleManager;
             _userManager = userManager;
         }
-        public async Task<List<DaneRoli>> PobierzRole()
+        public async Task<List<DaneRoli>> PobierzRole(ClaimsPrincipal user)
         {
-            return await _roleManager.Roles
-                .Where(x => x.Name != "Brak roli" &&
-                            x.Name != "Uczeń")
+            var query = _roleManager.Roles.Where(
+                x => x.Name != "Brak roli" &&
+                x.Name != "Uczeń");
+
+            if (user.IsInRole("SuperAdmin"))
+            {
+                query = query.Where(x => x.Name == "Admin");
+            }
+            else if (user.IsInRole("Admin"))
+            {
+                query = query.Where(x =>
+                    x.Name != "Admin" &&
+                    x.Name != "SuperAdmin");
+            }
+            else if (user.IsInRole("Dyrektor"))
+            {
+                query = query.Where(x =>
+                    x.Name != "SuperAdmin" &&
+                    x.Name != "Admin" &&
+                    x.Name != "Dyrektor" &&
+                    x.Name != "ViceDyrektor");
+            }
+
+            return await query
                 .OrderBy(x => x.Name)
                 .Select(x => new DaneRoli
                 {
@@ -68,7 +90,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
 
             return await _userManager.GetRolesAsync(uzytkownik);
         }
-        public  async Task<List<string>> PobierzNazwyRolPoIdAsync(List<string> idRol)
+        public async Task<List<string>> PobierzNazwyRolPoIdAsync(List<string> idRol)
         {
             if (idRol == null || idRol.Count == 0)
             {

@@ -6,31 +6,20 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
     public class DodajLoginyStartowe
     {
         private readonly UserManager<LoginUzytkownika> _userManager;
+        private readonly DaneStartowe _daneStartowe;
 
         public DodajLoginyStartowe(
-            UserManager<LoginUzytkownika> userManager)
+            UserManager<LoginUzytkownika> userManager,DaneStartowe daneStartowe)
         {
             _userManager = userManager;
+            _daneStartowe = daneStartowe;
         }
 
         public async Task DodajLoginyStartoweAsync()
         {
-            List<string[]> loginy =
-            [
-                new[] { "Admin", "Admin@gmail.com", "Admin" },
-                new[] { "Dyrektor", "Dyrektor@gmail.com", "Dyrektor" },
-                new[] { "Sekretarka", "Sekretarka@gmail.com", "Sekretarka" },
+           
 
-                new[] { "Nauczyciel1", "Nauczyciel1@gmail.com", "Nauczyciel1" },
-                new[] { "Nauczyciel2", "Nauczyciel2@gmail.com", "Nauczyciel2" },
-                new[] { "Nauczyciel3", "Nauczyciel3@gmail.com", "Nauczyciel3" },
-
-                new[] { "Rodzic1", "Rodzic1@gmail.com", "Rodzic1" },
-                new[] { "Rodzic2", "Rodzic2@gmail.com", "Rodzic2" },
-                new[] { "Rodzic3", "Rodzic3@gmail.com", "Rodzic3" }
-            ];
-
-            foreach (var dane in loginy)
+            foreach (var dane in _daneStartowe.Loginy)
             {
                 string login = dane[0];
                 string email = dane[1];
