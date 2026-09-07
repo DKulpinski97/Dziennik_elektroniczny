@@ -14,37 +14,30 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
     {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<LoginUzytkownika> _userManager;
-        public PobierajRoleService(RoleManager<IdentityRole> roleManager, UserManager<LoginUzytkownika> userManager)
+        private readonly AppDbContext _context;
+        public PobierajRoleService(RoleManager<IdentityRole> roleManager, UserManager<LoginUzytkownika> userManager, AppDbContext context)
         {
             _roleManager = roleManager;
             _userManager = userManager;
+            _context = context;
         }
         public async Task<List<DaneRoli>> PobierzRole(ClaimsPrincipal user)
         {
-            var query = _roleManager.Roles.Where(
-                x => x.Name != "Brak roli" &&
-                x.Name != "Uczeń");
+            var roleZalogowanego = await PobierzRoleZalogowanegoUzytkownikaAsync(user);
 
-            if (user.IsInRole("SuperAdmin"))
-            {
-                query = query.Where(x => x.Name == "Admin");
-            }
-            else if (user.IsInRole("Admin"))
-            {
-                query = query.Where(x =>
-                    x.Name != "Admin" &&
-                    x.Name != "SuperAdmin");
-            }
-            else if (user.IsInRole("Dyrektor"))
-            {
-                query = query.Where(x =>
-                    x.Name != "SuperAdmin" &&
-                    x.Name != "Admin" &&
-                    x.Name != "Dyrektor" &&
-                    x.Name != "ViceDyrektor");
-            }
+            var idRolZalogowanego = await _roleManager.Roles
+                .Where(x => roleZalogowanego.Contains(x.Name))
+                .Select(x => x.Id)
+                .ToListAsync();
 
-            return await query
+            var idRolDoZarzadzania = await _context.UprawnieniaZarzadzaniaRola
+                .Where(x => idRolZalogowanego.Contains(x.RolaZarzadzajacaId))
+                .Select(x => x.RolaZarzadzanaId)
+                .Distinct()
+                .ToListAsync();
+
+            return await _roleManager.Roles
+                .Where(x => idRolDoZarzadzania.Contains(x.Id))
                 .OrderBy(x => x.Name)
                 .Select(x => new DaneRoli
                 {
@@ -121,7 +114,17 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
 
             return rola?.Id;
         }
+        public async Task<List<string>> PobierzRoleUzytkownikaPoIdAsync(string idUzytkownika)
+        {
+            var uzytkownik = await _userManager.FindByIdAsync(idUzytkownika);
 
+            if (uzytkownik == null)
+            {
+                return new List<string>();
+            }
+
+            return (await _userManager.GetRolesAsync(uzytkownik)).ToList();
+        }
 
     }
 

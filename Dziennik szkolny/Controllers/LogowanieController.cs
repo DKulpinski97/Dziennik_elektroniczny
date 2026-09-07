@@ -21,15 +21,27 @@ namespace Dziennik_szkolny.Controllers
             }
             return View();
         }
+        // TODO: Przed wdrożeniem dodać ochronę CSRF na wylogowanie.
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(Login Login)
         {
+            // TODO: Przed wdrożeniem włączyć lockoutOnFailure (wymaga też
+            // odkomentowania sekcji Lockout w Program.cs).
+            /*
             var result = await _signInManager.PasswordSignInAsync(
-       Login.LoginUzytkownika,
-       Login.HasloUzytkownika,
-       false,
-       false
-   );
+                Login.LoginUzytkownika,
+                Login.HasloUzytkownika,
+                false,
+                true // lockoutOnFailure
+            );
+            */
+            var result = await _signInManager.PasswordSignInAsync(
+                Login.LoginUzytkownika,
+                Login.HasloUzytkownika,
+                false,
+                false
+            );
 
             if (result.Succeeded)
             {
@@ -41,8 +53,8 @@ namespace Dziennik_szkolny.Controllers
             return View(Login);
 
         }
- 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Wyloguj()
         {
             await _signInManager.SignOutAsync();

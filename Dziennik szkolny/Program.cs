@@ -35,6 +35,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Identity
 // TODO: Przed wdrożeniem włączyć wymagania silnego hasła.
+// TODO: Przed wdrożeniem włączyć blokadę konta po nieudanych próbach logowania.
+
 builder.Services.AddIdentity<LoginUzytkownika, IdentityRole>(options =>
 {
     /*
@@ -43,6 +45,9 @@ builder.Services.AddIdentity<LoginUzytkownika, IdentityRole>(options =>
     options.Password.RequireLowercase = true;     // Wymagana mała litera
     options.Password.RequireUppercase = true;     // Wymagana wielka litera
     options.Password.RequireNonAlphanumeric = true; // Wymagany znak specjalny
+    options.Lockout.MaxFailedAccessAttempts = 5;                       // Liczba prób przed blokadą
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);  // Czas trwania blokady
+    options.Lockout.AllowedForNewUsers = true;                        // Blokada dotyczy też nowych kont
      * */
     options.Password.RequiredLength = 1;
     options.Password.RequireDigit = false;

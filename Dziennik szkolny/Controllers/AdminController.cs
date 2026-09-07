@@ -213,7 +213,7 @@ namespace Dziennik_szkolny.Controllers
                 return View("DaneUżytkonikaKontrola", uzytkownikaViewModel);
             }
 
-            var wynik = await _obslugaUzytkownika.DodajUzytkownikaAsync(uzytkownikaViewModel);
+            var wynik = await _obslugaUzytkownika.DodajUzytkownikaAsync(uzytkownikaViewModel, User);
 
             if (wynik.CzyUdane)
             {
@@ -265,7 +265,12 @@ namespace Dziennik_szkolny.Controllers
 
                 return RedirectToAction(nameof(ZarządzajUżytkownikem));
             }
+            var mozeZarzadzac = await _pobierajUprawnieniaRoli.CzyMozeZarzadzacUzytkownikiemAsync(User,idUzytkownika);
 
+            if (!mozeZarzadzac)
+            {
+                return Forbid();
+            }
 
 
             LoginUzytkownika uzytkownik = await _pobierajUzytkownika.PobierzUzytkownikaPoIDAsync(idUzytkownika);
@@ -311,8 +316,17 @@ namespace Dziennik_szkolny.Controllers
                 return RedirectToAction(nameof(ZarządzajUżytkownikem));
 
             }
+
+            var mozeZarzadzac = await _pobierajUprawnieniaRoli
+                .CzyMozeZarzadzacUzytkownikiemAsync(User, viewModelUzytkownika.idUzytkownika);
+
+            if (!mozeZarzadzac)
+            {
+                return Forbid();
+            }
+
             _mapowanieUzytkownika.MapujDostepneRoleDoIStniejacegoVievModel(viewModelUzytkownika, await _pobierajRole.PobierzRole(User));
-            var wynik = await _obslugaUzytkownika.EdytujUzytkownikaAsync(viewModelUzytkownika);
+            var wynik = await _obslugaUzytkownika.EdytujUzytkownikaAsync(viewModelUzytkownika, User);
 
 
             TempData["TypWiadomosci"] = wynik.CzyUdane ? "success" : "danger";
@@ -342,6 +356,13 @@ namespace Dziennik_szkolny.Controllers
                 return RedirectToAction(nameof(ZarządzajUżytkownikem));
             }
 
+            var mozeZarzadzac = await _pobierajUprawnieniaRoli
+                .CzyMozeZarzadzacUzytkownikiemAsync(User, IdUzytkownika);
+
+            if (!mozeZarzadzac)
+            {
+                return Forbid();
+            }
 
             var wynik = await _uzytkownikService.UsunUzytkownika(IdUzytkownika);
 

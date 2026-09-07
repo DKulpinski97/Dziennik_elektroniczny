@@ -59,16 +59,16 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
 
             return wynik.Succeeded;
         }
-        public async Task<bool> DodajRoleUzytkownikowiAsync(LoginUzytkownika uzytkownik,List<string> idRoli)
+        public async Task<bool> DodajRoleUzytkownikowiAsync(LoginUzytkownika uzytkownik,List<string> NazwayRoli)
         {
-            if (idRoli == null || !idRoli.Any())
+            if (NazwayRoli == null || !NazwayRoli.Any())
             {
                 return false;
             }
 
-            foreach (var idRoliItem in idRoli)
+            foreach (var NazwaRoli in NazwayRoli)
             {
-                var rola = await _pobierajRole.PobierzRolePoNazwie(idRoliItem);
+                var rola = await _pobierajRole.PobierzRolePoNazwie(NazwaRoli);
 
                 if (rola == null)
                 {

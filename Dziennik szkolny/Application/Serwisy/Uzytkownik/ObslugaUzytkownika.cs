@@ -51,7 +51,7 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
         }
 
 
-        public async Task<(string Komunikat, UzytkownikaViewModel Uzytkownik, bool CzyUdane)> DodajUzytkownikaAsync(UzytkownikaViewModel model)
+        public async Task<(string Komunikat, UzytkownikaViewModel Uzytkownik, bool CzyUdane)> DodajUzytkownikaAsync(UzytkownikaViewModel model, ClaimsPrincipal zalogowanyUzytkownik)
         {
             // TODO: W wersji wdrożeniowej zastosować wymagania silnego hasła
             // zgodne z konfiguracją ASP.NET Core Identity.
@@ -92,6 +92,15 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
                 return ("Nie znaleziono jednej lub więcej wybranych ról.", model, false);
             }
 
+            var wybraneNazwyRol = await _pobierajRole.PobierzNazwyRolPoIdAsync(model.WybraneRole);
+            var roleZalogowanego = await _pobierajRole.PobierzRoleZalogowanegoUzytkownikaAsync(zalogowanyUzytkownik);
+            var roleDoZarzadzania = await _pobierajUprawnieniaRoli.PobierzRoleKtorymiMozeZarzadzacAsync(roleZalogowanego);
+
+            if (wybraneNazwyRol.Any(rola => !roleDoZarzadzania.Contains(rola)))
+            {
+                return ("Nie masz uprawnień do nadania jednej lub więcej wybranych ról.", model, false);
+            }
+
             await _jednostkaPracy.RozpocznijTransakcjeAsync();
 
             try
@@ -104,7 +113,7 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
                 }
                 var nowyUzytkownik = await _pobierajUzytkownika.PobierzUzytkownikaPoLoginieAsync(model.Login);
                 //Dodaj Role użytkownikowi
-                if (!await _zarzadzajUzytkownikema.DodajRoleUzytkownikowiAsync(nowyUzytkownik, model.WybraneRole))
+                if (!await _zarzadzajUzytkownikema.DodajRoleUzytkownikowiAsync(nowyUzytkownik, wybraneNazwyRol))
                 {
                     await _jednostkaPracy.CofnijAsync();
                     return ("Nie udało się przypisać ról.", model, false);
@@ -128,7 +137,7 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             }
         }
 
-        public async Task<(string Komunikat, UzytkownikaViewModel Uzytkownik, bool CzyUdane)> EdytujUzytkownikaAsync(UzytkownikaViewModel uzytkownikaViewModel)
+        public async Task<(string Komunikat, UzytkownikaViewModel Uzytkownik, bool CzyUdane)> EdytujUzytkownikaAsync(UzytkownikaViewModel uzytkownikaViewModel, ClaimsPrincipal zalogowanyUzytkownik)
         {
             //======================Sprawdzanie podstawowych danych=========================
             // TODO: W wersji wdrożeniowej zastosować wymagania silnego hasła
@@ -171,6 +180,15 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             if (!await _pobierajRole.CzyIstniejaRoleAsync(uzytkownikaViewModel.WybraneRole))
             {
                 return ("Nie znaleziono jednej lub więcej wybranych ról.", uzytkownikaViewModel, false);
+            }
+
+            var wybraneNazwyRol = await _pobierajRole.PobierzNazwyRolPoIdAsync(uzytkownikaViewModel.WybraneRole);
+            var roleZalogowanego = await _pobierajRole.PobierzRoleZalogowanegoUzytkownikaAsync(zalogowanyUzytkownik);
+            var roleDoZarzadzania = await _pobierajUprawnieniaRoli.PobierzRoleKtorymiMozeZarzadzacAsync(roleZalogowanego);
+
+            if (wybraneNazwyRol.Any(rola => !roleDoZarzadzania.Contains(rola)))
+            {
+                return ("Nie masz uprawnień do nadania jednej lub więcej wybranych ról.", uzytkownikaViewModel, false);
             }
 
             await _jednostkaPracy.RozpocznijTransakcjeAsync();

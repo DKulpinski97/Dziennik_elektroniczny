@@ -9,7 +9,7 @@ namespace Dziennik_szkolny.Application.Interfejsy.Uzytkownik
         Task<bool> DodajUzytkownikaAsync(UzytkownikaViewModel model);
         Task<bool> EdytujUzytkownikaAsync(UzytkownikaViewModel model, bool zmienHaslo);
         Task<bool> EdytujInformacjeUzytkownikaAsync(InformacjeUzytkownik informacjeUzytkownika);
-        Task<bool> DodajRoleUzytkownikowiAsync(LoginUzytkownika uzytkownik, List<string> idRoli);
+        Task<bool> DodajRoleUzytkownikowiAsync(LoginUzytkownika uzytkownik, List<string> NazwaRoli);
         Task<bool >DodajInformacjeUzytkownikaAsync(LoginUzytkownika uzytkownik, UzytkownikaViewModel model);
         Task<bool> UsunWszystkieRoleUzytkownikowiAsync(string login);
         Task<bool> UsunUzytkownika(string idUzytkownika);
