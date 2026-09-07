@@ -55,8 +55,6 @@ namespace Dziennik_szkolny.ViewModel
         public List<string> WybraneRole { get; set; }
         [ValidateNever]
         public string idUzytkownika { get; set; }
-        [ValidateNever]
-        public long IdDanych { get; set; }
 
     }
 }

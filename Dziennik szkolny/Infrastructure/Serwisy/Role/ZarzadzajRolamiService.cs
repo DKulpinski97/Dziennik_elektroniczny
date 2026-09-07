@@ -5,12 +5,14 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
 {
     public class ZarzadzajRolamiService : IZarzadzajRolami
     {
+        private readonly IPobierajUprawnieniaRoli _pobierajUprawnieniaRoli;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly Dziennik_szkolny.Infrastructure.DaneStartowe.DaneStartowe _daneStartowe;
-        public ZarzadzajRolamiService(RoleManager<IdentityRole> roleManager, Dziennik_szkolny.Infrastructure.DaneStartowe.DaneStartowe daneStartowe)
+        public ZarzadzajRolamiService(RoleManager<IdentityRole> roleManager, Dziennik_szkolny.Infrastructure.DaneStartowe.DaneStartowe daneStartowe, PobierajUprawnieniaRoli pobierajUprawnieniaRoli)
         {
             _roleManager = roleManager;
             _daneStartowe = daneStartowe;
+            _pobierajUprawnieniaRoli = pobierajUprawnieniaRoli;
         }
 
 
@@ -62,6 +64,10 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
 
         public async Task<(bool Sukces, string Komunikat)> UsunRole(string roleId)
         {
+            if (await _pobierajUprawnieniaRoli.CzyRolaJestUzywanaWHierarchiiAsync(roleId))
+            {
+                return (false, "Nie można usunąć roli, ponieważ jest częścią hierarchii zarządzania.");
+            }
             var rola = await _roleManager.FindByIdAsync(roleId);
 
             if (rola == null)

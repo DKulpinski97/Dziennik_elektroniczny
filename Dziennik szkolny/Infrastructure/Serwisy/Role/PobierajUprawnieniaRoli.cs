@@ -54,5 +54,9 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
 
             return roleUzytkownika.Any(x => roleDoZarzadzania.Contains(x));
         }
+        public async Task<bool> CzyRolaJestUzywanaWHierarchiiAsync(string idRoli)
+        {
+            return await _context.UprawnieniaZarzadzaniaRola.AnyAsync(x => x.RolaZarzadzajacaId == idRoli || x.RolaZarzadzanaId == idRoli);
+        }
     }
 }

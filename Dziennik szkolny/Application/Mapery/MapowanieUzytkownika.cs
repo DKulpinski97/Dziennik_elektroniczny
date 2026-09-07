@@ -26,8 +26,7 @@ namespace Dziennik_szkolny.Application.Mapery
                 NrMieszkania = informacjeUzytkownik.NrMieszkania,
                 DostepneRole = dostepneRole,
                 WybraneRole = wybraneRole,
-                idUzytkownika = login.Id,
-                IdDanych = informacjeUzytkownik.IdOsoby
+                idUzytkownika = login.Id
             };
         }
         public void MapujNaInformacjeUzytkownika(InformacjeUzytkownik informacjeUzytkownik,UzytkownikaViewModel uzytkownikaViewModel)

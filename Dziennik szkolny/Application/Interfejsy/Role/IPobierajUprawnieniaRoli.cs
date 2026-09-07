@@ -6,5 +6,6 @@ namespace Dziennik_szkolny.Application.Interfejsy.Role
     {
         Task<List<string>> PobierzRoleKtorymiMozeZarzadzacAsync(List<string> roleZarzadzajace);
         Task<bool> CzyMozeZarzadzacUzytkownikiemAsync(ClaimsPrincipal user, string idUzytkownika);
+        Task<bool> CzyRolaJestUzywanaWHierarchiiAsync(string idRoli);
     }
 }
