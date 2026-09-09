@@ -1,0 +1,85 @@
+HIERARCHIA RÓL I UPRAWNIENIA ZARZĄDZANIA
+
+Zasada:
+Użytkownik może zarządzać użytkownikami posiadającymi role, które zostały mu przypisane jako dozwolone w systemie.
+
+HIERARCHIA
+
+SuperAdmin
+|
++-- Admin
+|
++-- Dyrektor
+| |
+| +-- Sekretarka
+| +-- Nauczyciel
+| +-- Rodzic
+|
++-- ViceDyrektor
+|
++-- Sekretarka
++-- Nauczyciel
++-- Rodzic
+
+Sekretarka
+|
++-- Uczen
++-- Rodzic
+
+UPRAWNIENIA
+
+SuperAdmin:
+
+może zarządzać wyłącznie rolą Admin
+
+Admin:
+
+może zarządzać rolą Dyrektor
+może zarządzać rolą ViceDyrektor
+może zarządzać rolą Sekretarka
+może zarządzać rolą Nauczyciel
+może zarządzać rolą Rodzic
+
+Dyrektor:
+
+może zarządzać rolą Sekretarka
+może zarządzać rolą Nauczyciel
+może zarządzać rolą Rodzic
+
+ViceDyrektor:
+
+może zarządzać rolą Sekretarka
+może zarządzać rolą Nauczyciel
+może zarządzać rolą Rodzic
+
+Sekretarka:
+
+może zarządzać rolą Uczen
+może zarządzać rolą Rodzic
+
+Nauczyciel:
+
+nie może zarządzać innymi użytkownikami
+
+Rodzic:
+
+nie może zarządzać innymi użytkownikami
+
+Uczen:
+
+nie może zarządzać innymi użytkownikami
+
+WAŻNE
+
+Uprawnienia są przechowywane w bazie danych jako relacje:
+
+RolaZarzadzajaca -> RolaZarzadzana
+
+Dane startowe określają początkowe relacje pomiędzy rolami.
+
+Przykład:
+
+Admin -> Dyrektor
+
+oznacza, że użytkownik posiadający rolę Admin może zarządzać użytkownikiem posiadającym rolę Dyrektor.
+
