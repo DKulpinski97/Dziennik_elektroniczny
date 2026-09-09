@@ -8,7 +8,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
         private readonly IPobierajUprawnieniaRoli _pobierajUprawnieniaRoli;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly Dziennik_szkolny.Infrastructure.DaneStartowe.DaneStartowe _daneStartowe;
-        public ZarzadzajRolamiService(RoleManager<IdentityRole> roleManager, Dziennik_szkolny.Infrastructure.DaneStartowe.DaneStartowe daneStartowe, PobierajUprawnieniaRoli pobierajUprawnieniaRoli)
+        public ZarzadzajRolamiService(RoleManager<IdentityRole> roleManager, Dziennik_szkolny.Infrastructure.DaneStartowe.DaneStartowe daneStartowe, IPobierajUprawnieniaRoli pobierajUprawnieniaRoli)
         {
             _roleManager = roleManager;
             _daneStartowe = daneStartowe;

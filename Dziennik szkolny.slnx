@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="Dziennik szkolny.Tests/Dziennik szkolny.Tests.csproj" />
   <Project Path="Dziennik szkolny/Dziennik szkolny.csproj" />
 </Solution>
