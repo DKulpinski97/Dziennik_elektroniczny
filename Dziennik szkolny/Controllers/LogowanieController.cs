@@ -21,7 +21,6 @@ namespace Dziennik_szkolny.Controllers
             }
             return View();
         }
-        // TODO: Przed wdrożeniem dodać ochronę CSRF na wylogowanie.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(Login Login)
@@ -60,6 +59,11 @@ namespace Dziennik_szkolny.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Login");
         }
-
+        [HttpGet]
+        public IActionResult BrakDostepu()
+        {
+            TempData["BladDostepu"] = "Nie masz uprawnień do wykonania tej akcji.";
+            return RedirectToAction("Login");
+        }
     }
 }
