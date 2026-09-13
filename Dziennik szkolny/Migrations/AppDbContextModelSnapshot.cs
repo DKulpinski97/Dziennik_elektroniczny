@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Dzienik_szkolny.Migrations
+namespace Dziennik_szkolny.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
@@ -86,13 +86,17 @@ namespace Dzienik_szkolny.Migrations
 
                     b.Property<string>("RolaZarzadzajacaId")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("RolaZarzadzanaId")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RolaZarzadzajacaId");
+
+                    b.HasIndex("RolaZarzadzanaId");
 
                     b.ToTable("UprawnieniaZarzadzaniaRola");
                 });
@@ -302,6 +306,21 @@ namespace Dzienik_szkolny.Migrations
                         .IsRequired();
 
                     b.Navigation("LoginUzytkownika");
+                });
+
+            modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.UprawnienieZarzadzaniaRola", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RolaZarzadzajacaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RolaZarzadzanaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

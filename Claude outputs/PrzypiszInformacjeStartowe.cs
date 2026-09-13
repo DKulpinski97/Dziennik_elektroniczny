@@ -22,7 +22,7 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
 
         public async Task PrzypiszInformacjeDodatkoweAsync()
         {
-            List<InformacjeUzytkownik> informacjeUzytkownikow = [];
+            List<InformacjeUzytkownik> noweInformacje = [];
 
             foreach (var dane in _daneStartowe.Informacje)
             {
@@ -30,21 +30,12 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
                     ?? throw new InvalidOperationException(
                         $"Nie znaleziono użytkownika startowego '{dane[0]}'.");
 
-                informacjeUzytkownikow.Add(
-                    PrzypiszDane(dane, uzytkownik.Id));
-            }
-
-            List<InformacjeUzytkownik> noweInformacje = [];
-
-            foreach (var informacjeUzytkownika in informacjeUzytkownikow)
-            {
                 bool istnieje = await _context.InformacjeUzytkownik
-                    .AnyAsync(x =>
-                        x.IdUzytkownika == informacjeUzytkownika.IdUzytkownika);
+                    .AnyAsync(x => x.IdUzytkownika == uzytkownik.Id);
 
                 if (!istnieje)
                 {
-                    noweInformacje.Add(informacjeUzytkownika);
+                    noweInformacje.Add(PrzypiszDane(dane, uzytkownik.Id));
                 }
             }
 
