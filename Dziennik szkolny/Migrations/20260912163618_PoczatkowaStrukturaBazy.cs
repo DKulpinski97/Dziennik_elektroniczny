@@ -1,39 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Dzienik_szkolny.Migrations
+namespace Dziennik_szkolny.Migrations
 {
     /// <inheritdoc />
-    public partial class Pierwszamigracja : Migration
+    public partial class PoczatkowaStrukturaBazy : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "AdresUzytkownika",
-                columns: table => new
-                {
-                    IdAdresu = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Miejscowosc = table.Column<string>(type: "varchar(60)", maxLength: 60, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    KodPocztowy = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Adres = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    NrMieszkania = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    IdUzytkownika = table.Column<long>(type: "bigint", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AdresUzytkownika", x => x.IdAdresu);
-                })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -91,21 +70,6 @@ namespace Dzienik_szkolny.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "ListaRole",
-                columns: table => new
-                {
-                    IdRoli = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    NazwaRoli = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ListaRole", x => x.IdRoli);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -127,6 +91,35 @@ namespace Dzienik_szkolny.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "UprawnieniaZarzadzaniaRola",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    RolaZarzadzajacaId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RolaZarzadzanaId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UprawnieniaZarzadzaniaRola", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UprawnieniaZarzadzaniaRola_AspNetRoles_RolaZarzadzajacaId",
+                        column: x => x.RolaZarzadzajacaId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UprawnieniaZarzadzaniaRola_AspNetRoles_RolaZarzadzanaId",
+                        column: x => x.RolaZarzadzanaId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -233,36 +226,10 @@ namespace Dzienik_szkolny.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "InformacjePracownik",
-                columns: table => new
-                {
-                    IdPracownika = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Imie = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Nazwisko = table.Column<string>(type: "varchar(60)", maxLength: 60, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Pesel = table.Column<string>(type: "varchar(11)", maxLength: 11, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    LoginId = table.Column<string>(type: "varchar(255)", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_InformacjePracownik", x => x.IdPracownika);
-                    table.ForeignKey(
-                        name: "FK_InformacjePracownik_AspNetUsers_LoginId",
-                        column: x => x.LoginId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "InformacjeUzytkownik",
                 columns: table => new
                 {
-                    IdRodzica = table.Column<long>(type: "bigint", nullable: false)
+                    IdOsoby = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Imie = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -272,54 +239,23 @@ namespace Dzienik_szkolny.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Telefon = table.Column<string>(type: "varchar(9)", maxLength: 9, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    IdUzytkownika = table.Column<long>(type: "bigint", nullable: false),
-                    IdAdresu = table.Column<long>(type: "bigint", nullable: false),
-                    LoginId = table.Column<string>(type: "varchar(255)", nullable: true)
+                    Miasto = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    AdresIdAdresu = table.Column<long>(type: "bigint", nullable: false)
+                    Ulica = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    NrMieszkania = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IdUzytkownika = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_InformacjeUzytkownik", x => x.IdRodzica);
+                    table.PrimaryKey("PK_InformacjeUzytkownik", x => x.IdOsoby);
                     table.ForeignKey(
-                        name: "FK_InformacjeUzytkownik_AdresUzytkownika_AdresIdAdresu",
-                        column: x => x.AdresIdAdresu,
-                        principalTable: "AdresUzytkownika",
-                        principalColumn: "IdAdresu",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_InformacjeUzytkownik_AspNetUsers_LoginId",
-                        column: x => x.LoginId,
+                        name: "FK_InformacjeUzytkownik_AspNetUsers_IdUzytkownika",
+                        column: x => x.IdUzytkownika,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "LoczenieRoli",
-                columns: table => new
-                {
-                    IdLoczenia = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    IdUzytkownika = table.Column<long>(type: "bigint", nullable: false),
-                    IdRoli = table.Column<long>(type: "bigint", nullable: false),
-                    LoginId = table.Column<string>(type: "varchar(255)", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    RolaIdRoli = table.Column<long>(type: "bigint", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LoczenieRoli", x => x.IdLoczenia);
-                    table.ForeignKey(
-                        name: "FK_LoczenieRoli_AspNetUsers_LoginId",
-                        column: x => x.LoginId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_LoczenieRoli_ListaRole_RolaIdRoli",
-                        column: x => x.RolaIdRoli,
-                        principalTable: "ListaRole",
-                        principalColumn: "IdRoli",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
@@ -362,29 +298,19 @@ namespace Dzienik_szkolny.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_InformacjePracownik_LoginId",
-                table: "InformacjePracownik",
-                column: "LoginId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_InformacjeUzytkownik_AdresIdAdresu",
+                name: "IX_InformacjeUzytkownik_IdUzytkownika",
                 table: "InformacjeUzytkownik",
-                column: "AdresIdAdresu");
+                column: "IdUzytkownika");
 
             migrationBuilder.CreateIndex(
-                name: "IX_InformacjeUzytkownik_LoginId",
-                table: "InformacjeUzytkownik",
-                column: "LoginId");
+                name: "IX_UprawnieniaZarzadzaniaRola_RolaZarzadzajacaId",
+                table: "UprawnieniaZarzadzaniaRola",
+                column: "RolaZarzadzajacaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LoczenieRoli_LoginId",
-                table: "LoczenieRoli",
-                column: "LoginId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_LoczenieRoli_RolaIdRoli",
-                table: "LoczenieRoli",
-                column: "RolaIdRoli");
+                name: "IX_UprawnieniaZarzadzaniaRola_RolaZarzadzanaId",
+                table: "UprawnieniaZarzadzaniaRola",
+                column: "RolaZarzadzanaId");
         }
 
         /// <inheritdoc />
@@ -406,25 +332,16 @@ namespace Dzienik_szkolny.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "InformacjePracownik");
-
-            migrationBuilder.DropTable(
                 name: "InformacjeUzytkownik");
 
             migrationBuilder.DropTable(
-                name: "LoczenieRoli");
-
-            migrationBuilder.DropTable(
-                name: "AspNetRoles");
-
-            migrationBuilder.DropTable(
-                name: "AdresUzytkownika");
+                name: "UprawnieniaZarzadzaniaRola");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "ListaRole");
+                name: "AspNetRoles");
         }
     }
 }

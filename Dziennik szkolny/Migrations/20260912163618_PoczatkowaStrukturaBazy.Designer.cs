@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Dzienik_szkolny.Migrations
+namespace Dziennik_szkolny.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260730165156_DodanokluczGlowny")]
-    partial class DodanokluczGlowny
+    [Migration("20260912163618_PoczatkowaStrukturaBazy")]
+    partial class PoczatkowaStrukturaBazy
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace Dzienik_szkolny.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("Dzienik_szkolny.Models.InformacjeUzytkownik", b =>
+            modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.InformacjeUzytkownik", b =>
                 {
                     b.Property<long>("IdOsoby")
                         .ValueGeneratedOnAdd()
@@ -79,7 +79,32 @@ namespace Dzienik_szkolny.Migrations
                     b.ToTable("InformacjeUzytkownik");
                 });
 
-            modelBuilder.Entity("Dzienik_szkolny.Models.LoginUzytkownika", b =>
+            modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.UprawnienieZarzadzaniaRola", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("RolaZarzadzajacaId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("RolaZarzadzanaId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RolaZarzadzajacaId");
+
+                    b.HasIndex("RolaZarzadzanaId");
+
+                    b.ToTable("UprawnieniaZarzadzaniaRola");
+                });
+
+            modelBuilder.Entity("Dziennik_szkolny.Infrastructure.Identyfikatory.LoginUzytkownika", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
@@ -275,15 +300,30 @@ namespace Dzienik_szkolny.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Dzienik_szkolny.Models.InformacjeUzytkownik", b =>
+            modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.InformacjeUzytkownik", b =>
                 {
-                    b.HasOne("Dzienik_szkolny.Models.LoginUzytkownika", "LoginUzytkownika")
+                    b.HasOne("Dziennik_szkolny.Infrastructure.Identyfikatory.LoginUzytkownika", "LoginUzytkownika")
                         .WithMany()
                         .HasForeignKey("IdUzytkownika")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("LoginUzytkownika");
+                });
+
+            modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.UprawnienieZarzadzaniaRola", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RolaZarzadzajacaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RolaZarzadzanaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -297,7 +337,7 @@ namespace Dzienik_szkolny.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Dzienik_szkolny.Models.LoginUzytkownika", null)
+                    b.HasOne("Dziennik_szkolny.Infrastructure.Identyfikatory.LoginUzytkownika", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -306,7 +346,7 @@ namespace Dzienik_szkolny.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Dzienik_szkolny.Models.LoginUzytkownika", null)
+                    b.HasOne("Dziennik_szkolny.Infrastructure.Identyfikatory.LoginUzytkownika", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -321,7 +361,7 @@ namespace Dzienik_szkolny.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Dzienik_szkolny.Models.LoginUzytkownika", null)
+                    b.HasOne("Dziennik_szkolny.Infrastructure.Identyfikatory.LoginUzytkownika", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -330,7 +370,7 @@ namespace Dzienik_szkolny.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Dzienik_szkolny.Models.LoginUzytkownika", null)
+                    b.HasOne("Dziennik_szkolny.Infrastructure.Identyfikatory.LoginUzytkownika", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

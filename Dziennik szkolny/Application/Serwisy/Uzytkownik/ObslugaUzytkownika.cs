@@ -28,6 +28,7 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
         private readonly MapowanieUzytkownika _mapowanieUzytkownika = new MapowanieUzytkownika();
         private readonly DaneStartowe _daneStartowe;
         private readonly IPobierajUprawnieniaRoli _pobierajUprawnieniaRoli;
+        private readonly ILogger<ObslugaUzytkownika> _logger;
 
 
         public ObslugaUzytkownika(
@@ -38,7 +39,8 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             WalidacjaDanychUzytkownika walidacjaDanychUzytkownika,
             IJednostkaPracy jednostkaPracy,
             DaneStartowe daneStartowe,
-            IPobierajUprawnieniaRoli pobierajUprawnieniaRoli)
+            IPobierajUprawnieniaRoli pobierajUprawnieniaRoli,
+            ILogger<ObslugaUzytkownika> logger)
         {
             _weryfikacjaDanychLogowania = weryfikacjaDanychLogowania;
             _pobierajRole = pobierajRole;
@@ -48,6 +50,9 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             _jednostkaPracy = jednostkaPracy;
             _daneStartowe = daneStartowe;
             _pobierajUprawnieniaRoli = pobierajUprawnieniaRoli;
+            _logger = logger;
+
+
         }
 
 
@@ -132,8 +137,9 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             catch (Exception ex)
             {
                 await _jednostkaPracy.CofnijAsync();
+                _logger.LogError(ex, "Błąd podczas dodawania użytkownika {Login}", model.Login);
 
-                return ($"Błąd: {ex.Message} Inner: {ex.InnerException?.Message}", model, false);
+                return ("Błąd: Nie udało się dodać użytkownika. Błąd systemu, spróbuj ponownie.", model, false);
             }
         }
 
@@ -230,8 +236,6 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
                 // Aktualizacja ról
                 // =====================
 
-                //var obecneRole = await _pobierajRole.PobierzRoleUzytkownikaPoLoginieAsync(uzytkownikaViewModel.Login);
-
                 LoginUzytkownika uzytkownik = await _pobierajUzytkownika.PobierzUzytkownikaPoLoginieAsync(uzytkownikaViewModel.Login);
 
                 if (!await _zarzadzajUzytkownikema.UsunWszystkieRoleUzytkownikowiAsync(uzytkownikaViewModel.Login))
@@ -257,9 +261,10 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
 
                 return ("Dane użytkownika zostały zmienione.", uzytkownikaViewModel, true);
             }
-            catch
+            catch (Exception ex)
             {
                 await _jednostkaPracy.CofnijAsync();
+                _logger.LogError(ex, "Błąd podczas edycji użytkownika {Login}", uzytkownikaViewModel.Login);
 
                 return ("Wystąpił błąd podczas edycji użytkownika.", uzytkownikaViewModel, false);
             }
