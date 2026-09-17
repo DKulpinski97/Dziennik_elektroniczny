@@ -87,12 +87,8 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
         }
         public async Task<bool> DodajInformacjeUzytkownikaAsync(LoginUzytkownika uzytkownik, UzytkownikaViewModel model)
         {
-            long ostatniId = await _dbContext.InformacjeUzytkownik.Select(x => (long?)x.IdOsoby).MaxAsync() ?? 0;
-
-            long nowyId = ostatniId + 1;
             var informacje = new InformacjeUzytkownik
             {
-                IdOsoby = nowyId,
                 IdUzytkownika = uzytkownik.Id,
                 Imie = model.Imie,
                 Nazwisko = model.Nazwisko,
@@ -103,13 +99,10 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
                 NrMieszkania = model.NrMieszkania
             };
 
-
             await _dbContext.InformacjeUzytkownik.AddAsync(informacje);
             var wynik = await _dbContext.SaveChangesAsync();
 
             return wynik > 0;
-
-
         }
 
         public async Task<bool> EdytujInformacjeUzytkownikaAsync(InformacjeUzytkownik informacjeUzytkownika)

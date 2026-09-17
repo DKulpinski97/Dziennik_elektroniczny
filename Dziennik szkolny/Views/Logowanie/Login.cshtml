@@ -8,6 +8,10 @@
     <div class="login-container">
         <div style="color:red">
             @Html.ValidationSummary()
+            @if (TempData["BladDostepu"] != null)
+            {
+                <p>@TempData["BladDostepu"]</p>
+            }
         </div>
         @using (Html.BeginForm("Login", "Logowanie", FormMethod.Post))
         {

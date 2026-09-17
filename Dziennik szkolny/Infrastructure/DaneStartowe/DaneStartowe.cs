@@ -1,71 +1,73 @@
-﻿namespace Dziennik_szkolny.Infrastructure.DaneStartowe
+using Dziennik_szkolny.Domain;
+
+namespace Dziennik_szkolny.Infrastructure.DaneStartowe
 {
     public class DaneStartowe
     {
         //Lista ról pracowników w systemie
         public List<string> RolePracownika { get; } =
         [
-        "Admin",
-        "SuperAdmin",
-        "Nauczyciel",
-        "Dyrektor",
-        "ViceDyrektor",
-        "Sekretarka",
+        NazwyRoli.Admin,
+        NazwyRoli.SuperAdmin,
+        NazwyRoli.Nauczyciel,
+        NazwyRoli.Dyrektor,
+        NazwyRoli.ViceDyrektor,
+        NazwyRoli.Sekretarka,
 
         ];
         //Lista ról w systemie
         public List<string> Role { get; } =
         [
-        "Admin",
-        "SuperAdmin",
-        "Nauczyciel",
-        "Uczen",
-        "Brak roli",
-        "Dyrektor",
-        "ViceDyrektor",
-        "Sekretarka",
-        "Rodzic"
+        NazwyRoli.Admin,
+        NazwyRoli.SuperAdmin,
+        NazwyRoli.Nauczyciel,
+        NazwyRoli.Uczen,
+        NazwyRoli.BrakRoli,
+        NazwyRoli.Dyrektor,
+        NazwyRoli.ViceDyrektor,
+        NazwyRoli.Sekretarka,
+        NazwyRoli.Rodzic
 
         ];
         //Połączenia w rolach w systemie
         public List<(string RolaZarzadzajaca, string RolaZarzadzana)> UprawnieniaRoli { get; } =
 [
     // SuperAdmin
-    ("SuperAdmin", "Admin"),
+    (NazwyRoli.SuperAdmin, NazwyRoli.Admin),
 
     // Admin
-    ("Admin", "Dyrektor"),
-    ("Admin", "ViceDyrektor"),
-    ("Admin", "Sekretarka"),
-    ("Admin", "Nauczyciel"),
-    ("Admin", "Rodzic"),
+    (NazwyRoli.Admin, NazwyRoli.Dyrektor),
+    (NazwyRoli.Admin, NazwyRoli.ViceDyrektor),
+    (NazwyRoli.Admin, NazwyRoli.Sekretarka),
+    (NazwyRoli.Admin, NazwyRoli.Nauczyciel),
+    (NazwyRoli.Admin, NazwyRoli.Rodzic),
 
     // Dyrektor
-    ("Dyrektor", "Sekretarka"),
-    ("Dyrektor", "Nauczyciel"),
-    ("Dyrektor", "Rodzic"),
-            // Dyrektor
-    ("ViceDyrektor", "Sekretarka"),
-    ("ViceDyrektor", "Nauczyciel"),
-    ("ViceDyrektor", "Rodzic"),
+    (NazwyRoli.Dyrektor, NazwyRoli.Sekretarka),
+    (NazwyRoli.Dyrektor, NazwyRoli.Nauczyciel),
+    (NazwyRoli.Dyrektor, NazwyRoli.Rodzic),
+    // ViceDyrektor
+    (NazwyRoli.ViceDyrektor, NazwyRoli.Sekretarka),
+    (NazwyRoli.ViceDyrektor, NazwyRoli.Nauczyciel),
+    (NazwyRoli.ViceDyrektor, NazwyRoli.Rodzic),
 
     // Sekretarka
-    ("Sekretarka", "Uczen"),
-    ("Sekretarka", "Rodzic")
+    (NazwyRoli.Sekretarka, NazwyRoli.Uczen),
+    (NazwyRoli.Sekretarka, NazwyRoli.Rodzic)
 ];
         //Lista ról przypisanych do użytkowników w systemie
         public List<List<string>> PrzypisanieRoli { get; } =
    [
-        ["Admin"],
-        ["SuperAdmin"],
-        ["Dyrektor"],
-        ["Sekretarka"],
-        ["Nauczyciel", "Rodzic"],
-        ["Nauczyciel"],
-        ["Nauczyciel"],
-        ["Rodzic"],
-        ["Rodzic"],
-        ["Rodzic"]
+        [NazwyRoli.Admin],
+        [NazwyRoli.SuperAdmin],
+        [NazwyRoli.Dyrektor],
+        [NazwyRoli.Sekretarka],
+        [NazwyRoli.Nauczyciel, NazwyRoli.Rodzic],
+        [NazwyRoli.Nauczyciel],
+        [NazwyRoli.Nauczyciel],
+        [NazwyRoli.Rodzic],
+        [NazwyRoli.Rodzic],
+        [NazwyRoli.Rodzic]
    ];
         //Lista loginów i haseł użytkowników w systemie
         public List<string[]> Loginy { get; } =

@@ -22,8 +22,6 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
 
         public async Task PrzypiszInformacjeDodatkoweAsync()
         {
-           
-
             List<InformacjeUzytkownik> informacjeUzytkownikow = [];
 
             foreach (var dane in _daneStartowe.Informacje)
@@ -36,12 +34,6 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
                     PrzypiszDane(dane, uzytkownik.Id));
             }
 
-            // Tymczasowo ręczne nadawanie ID, ponieważ AUTO_INCREMENT
-            // dla IdOsoby nie działa poprawnie w obecnej konfiguracji.
-            long ostatnieId = await _context.InformacjeUzytkownik
-                .Select(x => (long?)x.IdOsoby)
-                .MaxAsync() ?? 0;
-
             List<InformacjeUzytkownik> noweInformacje = [];
 
             foreach (var informacjeUzytkownika in informacjeUzytkownikow)
@@ -52,10 +44,6 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
 
                 if (!istnieje)
                 {
-                    ostatnieId++;
-
-                    informacjeUzytkownika.IdOsoby = ostatnieId;
-
                     noweInformacje.Add(informacjeUzytkownika);
                 }
             }
