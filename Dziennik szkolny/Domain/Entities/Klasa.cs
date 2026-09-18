@@ -25,6 +25,8 @@ namespace Dziennik_szkolny.Domain.Entities
 
         public virtual List<Uczen> Uczniowie { get; set; } = new List<Uczen>();
 
+        public virtual List<WpisPlanu> WpisyPlanu { get; set; } = new();
+
 
     }
 }

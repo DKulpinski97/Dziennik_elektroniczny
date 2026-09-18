@@ -20,6 +20,7 @@ namespace Dziennik_szkolny.Infrastructure
         public DbSet<Uczen> Uczniowie { get; set; }
         public DbSet<Przedmiot> Przedmioty { get; set; }
         public DbSet<PrzypisaniePrzedmiotu> PrzypisanePrzedmioty { get; set; }
+        public DbSet<WpisPlanu> WpisyPlanu { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,6 +48,11 @@ namespace Dziennik_szkolny.Infrastructure
                 .WithOne(u => u.Klasa)              
                 .HasForeignKey(u => u.IdKlasy)      
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Klasa>()
+                .HasMany(k => k.WpisyPlanu)
+                .WithOne(w => w.Klasa)
+                .HasForeignKey(w => w.IdKlasy)
+                .OnDelete(DeleteBehavior.Restrict);
             //========================Uczniowie=========================//
 
             modelBuilder.Entity<Uczen>()
@@ -71,7 +77,14 @@ namespace Dziennik_szkolny.Infrastructure
                 .HasOne(x => x.Nauczyciel)
                 .WithMany() 
                 .HasForeignKey(x => x.IdNauczyciela)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
+            //========================Wpis planu=========================//
+            modelBuilder.Entity<WpisPlanu>()
+            .HasOne(x => x.PrzypisaniePrzedmiotu)
+            .WithMany()
+            .HasForeignKey(x => new { x.IdPrzedmiotu, x.IdNauczyciela })
+            .OnDelete(DeleteBehavior.Restrict);
+
 
         }
 
