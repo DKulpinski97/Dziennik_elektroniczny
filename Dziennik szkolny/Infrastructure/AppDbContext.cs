@@ -18,6 +18,7 @@ namespace Dziennik_szkolny.Infrastructure
         public DbSet<UprawnienieZarzadzaniaRola> UprawnieniaZarzadzaniaRola { get; set; }
         public DbSet<Klasa> Klasa { get; set; }
         public DbSet<Uczen> Uczniowie { get; set; }
+        public DbSet<Przedmiot> Przedmioty { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -58,6 +59,7 @@ namespace Dziennik_szkolny.Infrastructure
                 .WithMany()
                 .HasForeignKey(x => x.IdOpiekun2)
                 .OnDelete(DeleteBehavior.Restrict);
+           
 
         }
 
