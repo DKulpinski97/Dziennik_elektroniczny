@@ -14,9 +14,8 @@ namespace Dziennik_szkolny.Domain.Entities
         [MaxLength(50)]
         public string NazwaPrzedmiotu { get; set; }
 
-        /* odwołania
-         * 
-         * public virtual List<PrzypisaniePrzedmiotu> Nauczyciele { get; set; } = new List<PrzypisaniePrzedmiotu>();
-         * */
+         //odwołania
+         public virtual List<PrzypisaniePrzedmiotu> Nauczyciele { get; set; } = new List<PrzypisaniePrzedmiotu>();
+         
     }
 }
