@@ -22,15 +22,15 @@ namespace Dziennik_szkolny.Migrations
                     RokNauki = table.Column<byte>(type: "tinyint unsigned", nullable: false),
                     RokRozpoczecia = table.Column<int>(type: "int", nullable: false),
                     RokZakonczenia = table.Column<int>(type: "int", nullable: true),
-                    WychowawcaId = table.Column<string>(type: "varchar(255)", nullable: true)
+                    IdWychowawcy = table.Column<string>(type: "varchar(255)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Klasa", x => x.IdKlasy);
                     table.ForeignKey(
-                        name: "FK_Klasa_AspNetUsers_WychowawcaId",
-                        column: x => x.WychowawcaId,
+                        name: "FK_Klasa_AspNetUsers_IdWychowawcy",
+                        column: x => x.IdWychowawcy,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -38,9 +38,9 @@ namespace Dziennik_szkolny.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Klasa_WychowawcaId",
+                name: "IX_Klasa_IdWychowawcy",
                 table: "Klasa",
-                column: "WychowawcaId");
+                column: "IdWychowawcy");
         }
 
         /// <inheritdoc />
