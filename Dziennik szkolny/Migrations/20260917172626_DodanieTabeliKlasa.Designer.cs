@@ -101,12 +101,12 @@ namespace Dziennik_szkolny.Migrations
                     b.Property<int?>("RokZakonczenia")
                         .HasColumnType("int");
 
-                    b.Property<string>("WychowawcaId")
+                    b.Property<string>("IdWychowawcy")
                         .HasColumnType("varchar(255)");
 
                     b.HasKey("IdKlasy");
 
-                    b.HasIndex("WychowawcaId");
+                    b.HasIndex("IdWychowawcy");
 
                     b.ToTable("Klasa");
                 });
@@ -347,7 +347,7 @@ namespace Dziennik_szkolny.Migrations
                 {
                     b.HasOne("Dziennik_szkolny.Infrastructure.Identyfikatory.LoginUzytkownika", "Wychowawca")
                         .WithMany()
-                        .HasForeignKey("WychowawcaId")
+                        .HasForeignKey("IdWychowawcy")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Wychowawca");

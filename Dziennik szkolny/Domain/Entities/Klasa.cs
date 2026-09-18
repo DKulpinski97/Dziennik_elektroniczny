@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dziennik_szkolny.Domain.Entities
 {
+
     public class Klasa
     {
         [Key]
@@ -18,13 +19,12 @@ namespace Dziennik_szkolny.Domain.Entities
  
         public int? RokZakonczenia { get; set; }
 
-        public string? WychowawcaId { get; set; }
-        [ForeignKey(nameof(WychowawcaId))]
+        public string? IdWychowawcy { get; set; }
+        [ForeignKey(nameof(IdWychowawcy))]
         public LoginUzytkownika? Wychowawca { get; set; }
-    
-        /*dowiązanie na potem
-         * List<Uczen> Uczniowie { get; set; } = new();
-         */
+
+        public virtual List<Uczen> Uczniowie { get; set; } = new List<Uczen>();
+
 
     }
 }

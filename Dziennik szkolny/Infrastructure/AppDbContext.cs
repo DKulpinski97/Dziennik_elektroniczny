@@ -17,11 +17,12 @@ namespace Dziennik_szkolny.Infrastructure
 
         public DbSet<UprawnienieZarzadzaniaRola> UprawnieniaZarzadzaniaRola { get; set; }
         public DbSet<Klasa> Klasa { get; set; }
+        public DbSet<Uczen> Uczniowie { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
+            //========================Role=========================//
             modelBuilder.Entity<UprawnienieZarzadzaniaRola>()
                 .HasOne<IdentityRole>()
                 .WithMany()
@@ -33,12 +34,31 @@ namespace Dziennik_szkolny.Infrastructure
                 .WithMany()
                 .HasForeignKey(x => x.RolaZarzadzanaId)
                 .OnDelete(DeleteBehavior.Restrict);
-
+            //========================Klasa=========================//
             modelBuilder.Entity<Klasa>()
-            .HasOne(x => x.Wychowawca)
-            .WithMany()
-            .HasForeignKey(x => x.WychowawcaId)
-            .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(x => x.Wychowawca)
+                .WithMany()
+                .HasForeignKey(x => x.IdWychowawcy)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Klasa>()
+                .HasMany(k => k.Uczniowie)          
+                .WithOne(u => u.Klasa)              
+                .HasForeignKey(u => u.IdKlasy)      
+                .OnDelete(DeleteBehavior.Restrict);
+            //========================Uczniowie=========================//
+
+            modelBuilder.Entity<Uczen>()
+                .HasOne(x => x.Opiekun1)
+                .WithMany()
+                .HasForeignKey(x => x.IdOpiekun1)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Uczen>()
+                .HasOne(x => x.Opiekun2)
+                .WithMany()
+                .HasForeignKey(x => x.IdOpiekun2)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
