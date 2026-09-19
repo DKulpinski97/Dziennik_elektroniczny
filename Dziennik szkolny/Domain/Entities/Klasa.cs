@@ -21,7 +21,7 @@ namespace Dziennik_szkolny.Domain.Entities
 
         public string? IdWychowawcy { get; set; }
         [ForeignKey(nameof(IdWychowawcy))]
-        public LoginUzytkownika? Wychowawca { get; set; }
+        public virtual LoginUzytkownika? Wychowawca { get; set; }
 
         public virtual List<Uczen> Uczniowie { get; set; } = new List<Uczen>();
 

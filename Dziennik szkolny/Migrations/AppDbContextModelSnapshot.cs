@@ -73,7 +73,7 @@ namespace Dziennik_szkolny.Migrations
 
                     b.HasIndex("IdUzytkownika");
 
-                    b.ToTable("InformacjeUzytkownik");
+                    b.ToTable("InformacjeUzytkownik", (string)null);
                 });
 
             modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.Klasa", b =>
@@ -105,7 +105,7 @@ namespace Dziennik_szkolny.Migrations
 
                     b.HasIndex("IdWychowawcy");
 
-                    b.ToTable("Klasa");
+                    b.ToTable("Klasa", (string)null);
                 });
 
             modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.Przedmiot", b =>
@@ -126,7 +126,7 @@ namespace Dziennik_szkolny.Migrations
                     b.HasIndex("NazwaPrzedmiotu")
                         .IsUnique();
 
-                    b.ToTable("Przedmioty");
+                    b.ToTable("Przedmioty", (string)null);
                 });
 
             modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.PrzypisaniePrzedmiotu", b =>
@@ -141,7 +141,7 @@ namespace Dziennik_szkolny.Migrations
 
                     b.HasIndex("IdNauczyciela");
 
-                    b.ToTable("PrzypisanePrzedmioty");
+                    b.ToTable("PrzypisanePrzedmioty", (string)null);
                 });
 
             modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.Uczen", b =>
@@ -191,7 +191,7 @@ namespace Dziennik_szkolny.Migrations
                     b.HasIndex("Pesel")
                         .IsUnique();
 
-                    b.ToTable("Uczniowie");
+                    b.ToTable("Uczniowie", (string)null);
                 });
 
             modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.UprawnienieZarzadzaniaRola", b =>
@@ -216,7 +216,7 @@ namespace Dziennik_szkolny.Migrations
 
                     b.HasIndex("RolaZarzadzanaId");
 
-                    b.ToTable("UprawnieniaZarzadzaniaRola");
+                    b.ToTable("UprawnieniaZarzadzaniaRola", (string)null);
                 });
 
             modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.WpisPlanu", b =>
@@ -249,7 +249,7 @@ namespace Dziennik_szkolny.Migrations
 
                     b.HasIndex("IdPrzedmiotu", "IdNauczyciela");
 
-                    b.ToTable("WpisyPlanu");
+                    b.ToTable("WpisyPlanu", (string)null);
                 });
 
             modelBuilder.Entity("Dziennik_szkolny.Infrastructure.Identyfikatory.LoginUzytkownika", b =>
