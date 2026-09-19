@@ -16,11 +16,16 @@ namespace Dziennik_szkolny.Infrastructure
         public DbSet<InformacjeUzytkownik> InformacjeUzytkownik { get; set; }
 
         public DbSet<UprawnienieZarzadzaniaRola> UprawnieniaZarzadzaniaRola { get; set; }
+        public DbSet<Klasa> Klasa { get; set; }
+        public DbSet<Uczen> Uczniowie { get; set; }
+        public DbSet<Przedmiot> Przedmioty { get; set; }
+        public DbSet<PrzypisaniePrzedmiotu> PrzypisanePrzedmioty { get; set; }
+        public DbSet<WpisPlanu> WpisyPlanu { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
+            //========================Role=========================//
             modelBuilder.Entity<UprawnienieZarzadzaniaRola>()
                 .HasOne<IdentityRole>()
                 .WithMany()
@@ -32,6 +37,55 @@ namespace Dziennik_szkolny.Infrastructure
                 .WithMany()
                 .HasForeignKey(x => x.RolaZarzadzanaId)
                 .OnDelete(DeleteBehavior.Restrict);
+            //========================Klasa=========================//
+            modelBuilder.Entity<Klasa>()
+                .HasOne(x => x.Wychowawca)
+                .WithMany()
+                .HasForeignKey(x => x.IdWychowawcy)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Klasa>()
+                .HasMany(k => k.Uczniowie)          
+                .WithOne(u => u.Klasa)              
+                .HasForeignKey(u => u.IdKlasy)      
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Klasa>()
+                .HasMany(k => k.WpisyPlanu)
+                .WithOne(w => w.Klasa)
+                .HasForeignKey(w => w.IdKlasy)
+                .OnDelete(DeleteBehavior.Restrict);
+            //========================Uczniowie=========================//
+
+            modelBuilder.Entity<Uczen>()
+                .HasOne(x => x.Opiekun1)
+                .WithMany()
+                .HasForeignKey(x => x.IdOpiekun1)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Uczen>()
+                .HasOne(x => x.Opiekun2)
+                .WithMany()
+                .HasForeignKey(x => x.IdOpiekun2)
+                .OnDelete(DeleteBehavior.Restrict);
+            //========================Przypisanie przedmiotów=========================//
+            modelBuilder.Entity<PrzypisaniePrzedmiotu>()
+                .HasOne(x => x.Przedmiot)
+                .WithMany(x => x.Nauczyciele) 
+                .HasForeignKey(x => x.IdPrzedmiotu)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PrzypisaniePrzedmiotu>()
+                .HasOne(x => x.Nauczyciel)
+                .WithMany() 
+                .HasForeignKey(x => x.IdNauczyciela)
+                .OnDelete(DeleteBehavior.Restrict);
+            //========================Wpis planu=========================//
+            modelBuilder.Entity<WpisPlanu>()
+            .HasOne(x => x.PrzypisaniePrzedmiotu)
+            .WithMany()
+            .HasForeignKey(x => new { x.IdPrzedmiotu, x.IdNauczyciela })
+            .OnDelete(DeleteBehavior.Restrict);
+
+
         }
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
