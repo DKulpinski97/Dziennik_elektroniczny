@@ -4,6 +4,7 @@ using Dziennik_szkolny.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dziennik_szkolny.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260917172626_DodanieTabeliKlasa")]
+    partial class DodanieTabeliKlasa
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,7 +76,7 @@ namespace Dziennik_szkolny.Migrations
 
                     b.HasIndex("IdUzytkownika");
 
-                    b.ToTable("InformacjeUzytkownik", (string)null);
+                    b.ToTable("InformacjeUzytkownik");
                 });
 
             modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.Klasa", b =>
@@ -83,9 +86,6 @@ namespace Dziennik_szkolny.Migrations
                         .HasColumnType("int");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdKlasy"));
-
-                    b.Property<string>("IdWychowawcy")
-                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Oznaczenie")
                         .IsRequired()
@@ -101,97 +101,14 @@ namespace Dziennik_szkolny.Migrations
                     b.Property<int?>("RokZakonczenia")
                         .HasColumnType("int");
 
+                    b.Property<string>("IdWychowawcy")
+                        .HasColumnType("varchar(255)");
+
                     b.HasKey("IdKlasy");
 
                     b.HasIndex("IdWychowawcy");
 
-                    b.ToTable("Klasa", (string)null);
-                });
-
-            modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.Przedmiot", b =>
-                {
-                    b.Property<int>("IdPrzedmiotu")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdPrzedmiotu"));
-
-                    b.Property<string>("NazwaPrzedmiotu")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
-                    b.HasKey("IdPrzedmiotu");
-
-                    b.HasIndex("NazwaPrzedmiotu")
-                        .IsUnique();
-
-                    b.ToTable("Przedmioty", (string)null);
-                });
-
-            modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.PrzypisaniePrzedmiotu", b =>
-                {
-                    b.Property<int>("IdPrzedmiotu")
-                        .HasColumnType("int");
-
-                    b.Property<string>("IdNauczyciela")
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("IdPrzedmiotu", "IdNauczyciela");
-
-                    b.HasIndex("IdNauczyciela");
-
-                    b.ToTable("PrzypisanePrzedmioty", (string)null);
-                });
-
-            modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.Uczen", b =>
-                {
-                    b.Property<int>("IdUcznia")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdUcznia"));
-
-                    b.Property<DateOnly>("DataUrodzenia")
-                        .HasColumnType("date");
-
-                    b.Property<int>("IdKlasy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("IdOpiekun1")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("IdOpiekun2")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("Imie")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)");
-
-                    b.Property<string>("Nazwisko")
-                        .IsRequired()
-                        .HasMaxLength(60)
-                        .HasColumnType("varchar(60)");
-
-                    b.Property<string>("Pesel")
-                        .IsRequired()
-                        .HasMaxLength(11)
-                        .HasColumnType("varchar(11)");
-
-                    b.HasKey("IdUcznia");
-
-                    b.HasIndex("IdKlasy");
-
-                    b.HasIndex("IdOpiekun1");
-
-                    b.HasIndex("IdOpiekun2");
-
-                    b.HasIndex("Pesel")
-                        .IsUnique();
-
-                    b.ToTable("Uczniowie", (string)null);
+                    b.ToTable("Klasa");
                 });
 
             modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.UprawnienieZarzadzaniaRola", b =>
@@ -216,40 +133,7 @@ namespace Dziennik_szkolny.Migrations
 
                     b.HasIndex("RolaZarzadzanaId");
 
-                    b.ToTable("UprawnieniaZarzadzaniaRola", (string)null);
-                });
-
-            modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.WpisPlanu", b =>
-                {
-                    b.Property<int>("IdWpisu")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdWpisu"));
-
-                    b.Property<int>("Dzien")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdKlasy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("IdNauczyciela")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<int>("IdPrzedmiotu")
-                        .HasColumnType("int");
-
-                    b.Property<byte>("Lekcja")
-                        .HasColumnType("tinyint unsigned");
-
-                    b.HasKey("IdWpisu");
-
-                    b.HasIndex("IdKlasy");
-
-                    b.HasIndex("IdPrzedmiotu", "IdNauczyciela");
-
-                    b.ToTable("WpisyPlanu", (string)null);
+                    b.ToTable("UprawnieniaZarzadzaniaRola");
                 });
 
             modelBuilder.Entity("Dziennik_szkolny.Infrastructure.Identyfikatory.LoginUzytkownika", b =>
@@ -469,51 +353,6 @@ namespace Dziennik_szkolny.Migrations
                     b.Navigation("Wychowawca");
                 });
 
-            modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.PrzypisaniePrzedmiotu", b =>
-                {
-                    b.HasOne("Dziennik_szkolny.Infrastructure.Identyfikatory.LoginUzytkownika", "Nauczyciel")
-                        .WithMany()
-                        .HasForeignKey("IdNauczyciela")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Dziennik_szkolny.Domain.Entities.Przedmiot", "Przedmiot")
-                        .WithMany("Nauczyciele")
-                        .HasForeignKey("IdPrzedmiotu")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Nauczyciel");
-
-                    b.Navigation("Przedmiot");
-                });
-
-            modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.Uczen", b =>
-                {
-                    b.HasOne("Dziennik_szkolny.Domain.Entities.Klasa", "Klasa")
-                        .WithMany("Uczniowie")
-                        .HasForeignKey("IdKlasy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Dziennik_szkolny.Infrastructure.Identyfikatory.LoginUzytkownika", "Opiekun1")
-                        .WithMany()
-                        .HasForeignKey("IdOpiekun1")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Dziennik_szkolny.Infrastructure.Identyfikatory.LoginUzytkownika", "Opiekun2")
-                        .WithMany()
-                        .HasForeignKey("IdOpiekun2")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Klasa");
-
-                    b.Navigation("Opiekun1");
-
-                    b.Navigation("Opiekun2");
-                });
-
             modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.UprawnienieZarzadzaniaRola", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -527,25 +366,6 @@ namespace Dziennik_szkolny.Migrations
                         .HasForeignKey("RolaZarzadzanaId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.WpisPlanu", b =>
-                {
-                    b.HasOne("Dziennik_szkolny.Domain.Entities.Klasa", "Klasa")
-                        .WithMany("WpisyPlanu")
-                        .HasForeignKey("IdKlasy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Dziennik_szkolny.Domain.Entities.PrzypisaniePrzedmiotu", "PrzypisaniePrzedmiotu")
-                        .WithMany()
-                        .HasForeignKey("IdPrzedmiotu", "IdNauczyciela")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Klasa");
-
-                    b.Navigation("PrzypisaniePrzedmiotu");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -597,18 +417,6 @@ namespace Dziennik_szkolny.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.Klasa", b =>
-                {
-                    b.Navigation("Uczniowie");
-
-                    b.Navigation("WpisyPlanu");
-                });
-
-            modelBuilder.Entity("Dziennik_szkolny.Domain.Entities.Przedmiot", b =>
-                {
-                    b.Navigation("Nauczyciele");
                 });
 #pragma warning restore 612, 618
         }
