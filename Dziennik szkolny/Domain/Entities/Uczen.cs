@@ -26,15 +26,15 @@ namespace Dziennik_szkolny.Domain.Entities
         //nawigacjie
         public int IdKlasy { get; set; }
         [ForeignKey(nameof(IdKlasy))]
-        public Klasa Klasa { get; set; }
+        public virtual Klasa Klasa { get; set; }
 
         [Required]
         public string IdOpiekun1 { get; set; }
         [ForeignKey(nameof(IdOpiekun1))]
-        public LoginUzytkownika Opiekun1 { get; set; }
+        public virtual LoginUzytkownika Opiekun1 { get; set; }
         public string? IdOpiekun2 { get; set; }
         [ForeignKey(nameof(IdOpiekun2))]
-        public LoginUzytkownika? Opiekun2 { get; set; }
+        public virtual LoginUzytkownika? Opiekun2 { get; set; }
 
 
     }

@@ -17,10 +17,10 @@ namespace Dziennik_szkolny.Domain.Entities
         public int IdKlasy { get; set; }
         [Required]
         [ForeignKey(nameof(IdKlasy))]
-        public Klasa Klasa { get; set; }
+        public virtual Klasa Klasa { get; set; }
         public int IdPrzedmiotu { get; set; }
         public string IdNauczyciela { get; set; }
-        public PrzypisaniePrzedmiotu PrzypisaniePrzedmiotu { get; set; }
+        public virtual PrzypisaniePrzedmiotu PrzypisaniePrzedmiotu { get; set; }
         
     }
 }
