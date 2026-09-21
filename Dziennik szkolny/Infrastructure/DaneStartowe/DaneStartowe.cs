@@ -2,6 +2,7 @@ using Dziennik_szkolny.Domain;
 
 namespace Dziennik_szkolny.Infrastructure.DaneStartowe
 {
+    
     public class DaneStartowe
     {
         //Lista ról pracowników w systemie
@@ -100,6 +101,15 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
         ["Rodzic1", "Rodzic1@gmail.com", "Rodzic1", "Rodzic1Imie", "Rodzic1Naz", "85070778901", "500700700", "Warszawa", "Modlińska", "25"],
         ["Rodzic2", "Rodzic2@gmail.com", "Rodzic2", "Rodzic2Imie", "Rodzic2Naz", "84080889012", "500800800", "Warszawa", "Wawelska", "15"],
         ["Rodzic3", "Rodzic3@gmail.com", "Rodzic3", "Rodzic3Imie", "Rodzic3Naz", "83090990123", "500900900", "Warszawa", "Białobrzeska", "26"]
+        ];
+        //Informacjie niezbedne do tworzenia klasy
+        public List<string[]> Klasy { get; } =
+        [
+        new[] { "A","4", "2023", "", "Nauczyciel1" },
+        new[] { "B","4", "2023", "", "Nauczyciel1" },
+        new[] { "Chemiczno fizyczna","3", "2024", "","Nauczyciel2" },
+        new[] { "Matematyczna", "2","2025", "", "Nauczyciel3" },
+
         ];
     }
 }

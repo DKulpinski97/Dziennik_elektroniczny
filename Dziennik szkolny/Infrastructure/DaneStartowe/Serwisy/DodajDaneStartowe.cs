@@ -9,19 +9,22 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
         private readonly PrzypiszRoleStartowe _przypiszRoleStartowe;
         private readonly PrzypiszInformacjeStartowe _przypiszInformacjeStartowe;
         private readonly DodajUprawnieniaZarzadzaniaRoli _przypiszUprawnieniaZarzadzaniaRoli;
+        private readonly DodajKlasyStartowe _dodajKlasyStartowe;
 
         public DodajDaneStartowe(
             DodajRoleStartowe dodajRoleStartowe,
             DodajLoginyStartowe dodajLoginyStartowe,
             PrzypiszRoleStartowe przypiszRoleStartowe,
             PrzypiszInformacjeStartowe przypiszInformacjeStartowe,
-            DodajUprawnieniaZarzadzaniaRoli przypiszUprawnieniaZarzadzaniaRoli)
+            DodajUprawnieniaZarzadzaniaRoli przypiszUprawnieniaZarzadzaniaRoli,
+            DodajKlasyStartowe dodajKlasyStartowe)
         {
             _dodajRoleStartowe = dodajRoleStartowe;
             _dodajLoginyStartowe = dodajLoginyStartowe;
             _przypiszRoleStartowe = przypiszRoleStartowe;
             _przypiszInformacjeStartowe = przypiszInformacjeStartowe;
             _przypiszUprawnieniaZarzadzaniaRoli = przypiszUprawnieniaZarzadzaniaRoli;
+            _dodajKlasyStartowe = dodajKlasyStartowe;
         }
 
         public async Task DodajDaneStartoweAsync()
@@ -37,6 +40,10 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
                 await _przypiszInformacjeStartowe.PrzypiszInformacjeDodatkoweAsync();
 
                 await _przypiszUprawnieniaZarzadzaniaRoli.DodajUprawnieniaZarzadzaniaRoliAsync();
+
+               var tlumaczenia= await _dodajKlasyStartowe.PobierzIPrzygotujSlownikTlumaczenAsync();
+
+                await _dodajKlasyStartowe.PrześlijDaneNaBaze(tlumaczenia);
             }
             catch (Exception ex)
             {
