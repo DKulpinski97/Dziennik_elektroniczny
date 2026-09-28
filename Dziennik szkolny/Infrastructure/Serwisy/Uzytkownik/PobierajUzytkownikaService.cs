@@ -69,5 +69,11 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
 
             return wynik;
         }
+
+        public async Task<string> PobierzIdUzytkownikaPoLoginieAsync(string login)
+        {
+            var uzytkownik = await _userManager.FindByNameAsync(login);
+            return uzytkownik?.Id;
+        }
     }
 }

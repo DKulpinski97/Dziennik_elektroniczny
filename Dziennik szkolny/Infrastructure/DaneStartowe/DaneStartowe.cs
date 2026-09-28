@@ -111,5 +111,16 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
         new[] { "Matematyczna", "2","2025", "", "Nauczyciel3" },
 
         ];
+        //Informacje do tworzenia ucznia
+        //Format każdego wpisu: Pesel, Imie, Nazwisko, DataUrodzenia(YYYY-MM-DD), OznaczenieKlasy, RokRozpoczeciaKlasy, Opiekun1Login, Opiekun2Login (opcjonalnie)
+        public List<string[]> Uczen { get; } =
+        [
+        new[] { "13241265419", "Jan", "Kowalski", "2010-03-15", "A", "2023", "Rodzic1", "" },
+        new[] { "12290302544", "Anna", "Nowak", "2010-07-22", "A", "2023", "Rodzic2", "" },
+        new[] { "14212725033", "Piotr", "Wiśniewski", "2009-11-05", "Chemiczno fizyczna", "2024", "Rodzic3", "" },
+        new[] { "13311514209", "Katarzyna", "Lewandowska", "2008-01-30", "Matematyczna", "2025", "Rodzic1", "Rodzic2" },
+        new[] { "12263069290", "Marek", "Zieliński", "2008-05-12", "Matematyczna", "2025", "Rodzic3", "" },
+
+        ];
     }
 }
