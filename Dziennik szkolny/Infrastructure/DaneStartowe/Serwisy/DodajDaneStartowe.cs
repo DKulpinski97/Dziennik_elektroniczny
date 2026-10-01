@@ -40,11 +40,11 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
 
                 await _przypiszRoleStartowe.PrzypiszRoleStartoweAsync();
 
-                await _przypiszInformacjeStartowe.PrzypiszInformacjeDodatkoweAsync();
+               var tlumaczenia= await _przypiszInformacjeStartowe.PobierzIPrzygotujSlownikTlumaczenAsync();
+                await _przypiszInformacjeStartowe.PrześlijDaneNaBaze(tlumaczenia);
 
                 await _przypiszUprawnieniaZarzadzaniaRoli.DodajUprawnieniaZarzadzaniaRoliAsync();
 
-               var tlumaczenia= await _dodajKlasyStartowe.PobierzIPrzygotujSlownikTlumaczenAsync();
 
                 await _dodajKlasyStartowe.PrześlijDaneNaBaze(tlumaczenia);
                 await _dodajUczniowStartowych.PrzeslijUczniowStartowych(tlumaczenia);

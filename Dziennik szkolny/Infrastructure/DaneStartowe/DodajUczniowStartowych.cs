@@ -1,9 +1,7 @@
 ﻿using Dziennik_szkolny.Application.Interfejsy.Klasa;
 using Dziennik_szkolny.Application.Interfejsy.Uczen;
 using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
-using Dziennik_szkolny.Domain.Entities;
-using Dziennik_szkolny.Infrastructure.Identyfikatory;
-using Microsoft.AspNetCore.Identity;
+using Dziennik_szkolny.Infrastructure.DaneStartowe.ObiektyTransferuDanych;
 
 namespace Dziennik_szkolny.Infrastructure.DaneStartowe
 {
@@ -14,7 +12,7 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
         private readonly IPobierajKlase _pobierajKlase;
         private readonly IPobierajUcznia _pobierajUczen;
 
-        public DodajUczniowStartowych(DaneStartowe daneStartowe,IPobierajUzytkownika pobierajUzytkownika, 
+        public DodajUczniowStartowych(DaneStartowe daneStartowe,
             AppDbContext context, IPobierajKlase pobierajKlase, IPobierajUcznia pobierajUczen)
         {
             _daneStartowe = daneStartowe;
@@ -22,46 +20,33 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
             _pobierajKlase = pobierajKlase;
             _pobierajUczen = pobierajUczen;
         }
-        public List<string> PrzygotujListeDoPrzesłania(List<Dziennik_szkolny.Domain.Entities.Klasa> klasy, Dictionary<string, string> tlumaczenieLoginuNaID)
+        internal async Task<List<DTOUczen>> PrzygotujListe(Dictionary<string, string> tlumaczenieLoginuNaID)
         {
-            List<string> result = new List<string>();
+            var klasy = await _pobierajKlase.PobierzWszystkieKlasy();
+            List<DTOUczen> przygotowanaLista = new List<DTOUczen>();
             foreach (var x in _daneStartowe.Uczen)
             {
-                var klasa = klasy.Where(k => k.Oznaczenie == x[4] && k.RokRozpoczecia == Convert.ToInt32(x[5])).FirstOrDefault();
-                if(klasa == null)
+                int idKlasy = klasy.FirstOrDefault(k => k.Oznaczenie == x.OznaczenieKlasy && k.RokRozpoczecia == Convert.ToInt32(x.RokRozpoczeciaKlasy))?.IdKlasy ?? 0;
+                if (idKlasy != 0)
                 {
-                    throw new InvalidOperationException($"Nie można znaleźć klasy o oznaczeniu {x[4]} i roku rozpoczęcia {x[5]}.");
+                    var dtoUczen = DTOUczen.Utworz(x.Pesel, x.Imie, x.Nazwisko, DateOnly.Parse(x.DataUrodzenia), idKlasy, x.Opiekun1Login, x.Opiekun2Login, tlumaczenieLoginuNaID);
+                    przygotowanaLista.Add(dtoUczen);
                 }
-                string opiekun1Id = tlumaczenieLoginuNaID.TryGetValue(x[6], out var id1) ? id1 : null;
-                string opiekun2Id = tlumaczenieLoginuNaID.TryGetValue(x[7], out var id2) ? id2 : null;
-                if(opiekun1Id == null)
+                else
                 {
-                    throw new InvalidOperationException($"Nie można znaleźć identyfikatora opiekuna 1 dla ucznia {x[0]} {x[1]}.");
+                    throw new InvalidOperationException($"Nie można znaleźć klasy dla ucznia {x.Imie} {x.Nazwisko} z oznaczeniem klasy {x.OznaczenieKlasy} i rokiem rozpoczęcia {x.RokRozpoczeciaKlasy}.");
                 }
-                result.Add($"{x[0]},{x[1]},{x[2]},{x[3]},{klasa.IdKlasy},{opiekun1Id},{opiekun2Id}");
             }
-            return result;
+            return przygotowanaLista;
         }
         public async Task PrzeslijUczniowStartowych(Dictionary<string, string> tlumaczenieLoginuNaID)
         {
-            Uczen uczen;
-            var klasy = await _pobierajKlase.PobierzWszystkieKlasy();
-            var przygotowanaLista = PrzygotujListeDoPrzesłania(klasy, tlumaczenieLoginuNaID);
+            var przygotowanaLista = await PrzygotujListe(tlumaczenieLoginuNaID);
             foreach (var x in przygotowanaLista)
             {
-               string[] tmp = x.Split(',');
-                uczen = new Uczen();
-                uczen.Pesel = tmp[0];
-                uczen.Imie = tmp[1];
-                uczen.Nazwisko = tmp[2];
-                uczen.DataUrodzenia = DateOnly.Parse(tmp[3]);
-                uczen.IdKlasy = Convert.ToInt32(tmp[4]);
-                uczen.IdOpiekun1 = tmp[5];
-                uczen.IdOpiekun2 = string.IsNullOrEmpty(tmp[6]) ? null : tmp[6];
-
-                if (!await _pobierajUczen.SprawdzCzyUczenIstniejePoPeselAsync(uczen.Pesel))
+                if (!await _pobierajUczen.SprawdzCzyUczenIstniejePoPeselAsync(x.Pesel))
                 {
-                    await _context.Uczniowie.AddAsync(uczen);
+                    await _context.Uczniowie.AddAsync(x.DoEncja());
                 }
             }
             await _context.SaveChangesAsync();

@@ -9,6 +9,7 @@ using Dziennik_szkolny.Application.Serwisy.Uzytkownik;
 using Dziennik_szkolny.Application.Walidacja.Uzytkownik;
 using Dziennik_szkolny.Infrastructure;
 using Dziennik_szkolny.Infrastructure.DaneStartowe;
+using Dziennik_szkolny.Infrastructure.DaneStartowe.ObiektyTransferuDanych;
 using Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Dziennik_szkolny.Infrastructure.Serwisy;

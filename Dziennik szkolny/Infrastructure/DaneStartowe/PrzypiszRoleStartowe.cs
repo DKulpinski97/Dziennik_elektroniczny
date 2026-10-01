@@ -22,7 +22,7 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
             for (var i = 0; i < _daneStartowe.PrzypisanieRoli.Count; i++)
             {
                 var nazwaRoli = _daneStartowe.PrzypisanieRoli[i];
-                var userLogin = _daneStartowe.Loginy[i][0];
+                var userLogin = _daneStartowe.Loginy[i].Login;
                 var user = await _userManager.FindByNameAsync(userLogin);
 
                 if (user == null)
