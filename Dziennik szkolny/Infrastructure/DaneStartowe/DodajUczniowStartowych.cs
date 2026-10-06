@@ -23,7 +23,7 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
         {
             var klasy = await _pobierajKlase.PobierzWszystkieKlasy();
             List<DTOUczen> przygotowanaLista = new List<DTOUczen>();
-            foreach (var x in _daneStartowe.Uczen)
+            foreach (var x in _daneStartowe.Uczniowie)
             {
                 int idKlasy = klasy.FirstOrDefault(k => k.Oznaczenie == x.OznaczenieKlasy && k.RokRozpoczecia == Convert.ToInt32(x.RokRozpoczeciaKlasy))?.IdKlasy ?? 0;
                 if (idKlasy != 0)

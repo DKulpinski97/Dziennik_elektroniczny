@@ -115,7 +115,7 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
 
         ];
         //Informacje do tworzenia ucznia
-        public List<(string Pesel, string Imie, string Nazwisko, string DataUrodzenia, string OznaczenieKlasy, string RokRozpoczeciaKlasy, string Opiekun1Login, string Opiekun2Login)> Uczen { get; } =
+        public List<(string Pesel, string Imie, string Nazwisko, string DataUrodzenia, string OznaczenieKlasy, string RokRozpoczeciaKlasy, string Opiekun1Login, string Opiekun2Login)> Uczniowie { get; } =
         [
         ("13241265419", "Jan", "Kowalski", "2010-03-15", "A", "2023", "Rodzic1", ""),
         ("12290302544", "Anna", "Nowak", "2010-07-22", "A", "2023", "Rodzic2", ""),
@@ -124,5 +124,15 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
         ("12263069290", "Marek", "Zieliński", "2008-05-12", "Matematyczna", "2025", "Rodzic3", ""),
 
         ];
+        //Informacje o liście przedmiotów
+        public List<string> Przedmioty { get; } =
+        [
+        NazwyPrzedmiotu.Polski,
+        NazwyPrzedmiotu.Matematyka,
+        NazwyPrzedmiotu.Fizyka,
+        NazwyPrzedmiotu.Chemia
+        ];
     }
 }
+
+
