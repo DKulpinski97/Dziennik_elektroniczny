@@ -1,15 +1,12 @@
 ﻿using Dziennik_szkolny.Application.Interfejsy.Role;
-using Dziennik_szkolny.Domain;
 using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
 using Dziennik_szkolny.Application.Mapery;
+using Dziennik_szkolny.Domain;
 using Dziennik_szkolny.Domain.Entities;
-using Dziennik_szkolny.Infrastructure;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
-using Dziennik_szkolny.Infrastructure.Serwisy.Role;
 using Dziennik_szkolny.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Dziennik_szkolny.Controllers
 {
@@ -266,7 +263,7 @@ namespace Dziennik_szkolny.Controllers
 
                 return RedirectToAction(nameof(ZarzadzajUzytkownikem));
             }
-            var mozeZarzadzac = await _pobierajUprawnieniaRoli.CzyMozeZarzadzacUzytkownikiemAsync(User,idUzytkownika);
+            var mozeZarzadzac = await _pobierajUprawnieniaRoli.CzyMozeZarzadzacUzytkownikiemAsync(User, idUzytkownika);
 
             if (!mozeZarzadzac)
             {

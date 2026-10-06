@@ -5,16 +5,16 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.ObiektyTransferuDanych
     public class DTOUczen
     {
 
-        public string Pesel { get;  }
+        public string Pesel { get; }
 
-        public string Imie { get;  }
- 
-        public string Nazwisko { get;  }
+        public string Imie { get; }
 
-        public DateOnly DataUrodzenia { get;  }
+        public string Nazwisko { get; }
 
-        public int IdKlasy { get;  }
-       
+        public DateOnly DataUrodzenia { get; }
+
+        public int IdKlasy { get; }
+
         public string IdOpiekun1 { get; }
         public string? IdOpiekun2 { get; }
 

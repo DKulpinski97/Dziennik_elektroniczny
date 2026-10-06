@@ -1,7 +1,4 @@
 ﻿using Dziennik_szkolny.Domain.Entities;
-using Dziennik_szkolny.Infrastructure.Identyfikatory;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dziennik_szkolny.Infrastructure.DaneStartowe.ObiektyTransferuDanych
 {
@@ -29,14 +26,14 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.ObiektyTransferuDanych
             NrMieszkania = nrMieszkania;
             IdUzytkownika = idUzytkownika;
         }
-        public static DTOInformacjaUzytkownika Utworz(string Login, string imie, string nazwisko, string pesel, string telefon, string miasto, string ulica, string nrMieszkania, Dictionary<string, string> tlumaczenieLoginuNaId)
+        public static DTOInformacjaUzytkownika Utworz(string login, string imie, string nazwisko, string pesel, string telefon, string miasto, string ulica, string nrMieszkania, Dictionary<string, string> tlumaczenieLoginuNaId)
         {
-            if (!tlumaczenieLoginuNaId.TryGetValue(Login, out string IdUzytkownika))
+            if (!tlumaczenieLoginuNaId.TryGetValue(login, out string idUzytkownika))
             {
-                throw new InvalidOperationException($"Nie można znaleźć uzytkownika dla loginu {Login}.");
+                throw new InvalidOperationException($"Nie można znaleźć uzytkownika dla loginu {login}.");
             }
-           
-            return new DTOInformacjaUzytkownika (imie, nazwisko, pesel, telefon, miasto, ulica, nrMieszkania, IdUzytkownika);
+
+            return new DTOInformacjaUzytkownika(imie, nazwisko, pesel, telefon, miasto, ulica, nrMieszkania, idUzytkownika);
         }
         public InformacjeUzytkownik DoEncja()
         {

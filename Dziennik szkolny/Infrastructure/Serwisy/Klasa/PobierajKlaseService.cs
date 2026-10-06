@@ -8,7 +8,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Klasa
         readonly private AppDbContext _dbContext;
         public PobierajKlaseService(AppDbContext dbContext)
         {
-            _dbContext= dbContext;
+            _dbContext = dbContext;
         }
 
         public async Task<int> PobieranieIdKlasyPoDacieIOznaczeniuAsync(string oznaczenie, int rokRozpoczecia)

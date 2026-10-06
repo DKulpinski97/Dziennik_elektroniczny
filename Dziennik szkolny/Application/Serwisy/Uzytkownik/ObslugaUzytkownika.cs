@@ -4,16 +4,11 @@ using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
 using Dziennik_szkolny.Application.Mapery;
 using Dziennik_szkolny.Application.Modele.Uzytkownik;
 using Dziennik_szkolny.Application.Walidacja.Uzytkownik;
-using Dziennik_szkolny.Domain.Entities;
-using Dziennik_szkolny.Infrastructure;
 using Dziennik_szkolny.Infrastructure.DaneStartowe;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Dziennik_szkolny.ViewModel;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using System.Text.RegularExpressions;
 
 namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
 {
@@ -60,10 +55,10 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
         {
             // TODO: W wersji wdrożeniowej zastosować wymagania silnego hasła
             // zgodne z konfiguracją ASP.NET Core Identity.
-           /* if (!_walidacjaDanychUzytkownika.CzyHasloPrawidlowe(model.Haslo))
-            {
-                return ("Hasło musi zawierać co najmniej 3 znaki.", model, false);
-            }*/
+            /* if (!_walidacjaDanychUzytkownika.CzyHasloPrawidlowe(model.Haslo))
+             {
+                 return ("Hasło musi zawierać co najmniej 3 znaki.", model, false);
+             }*/
             // Walidacja telefonu
             if (!_walidacjaDanychUzytkownika.CzyPoprawnyTelefon(model.Telefon))
             {
@@ -278,11 +273,11 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
 
             var roleDoZarzadzania = await _pobierajUprawnieniaRoli.PobierzRoleKtorymiMozeZarzadzacAsync(roleUzytkownika);
 
-            var uzytkownicy =await _pobierajUzytkownika.PobierzUzytkownikowPoRolachAsync(roleDoZarzadzania);
+            var uzytkownicy = await _pobierajUzytkownika.PobierzUzytkownikowPoRolachAsync(roleDoZarzadzania);
 
-            var informacje =await _pobierajUzytkownika.PobierzWszystkieInformacjeOUzrzytkownikach();
+            var informacje = await _pobierajUzytkownika.PobierzWszystkieInformacjeOUzrzytkownikach();
 
-            var informacjePoId =informacje.ToDictionary(x => x.IdUzytkownika);
+            var informacjePoId = informacje.ToDictionary(x => x.IdUzytkownika);
 
             foreach (var uzytkownik in uzytkownicy)
             {

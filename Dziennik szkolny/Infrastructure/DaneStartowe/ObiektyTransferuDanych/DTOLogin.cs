@@ -1,5 +1,4 @@
-﻿using Dziennik_szkolny.Domain.Entities;
-using Dziennik_szkolny.Infrastructure.Identyfikatory;
+﻿using Dziennik_szkolny.Infrastructure.Identyfikatory;
 
 namespace Dziennik_szkolny.Infrastructure.DaneStartowe.ObiektyTransferuDanych
 {
@@ -11,7 +10,7 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.ObiektyTransferuDanych
         public string Login { get; }
         public string Email { get; }
         public string Haslo { get; }
-        
+
         public DTOLogin(string login, string email, string haslo)
         {
             this.Login = login;

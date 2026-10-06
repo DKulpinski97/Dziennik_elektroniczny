@@ -1,6 +1,5 @@
 ﻿using Dziennik_szkolny.Application.Interfejsy.Klasa;
 using Dziennik_szkolny.Application.Interfejsy.Uczen;
-using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
 using Dziennik_szkolny.Infrastructure.DaneStartowe.ObiektyTransferuDanych;
 
 namespace Dziennik_szkolny.Infrastructure.DaneStartowe

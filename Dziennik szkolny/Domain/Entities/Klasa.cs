@@ -16,7 +16,7 @@ namespace Dziennik_szkolny.Domain.Entities
         [Required]
         public byte RokNauki { get; set; }
         public int RokRozpoczecia { get; set; }
- 
+
         public int? RokZakonczenia { get; set; }
 
         public string? IdWychowawcy { get; set; }

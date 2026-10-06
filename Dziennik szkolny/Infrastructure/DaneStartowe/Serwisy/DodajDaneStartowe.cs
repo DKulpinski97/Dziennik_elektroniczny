@@ -40,7 +40,7 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
 
                 await _przypiszRoleStartowe.PrzypiszRoleStartoweAsync();
 
-               var tlumaczenia= await _przypiszInformacjeStartowe.PobierzIPrzygotujSlownikTlumaczenAsync();
+                var tlumaczenia = await _przypiszInformacjeStartowe.PobierzIPrzygotujSlownikTlumaczenAsync();
                 await _przypiszInformacjeStartowe.PrześlijDaneNaBaze(tlumaczenia);
 
                 await _przypiszUprawnieniaZarzadzaniaRoli.DodajUprawnieniaZarzadzaniaRoliAsync();

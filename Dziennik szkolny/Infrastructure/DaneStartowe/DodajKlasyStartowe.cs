@@ -1,13 +1,5 @@
 ﻿using Dziennik_szkolny.Application.Interfejsy.Klasa;
-using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
-using Dziennik_szkolny.Domain;
-using Dziennik_szkolny.Domain.Entities;
 using Dziennik_szkolny.Infrastructure.DaneStartowe.ObiektyTransferuDanych;
-using Dziennik_szkolny.Infrastructure.Identyfikatory;
-using Dziennik_szkolny.Infrastructure.Serwisy.Klasa;
-using Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Dziennik_szkolny.Infrastructure.DaneStartowe
 {
@@ -18,13 +10,13 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
         private readonly IPobierajKlase _pobierajKlase;
 
         public DodajKlasyStartowe(DaneStartowe daneStartowe,
-            IPobierajUzytkownika pobierajUzytkownika, AppDbContext context, IPobierajKlase pobierajKlase)
+             AppDbContext context, IPobierajKlase pobierajKlase)
         {
             _daneStartowe = daneStartowe;
             _context = context;
             _pobierajKlase = pobierajKlase;
         }
-        
+
         internal List<DTOKlasa> PrzygotujListe(Dictionary<string, string> tlumaczenieLoginuNaID)
         {
             List<DTOKlasa> przygotowanaLista = new List<DTOKlasa>();

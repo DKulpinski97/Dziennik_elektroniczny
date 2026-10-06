@@ -86,8 +86,10 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
             ("Rodzic2", "Rodzic2@gmail.com", "Rodzic2"),
             ("Rodzic3", "Rodzic3@gmail.com", "Rodzic3"),
         ];
-        //Informacje do tworzenia Informacji o użytkownikach. Login i hasło są dodane z powodu czytelności.
-        //Nie są one używane w tworzeniu encji użytkownika, ponieważ są już zawarte w obiekcie Loginy.
+        //Dane do utworzenia informacji o użytkowniku.
+        //Hasło i e-mail są dodane dla czytelności i nie są używane przy tworzeniu encji InformacjeUzytkownik,
+        //ponieważ znajdują się już w liście Loginy.
+        //Login służy do odnalezienia identyfikatora użytkownika w słowniku tłumaczeń (login na Id).
         public List<(string Login, string Email, string Haslo, string Imie, string Nazwisko, string Pesel, string Telefon, string Miasto, string Ulica, string NrMieszkania)> Informacje { get; } =
          [
              ("Admin", "Admin@gmail.com", "Admin", "AdminImie", "AdminNaz", "85010112345", "500100100", "Warszawa", "Marszałkowska", "11"),

@@ -10,7 +10,7 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
         private readonly DaneStartowe _daneStartowe;
 
         public DodajLoginyStartowe(
-            UserManager<LoginUzytkownika> userManager,DaneStartowe daneStartowe)
+            UserManager<LoginUzytkownika> userManager, DaneStartowe daneStartowe)
         {
             _userManager = userManager;
             _daneStartowe = daneStartowe;
@@ -34,12 +34,13 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
                 var nowyLogin = dto.DoEncja();
 
 
-                var wynik = await _userManager.CreateAsync(nowyLogin,dane.Haslo);
+                var wynik = await _userManager.CreateAsync(nowyLogin, dane.Haslo);
 
-                if (!wynik.Succeeded) 
-                { 
-                    var bledy = string.Join("; ", wynik.Errors.Select(x => $"{x.Code}: {x.Description}")); 
-                    throw new InvalidOperationException($"Nie udało się utworzyć użytkownika '{dto.Login}'. " + $"Błędy: {bledy}"); }
+                if (!wynik.Succeeded)
+                {
+                    var bledy = string.Join("; ", wynik.Errors.Select(x => $"{x.Code}: {x.Description}"));
+                    throw new InvalidOperationException($"Nie udało się utworzyć użytkownika '{dto.Login}'. " + $"Błędy: {bledy}");
+                }
             }
         }
     }

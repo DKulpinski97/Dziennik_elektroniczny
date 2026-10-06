@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
@@ -16,7 +15,7 @@ namespace Dziennik_szkolny.ViewModel
         public string Email { get; set; }
 
 
-        
+
         public string? Haslo { get; set; }
 
 

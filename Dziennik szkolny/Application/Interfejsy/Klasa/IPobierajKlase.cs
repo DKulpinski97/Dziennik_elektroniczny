@@ -4,6 +4,6 @@
     {
         Task<bool> SprawdzCzyKlasaIstniejePoDacieIOznaczeniuAsync(string oznaczenie, int rokRozpoczecia);
         Task<int> PobieranieIdKlasyPoDacieIOznaczeniuAsync(string oznaczenie, int rokRozpoczecia);
-         Task<List<Dziennik_szkolny.Domain.Entities.Klasa>> PobierzWszystkieKlasy();
+        Task<List<Dziennik_szkolny.Domain.Entities.Klasa>> PobierzWszystkieKlasy();
     }
 }

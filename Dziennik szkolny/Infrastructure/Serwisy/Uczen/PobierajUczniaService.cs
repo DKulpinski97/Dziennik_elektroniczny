@@ -1,5 +1,4 @@
-﻿using Dziennik_szkolny.Application.Interfejsy.Uczen;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Dziennik_szkolny.Infrastructure.Serwisy.Uczen
 {

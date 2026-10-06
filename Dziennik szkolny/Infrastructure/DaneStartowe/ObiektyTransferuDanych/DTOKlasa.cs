@@ -4,12 +4,12 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.ObiektyTransferuDanych
 {
     public class DTOKlasa
     {
-        public string Oznaczenie { get;  }
-        public byte RokNauki { get;  }
+        public string Oznaczenie { get; }
+        public byte RokNauki { get; }
         public int RokRozpoczecia { get; }
-        public int? RokZakonczenia { get;  }
-        public string IdWychowawcy { get;  }
-        private DTOKlasa (string oznaczenie, byte rokNauki, int rokRozpoczecia, int? rokZakonczenia, string idWychowawcy)
+        public int? RokZakonczenia { get; }
+        public string IdWychowawcy { get; }
+        private DTOKlasa(string oznaczenie, byte rokNauki, int rokRozpoczecia, int? rokZakonczenia, string idWychowawcy)
         {
             Oznaczenie = oznaczenie;
             RokNauki = rokNauki;

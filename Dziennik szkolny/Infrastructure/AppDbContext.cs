@@ -44,9 +44,9 @@ namespace Dziennik_szkolny.Infrastructure
                 .HasForeignKey(x => x.IdWychowawcy)
                 .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<Klasa>()
-                .HasMany(k => k.Uczniowie)          
-                .WithOne(u => u.Klasa)              
-                .HasForeignKey(u => u.IdKlasy)      
+                .HasMany(k => k.Uczniowie)
+                .WithOne(u => u.Klasa)
+                .HasForeignKey(u => u.IdKlasy)
                 .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<Klasa>()
                 .HasMany(k => k.WpisyPlanu)
@@ -69,13 +69,13 @@ namespace Dziennik_szkolny.Infrastructure
             //========================Przypisanie przedmiotów=========================//
             modelBuilder.Entity<PrzypisaniePrzedmiotu>()
                 .HasOne(x => x.Przedmiot)
-                .WithMany(x => x.Nauczyciele) 
+                .WithMany(x => x.Nauczyciele)
                 .HasForeignKey(x => x.IdPrzedmiotu)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<PrzypisaniePrzedmiotu>()
                 .HasOne(x => x.Nauczyciel)
-                .WithMany() 
+                .WithMany()
                 .HasForeignKey(x => x.IdNauczyciela)
                 .OnDelete(DeleteBehavior.Restrict);
             //========================Wpis planu=========================//

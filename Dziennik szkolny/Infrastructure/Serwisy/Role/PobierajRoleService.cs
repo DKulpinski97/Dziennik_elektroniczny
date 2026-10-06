@@ -1,6 +1,4 @@
 ﻿using Dziennik_szkolny.Application.Interfejsy.Role;
-using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
-using Dziennik_szkolny.Application.Modele;
 using Dziennik_szkolny.Application.ObiektyTransferuDanych;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Microsoft.AspNetCore.Identity;

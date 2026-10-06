@@ -8,6 +8,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		
+		<InternalsVisibleTo Include="Dziennik szkolny.Tests" />
+		
+		
 		<PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.11" />
 
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.18" />

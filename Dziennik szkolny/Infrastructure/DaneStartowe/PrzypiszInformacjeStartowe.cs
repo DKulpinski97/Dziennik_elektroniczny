@@ -1,26 +1,19 @@
 ﻿using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
-using Dziennik_szkolny.Domain.Entities;
 using Dziennik_szkolny.Infrastructure.DaneStartowe.ObiektyTransferuDanych;
-using Dziennik_szkolny.Infrastructure.Identyfikatory;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Dziennik_szkolny.Infrastructure.DaneStartowe
 {
     public class PrzypiszInformacjeStartowe
     {
         private readonly AppDbContext _context;
-        private readonly UserManager<LoginUzytkownika> _userManager;
         private readonly DaneStartowe _daneStartowe;
         private readonly IPobierajUzytkownika _pobieranieUzytkownika;
         public PrzypiszInformacjeStartowe(
             AppDbContext appDbContext,
-            UserManager<LoginUzytkownika> userManager,
             DaneStartowe daneStartowe,
             IPobierajUzytkownika pobieranieUzytkownika)
         {
             _context = appDbContext;
-            _userManager = userManager;
             _daneStartowe = daneStartowe;
             _pobieranieUzytkownika = pobieranieUzytkownika;
         }
@@ -48,17 +41,17 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
 
             foreach (var informacjeUzytkownika in informacjeUzytkownikow)
             {
-                //sprawdzenie istnienia nie ma funkcji async w linq, więc trzeba zrobić to w pętli  
 
-                /*if (!istnieje)
+                bool istnieje = await _pobieranieUzytkownika.SprawdzCzyInformacjeUzytkownikaIstniejaPoIdUzytkownikaAsync(informacjeUzytkownika.IdUzytkownika);
+                if (!istnieje)
                 {
-                    //dodanie do listy wysłania
-                }*/
+                    _context.InformacjeUzytkownik.Add(informacjeUzytkownika.DoEncja());
+                }
             }
 
-            //await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
 
-        
+
     }
 }
