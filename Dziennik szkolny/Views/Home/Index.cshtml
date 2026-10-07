@@ -16,7 +16,7 @@
                     }
                     @if (new[] { NazwyRoli.SuperAdmin, NazwyRoli.Admin, NazwyRoli.Dyrektor }.Any(User.IsInRole))
                     {
-                        @Html.ActionLink("Zarządzaj użytkownikami", "ZarzadzajUzytkownikem ", "Admin", null, new { @class = "btn btn-primary w-100 mb-3" })
+                        @Html.ActionLink("Zarządzaj użytkownikami", "ZarzadzajUzytkownikem", "Admin", null, new { @class = "btn btn-primary w-100 mb-3" })
 
                     }
                     @using (Html.BeginForm("ZarzadzajPrzedmiotami", "Admin", FormMethod.Post))

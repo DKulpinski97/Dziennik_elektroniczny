@@ -75,6 +75,7 @@ builder.Services.AddScoped<DodajUprawnieniaZarzadzaniaRoli>();
 builder.Services.AddScoped<DodajKlasyStartowe>();
 builder.Services.AddScoped<DodajUczniowStartowych>();
 builder.Services.AddScoped<DodajPrzedmiotyStartowe>();
+builder.Services.AddScoped<DodajPrzypisaniePrzedmioty>();
 builder.Services.AddScoped<DodajDaneStartowe>();
 
 //zażądzanie użytkownikami

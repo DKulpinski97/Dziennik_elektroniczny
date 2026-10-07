@@ -132,6 +132,16 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
         NazwyPrzedmiotu.Fizyka,
         NazwyPrzedmiotu.Chemia
         ];
+        //Informacje niezbędne do utworzenia PrzypisaniaPrzedmiotu (który nauczyciel uczy jakiego przedmiotu)
+        public List<(string NazwaPrzedmiotu, string LoginNauczyciela)> PrzypiszPrzedmioty { get; } =
+        [
+        (NazwyPrzedmiotu.Polski, "Nauczyciel1"),
+        (NazwyPrzedmiotu.Polski, "Nauczyciel3"),
+        (NazwyPrzedmiotu.Matematyka, "Nauczyciel1"),
+        (NazwyPrzedmiotu.Fizyka, "Nauczyciel2"),
+        (NazwyPrzedmiotu.Chemia, "Nauczyciel3"),
+
+        ];
     }
 }
 

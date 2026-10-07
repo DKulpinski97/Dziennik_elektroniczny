@@ -12,6 +12,7 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
         private readonly DodajKlasyStartowe _dodajKlasyStartowe;
         private readonly DodajUczniowStartowych _dodajUczniowStartowych;
         private readonly DodajPrzedmiotyStartowe _dodajPrzedmiotyStartowe;
+        private readonly DodajPrzypisaniePrzedmioty _dodajPrzypisaniePrzedmiot;
 
         public DodajDaneStartowe(
             DodajRoleStartowe dodajRoleStartowe,
@@ -21,7 +22,8 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
             DodajUprawnieniaZarzadzaniaRoli przypiszUprawnieniaZarzadzaniaRoli,
             DodajKlasyStartowe dodajKlasyStartowe,
             DodajUczniowStartowych dodajUczniowStartowych,
-            DodajPrzedmiotyStartowe dodajPrzedmiotyStartowe)
+            DodajPrzedmiotyStartowe dodajPrzedmiotyStartowe,
+            DodajPrzypisaniePrzedmioty dodajPrzypisaniePrzedmiot)
         {
             _dodajRoleStartowe = dodajRoleStartowe;
             _dodajLoginyStartowe = dodajLoginyStartowe;
@@ -31,6 +33,7 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
             _dodajKlasyStartowe = dodajKlasyStartowe;
             _dodajUczniowStartowych = dodajUczniowStartowych;
             _dodajPrzedmiotyStartowe = dodajPrzedmiotyStartowe;
+            _dodajPrzypisaniePrzedmiot = dodajPrzypisaniePrzedmiot;
         }
 
         public async Task DodajDaneStartoweAsync()
@@ -43,16 +46,19 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
 
                 await _przypiszRoleStartowe.PrzypiszRoleStartoweAsync();
 
-                var tlumaczenia = await _przypiszInformacjeStartowe.PobierzIPrzygotujSlownikTlumaczenAsync();
-                await _przypiszInformacjeStartowe.PrześlijDaneNaBaze(tlumaczenia);
+                var tlumaczeniaLoginyNaIdUrzytkownika = await _przypiszInformacjeStartowe.PobierzIPrzygotujSlownikTlumaczenAsync();
+                await _przypiszInformacjeStartowe.PrześlijDaneNaBaze(tlumaczeniaLoginyNaIdUrzytkownika);
 
                 await _przypiszUprawnieniaZarzadzaniaRoli.DodajUprawnieniaZarzadzaniaRoliAsync();
 
 
-                await _dodajKlasyStartowe.PrześlijDaneNaBaze(tlumaczenia);
-                await _dodajUczniowStartowych.PrzeslijUczniowStartowych(tlumaczenia);
+                await _dodajKlasyStartowe.PrześlijDaneNaBaze(tlumaczeniaLoginyNaIdUrzytkownika);
+                await _dodajUczniowStartowych.PrzeslijUczniowStartowych(tlumaczeniaLoginyNaIdUrzytkownika);
 
                 await _dodajPrzedmiotyStartowe.DodajPrzedmiotyStartoweAsync();
+
+                var tlumaczeniaPrzedmiotNaIdPrzedmiotu = await _dodajPrzypisaniePrzedmiot.PobierzIPrzygotujSlownikTlumaczenAsync();
+                await _dodajPrzypisaniePrzedmiot.PrześlijDaneNaBaze(tlumaczeniaLoginyNaIdUrzytkownika, tlumaczeniaPrzedmiotNaIdPrzedmiotu);
             }
             catch (Exception ex)
             {
