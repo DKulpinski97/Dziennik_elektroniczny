@@ -1,75 +1,57 @@
-﻿using Dziennik_szkolny.Domain.Entities;
-using Dziennik_szkolny.Infrastructure.Identyfikatory;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
+using Dziennik_szkolny.Infrastructure.DaneStartowe.ObiektyTransferuDanych;
 
 namespace Dziennik_szkolny.Infrastructure.DaneStartowe
 {
     public class PrzypiszInformacjeStartowe
     {
         private readonly AppDbContext _context;
-        private readonly UserManager<LoginUzytkownika> _userManager;
         private readonly DaneStartowe _daneStartowe;
+        private readonly IPobierajUzytkownika _pobieranieUzytkownika;
         public PrzypiszInformacjeStartowe(
             AppDbContext appDbContext,
-            UserManager<LoginUzytkownika> userManager,
-            DaneStartowe daneStartowe)
+            DaneStartowe daneStartowe,
+            IPobierajUzytkownika pobieranieUzytkownika)
         {
             _context = appDbContext;
-            _userManager = userManager;
             _daneStartowe = daneStartowe;
+            _pobieranieUzytkownika = pobieranieUzytkownika;
         }
-
-        public async Task PrzypiszInformacjeDodatkoweAsync()
+        public async Task<Dictionary<string, string>> PobierzIPrzygotujSlownikTlumaczenAsync()
         {
-            List<InformacjeUzytkownik> informacjeUzytkownikow = [];
-
-            foreach (var dane in _daneStartowe.Informacje)
+            Dictionary<string, string> result = new Dictionary<string, string>();
+            foreach (var x in await _pobieranieUzytkownika.PobierzWszystkichUzytkownikow())
             {
-                var uzytkownik = await _userManager.FindByNameAsync(dane[0])
-                    ?? throw new InvalidOperationException(
-                        $"Nie znaleziono użytkownika startowego '{dane[0]}'.");
-
-                informacjeUzytkownikow.Add(
-                    PrzypiszDane(dane, uzytkownik.Id));
+                result.Add(x.UserName, x.Id);
             }
-
-            List<InformacjeUzytkownik> noweInformacje = [];
+            return result;
+        }
+        internal List<DTOInformacjaUzytkownika> PrzygotujListe(Dictionary<string, string> tlumaczenieLoginuNaID)
+        {
+            List<DTOInformacjaUzytkownika> przygotowanaLista = new List<DTOInformacjaUzytkownika>();
+            foreach (var x in _daneStartowe.Informacje)
+            {
+                przygotowanaLista.Add(DTOInformacjaUzytkownika.Utworz(x.Login, x.Imie, x.Nazwisko, x.Pesel, x.Telefon, x.Miasto, x.Ulica, x.NrMieszkania, tlumaczenieLoginuNaID));
+            }
+            return przygotowanaLista;
+        }
+        public async Task PrześlijDaneNaBaze(Dictionary<string, string> tlumaczenieLoginuNaID)
+        {
+            List<DTOInformacjaUzytkownika> informacjeUzytkownikow = PrzygotujListe(tlumaczenieLoginuNaID);
 
             foreach (var informacjeUzytkownika in informacjeUzytkownikow)
             {
-                bool istnieje = await _context.InformacjeUzytkownik
-                    .AnyAsync(x =>
-                        x.IdUzytkownika == informacjeUzytkownika.IdUzytkownika);
 
+                bool istnieje = await _pobieranieUzytkownika.SprawdzCzyInformacjeUzytkownikaIstniejaPoIdUzytkownikaAsync(informacjeUzytkownika.IdUzytkownika);
                 if (!istnieje)
                 {
-                    noweInformacje.Add(informacjeUzytkownika);
+                    _context.InformacjeUzytkownik.Add(informacjeUzytkownika.DoEncja());
                 }
             }
 
-            if (noweInformacje.Count > 0)
-            {
-                await _context.InformacjeUzytkownik.AddRangeAsync(noweInformacje);
-                await _context.SaveChangesAsync();
-            }
+            await _context.SaveChangesAsync();
         }
 
-        private InformacjeUzytkownik PrzypiszDane(
-            string[] dane,
-            string idUzytkownika)
-        {
-            return new InformacjeUzytkownik
-            {
-                IdUzytkownika = idUzytkownika,
-                Imie = dane[3],
-                Nazwisko = dane[4],
-                Pesel = dane[5],
-                Telefon = dane[6],
-                Miasto = dane[7],
-                Ulica = dane[8],
-                NrMieszkania = dane[9]
-            };
-        }
+
     }
 }

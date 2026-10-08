@@ -1,8 +1,11 @@
 using Dziennik_szkolny.Application.Interfejsy;
 using Dziennik_szkolny.Application.Interfejsy.DaneStartowe;
+using Dziennik_szkolny.Application.Interfejsy.Klasa;
+using Dziennik_szkolny.Application.Interfejsy.Plany;
+using Dziennik_szkolny.Application.Interfejsy.Przedmioty;
 using Dziennik_szkolny.Application.Interfejsy.Role;
+using Dziennik_szkolny.Application.Interfejsy.Uczen;
 using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
-using Dziennik_szkolny.Application.Mapery;
 using Dziennik_szkolny.Application.Serwisy.Uzytkownik;
 using Dziennik_szkolny.Application.Walidacja.Uzytkownik;
 using Dziennik_szkolny.Infrastructure;
@@ -10,7 +13,11 @@ using Dziennik_szkolny.Infrastructure.DaneStartowe;
 using Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Dziennik_szkolny.Infrastructure.Serwisy;
+using Dziennik_szkolny.Infrastructure.Serwisy.Klasa;
+using Dziennik_szkolny.Infrastructure.Serwisy.Plany;
+using Dziennik_szkolny.Infrastructure.Serwisy.Przedmiot;
 using Dziennik_szkolny.Infrastructure.Serwisy.Role;
+using Dziennik_szkolny.Infrastructure.Serwisy.Uczen;
 using Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -67,6 +74,12 @@ builder.Services.AddScoped<DodajLoginyStartowe>();
 builder.Services.AddScoped<PrzypiszRoleStartowe>();
 builder.Services.AddScoped<PrzypiszInformacjeStartowe>();
 builder.Services.AddScoped<DodajUprawnieniaZarzadzaniaRoli>();
+builder.Services.AddScoped<DodajKlasyStartowe>();
+builder.Services.AddScoped<DodajUczniowStartowych>();
+builder.Services.AddScoped<DodajPrzedmiotyStartowe>();
+builder.Services.AddScoped<DodajPrzypisaniePrzedmioty>();
+builder.Services.AddScoped<DodajWpisPlanu>();
+builder.Services.AddScoped<DodajDaneStartowe>();
 
 //zażądzanie użytkownikami
 builder.Services.AddScoped<IZarzadzajRolami, ZarzadzajRolamiService>();
@@ -82,6 +95,10 @@ builder.Services.AddScoped<IPobierajRole, PobierajRoleService>();
 builder.Services.AddScoped<IPobierajUzytkownika, PobierajUzytkownikaService>();
 builder.Services.AddScoped<IJednostkaPracy, JednostkaPracy>();
 builder.Services.AddScoped<IPobierajUprawnieniaRoli, PobierajUprawnieniaRoli>();
+builder.Services.AddScoped<IPobierajKlase, PobierajKlaseService>();
+builder.Services.AddScoped<IPobierajUcznia, PobierajUczniaService>();
+builder.Services.AddScoped<IPobierajPrzedmiot, PobierajPrzedmiot>();
+builder.Services.AddScoped<IPobierajWpisPlanu, PobierajWpisPlanuService>();
 
 
 

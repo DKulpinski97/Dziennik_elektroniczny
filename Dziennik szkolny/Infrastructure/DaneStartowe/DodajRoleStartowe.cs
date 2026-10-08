@@ -1,5 +1,4 @@
-﻿using Dziennik_szkolny.Models;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace Dziennik_szkolny.Infrastructure.DaneStartowe
 {
@@ -16,7 +15,7 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
 
         public async Task DodajRoleStartoweAsync()
         {
-          
+
 
             foreach (string nazwaRoli in _daneStartowe.Role)
             {

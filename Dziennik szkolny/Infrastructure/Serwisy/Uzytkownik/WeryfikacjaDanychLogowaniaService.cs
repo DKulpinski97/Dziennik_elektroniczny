@@ -1,12 +1,11 @@
-﻿using Dziennik_szkolny.Application.Interfejsy.Role;
-using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
+﻿using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
 {
-        
+
     public class WeryfikacjaDanychLogowaniaService : IWeryfikacjaDanychLogowania
     {
         private readonly UserManager<LoginUzytkownika> _userManager;
@@ -16,7 +15,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
         {
             _userManager = userManager;
         }
-        public  async Task<bool> CzyIstniejeLoginAsync(string login)
+        public async Task<bool> CzyIstniejeLoginAsync(string login)
         {
             var znormalizowanyLogin = _userManager.NormalizeName(login);
 
@@ -27,7 +26,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
 
 
 
-        public  async Task<bool> CzyIstniejeEmailAsync(string email)
+        public async Task<bool> CzyIstniejeEmailAsync(string email)
         {
             var znormalizowanyEmail = _userManager.NormalizeEmail(email);
 
@@ -35,13 +34,13 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
             bool istnieje = await _userManager.Users.AnyAsync(x => x.NormalizedEmail == znormalizowanyEmail);
             return istnieje;
         }
-        public async Task<bool> CzyIstniejeInnyLoginAsync(string login,string idUzytkownika)
+        public async Task<bool> CzyIstniejeInnyLoginAsync(string login, string idUzytkownika)
         {
-            return await _userManager.Users.AnyAsync(x =>x.UserName == login &&x.Id != idUzytkownika);
+            return await _userManager.Users.AnyAsync(x => x.UserName == login && x.Id != idUzytkownika);
         }
-        public async Task<bool> CzyIstniejeInnyEmailAsync(string email,string idUzytkownika)
+        public async Task<bool> CzyIstniejeInnyEmailAsync(string email, string idUzytkownika)
         {
-            return await _userManager.Users.AnyAsync(x =>x.Email == email &&x.Id != idUzytkownika);
+            return await _userManager.Users.AnyAsync(x => x.Email == email && x.Id != idUzytkownika);
         }
     }
 }

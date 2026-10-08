@@ -9,19 +9,34 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
         private readonly PrzypiszRoleStartowe _przypiszRoleStartowe;
         private readonly PrzypiszInformacjeStartowe _przypiszInformacjeStartowe;
         private readonly DodajUprawnieniaZarzadzaniaRoli _przypiszUprawnieniaZarzadzaniaRoli;
+        private readonly DodajKlasyStartowe _dodajKlasyStartowe;
+        private readonly DodajUczniowStartowych _dodajUczniowStartowych;
+        private readonly DodajPrzedmiotyStartowe _dodajPrzedmiotyStartowe;
+        private readonly DodajPrzypisaniePrzedmioty _dodajPrzypisaniePrzedmiot;
+        private readonly DodajWpisPlanu _dodajWpisPlanu;
 
         public DodajDaneStartowe(
             DodajRoleStartowe dodajRoleStartowe,
             DodajLoginyStartowe dodajLoginyStartowe,
             PrzypiszRoleStartowe przypiszRoleStartowe,
             PrzypiszInformacjeStartowe przypiszInformacjeStartowe,
-            DodajUprawnieniaZarzadzaniaRoli przypiszUprawnieniaZarzadzaniaRoli)
+            DodajUprawnieniaZarzadzaniaRoli przypiszUprawnieniaZarzadzaniaRoli,
+            DodajKlasyStartowe dodajKlasyStartowe,
+            DodajUczniowStartowych dodajUczniowStartowych,
+            DodajPrzedmiotyStartowe dodajPrzedmiotyStartowe,
+            DodajPrzypisaniePrzedmioty dodajPrzypisaniePrzedmiot,
+            DodajWpisPlanu dodajWpisPlanu)
         {
             _dodajRoleStartowe = dodajRoleStartowe;
             _dodajLoginyStartowe = dodajLoginyStartowe;
             _przypiszRoleStartowe = przypiszRoleStartowe;
             _przypiszInformacjeStartowe = przypiszInformacjeStartowe;
             _przypiszUprawnieniaZarzadzaniaRoli = przypiszUprawnieniaZarzadzaniaRoli;
+            _dodajKlasyStartowe = dodajKlasyStartowe;
+            _dodajUczniowStartowych = dodajUczniowStartowych;
+            _dodajPrzedmiotyStartowe = dodajPrzedmiotyStartowe;
+            _dodajPrzypisaniePrzedmiot = dodajPrzypisaniePrzedmiot;
+            _dodajWpisPlanu = dodajWpisPlanu;
         }
 
         public async Task DodajDaneStartoweAsync()
@@ -34,9 +49,23 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
 
                 await _przypiszRoleStartowe.PrzypiszRoleStartoweAsync();
 
-                await _przypiszInformacjeStartowe.PrzypiszInformacjeDodatkoweAsync();
+                var tlumaczeniaLoginyNaIdUrzytkownika = await _przypiszInformacjeStartowe.PobierzIPrzygotujSlownikTlumaczenAsync();
+                await _przypiszInformacjeStartowe.PrześlijDaneNaBaze(tlumaczeniaLoginyNaIdUrzytkownika);
 
                 await _przypiszUprawnieniaZarzadzaniaRoli.DodajUprawnieniaZarzadzaniaRoliAsync();
+
+
+                await _dodajKlasyStartowe.PrześlijDaneNaBaze(tlumaczeniaLoginyNaIdUrzytkownika);
+
+                var tlumaczeniaKlasyNaIdKlasy = await _dodajUczniowStartowych.PobierzIPrzygotujSlownikTlumaczenAsync();
+                await _dodajUczniowStartowych.PrzeslijUczniowStartowych(tlumaczeniaLoginyNaIdUrzytkownika, tlumaczeniaKlasyNaIdKlasy);
+
+                await _dodajPrzedmiotyStartowe.DodajPrzedmiotyStartoweAsync();
+
+                var tlumaczeniaPrzedmiotNaIdPrzedmiotu = await _dodajPrzypisaniePrzedmiot.PobierzIPrzygotujSlownikTlumaczenAsync();
+                await _dodajPrzypisaniePrzedmiot.PrześlijDaneNaBaze(tlumaczeniaLoginyNaIdUrzytkownika, tlumaczeniaPrzedmiotNaIdPrzedmiotu);
+
+                await _dodajWpisPlanu.PrześlijDaneNaBaze(tlumaczeniaLoginyNaIdUrzytkownika, tlumaczeniaKlasyNaIdKlasy, tlumaczeniaPrzedmiotNaIdPrzedmiotu);
             }
             catch (Exception ex)
             {

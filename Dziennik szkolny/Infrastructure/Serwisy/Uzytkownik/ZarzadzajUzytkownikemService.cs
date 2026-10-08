@@ -4,7 +4,6 @@ using Dziennik_szkolny.Domain.Entities;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Dziennik_szkolny.ViewModel;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
 {
@@ -31,11 +30,11 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
                 Email = model.Email
             };
 
-            var wynik = await _userManager.CreateAsync(nowyLogin,model.Haslo);
+            var wynik = await _userManager.CreateAsync(nowyLogin, model.Haslo);
 
             return wynik.Succeeded;
         }
-        public async Task<bool> EdytujUzytkownikaAsync(UzytkownikaViewModel model,bool zmienHaslo)
+        public async Task<bool> EdytujUzytkownikaAsync(UzytkownikaViewModel model, bool zmienHaslo)
         {
             var uzytkownik = await _userManager.FindByIdAsync(model.idUzytkownika);
 
@@ -59,7 +58,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
 
             return wynik.Succeeded;
         }
-        public async Task<bool> DodajRoleUzytkownikowiAsync(LoginUzytkownika uzytkownik,List<string> NazwayRoli)
+        public async Task<bool> DodajRoleUzytkownikowiAsync(LoginUzytkownika uzytkownik, List<string> NazwayRoli)
         {
             if (NazwayRoli == null || !NazwayRoli.Any())
             {
@@ -75,7 +74,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
                     return false;
                 }
 
-                var wynik = await _userManager.AddToRoleAsync(uzytkownik,rola.Name);
+                var wynik = await _userManager.AddToRoleAsync(uzytkownik, rola.Name);
 
                 if (!wynik.Succeeded)
                 {

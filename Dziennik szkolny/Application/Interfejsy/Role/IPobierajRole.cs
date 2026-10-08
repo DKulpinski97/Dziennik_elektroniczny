@@ -6,7 +6,7 @@ namespace Dziennik_szkolny.Application.Interfejsy.Role
 {
     public interface IPobierajRole
     {
-         Task<List<DaneRoli>> PobierzRole(ClaimsPrincipal user);
+        Task<List<DaneRoli>> PobierzRole(ClaimsPrincipal user);
         Task<List<string>> PobierzRoleZalogowanegoUzytkownikaAsync(ClaimsPrincipal user);
         Task<bool> CzyIstniejaRoleAsync(List<string> idRoli);
         Task<IdentityRole?> PobierzRolePoIdAsync(string idRoli);

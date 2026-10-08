@@ -10,7 +10,7 @@ namespace Dziennik_szkolny.Application.Mapery
     {
         private readonly MapowanieRoli _mapowanieRoli = new MapowanieRoli();
 
-        public UzytkownikaViewModel MapujNaUzytkownikaViewModel(InformacjeUzytkownik informacjeUzytkownik,LoginUzytkownika login,List<string> wybraneRole,List<SelectListItem> dostepneRole)
+        public UzytkownikaViewModel MapujNaUzytkownikaViewModel(InformacjeUzytkownik informacjeUzytkownik, LoginUzytkownika login, List<string> wybraneRole, List<SelectListItem> dostepneRole)
         {
             return new UzytkownikaViewModel
             {
@@ -29,7 +29,7 @@ namespace Dziennik_szkolny.Application.Mapery
                 idUzytkownika = login.Id
             };
         }
-        public void MapujNaInformacjeUzytkownika(InformacjeUzytkownik informacjeUzytkownik,UzytkownikaViewModel uzytkownikaViewModel)
+        public void MapujNaInformacjeUzytkownika(InformacjeUzytkownik informacjeUzytkownik, UzytkownikaViewModel uzytkownikaViewModel)
         {
             informacjeUzytkownik.Imie = uzytkownikaViewModel.Imie;
             informacjeUzytkownik.Nazwisko = uzytkownikaViewModel.Nazwisko;
@@ -47,7 +47,7 @@ namespace Dziennik_szkolny.Application.Mapery
                 DostepneRole = wszystkieRole
             };
         }
-        public void MapujDostepneRoleDoIStniejacegoVievModel(UzytkownikaViewModel uzytkownikaViewModel,List<DaneRoli> dostepneRole)
+        public void MapujDostepneRoleDoIStniejacegoVievModel(UzytkownikaViewModel uzytkownikaViewModel, List<DaneRoli> dostepneRole)
         {
             var wszystkieRole = _mapowanieRoli.MapujRoleNaSelectList(dostepneRole);
 

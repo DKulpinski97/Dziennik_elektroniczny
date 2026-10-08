@@ -1,4 +1,5 @@
-﻿using Dziennik_szkolny.Infrastructure.Identyfikatory;
+﻿using Dziennik_szkolny.Infrastructure.DaneStartowe.ObiektyTransferuDanych;
+using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Microsoft.AspNetCore.Identity;
 
 namespace Dziennik_szkolny.Infrastructure.DaneStartowe
@@ -9,7 +10,7 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
         private readonly DaneStartowe _daneStartowe;
 
         public DodajLoginyStartowe(
-            UserManager<LoginUzytkownika> userManager,DaneStartowe daneStartowe)
+            UserManager<LoginUzytkownika> userManager, DaneStartowe daneStartowe)
         {
             _userManager = userManager;
             _daneStartowe = daneStartowe;
@@ -17,41 +18,28 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
 
         public async Task DodajLoginyStartoweAsync()
         {
-           
 
             foreach (var dane in _daneStartowe.Loginy)
             {
-                string login = dane[0];
-                string email = dane[1];
-                string haslo = dane[2];
+                var dto = new DTOLogin(dane.Login, dane.Email, dane.Haslo);
 
-                var istnieje = await _userManager.FindByNameAsync(login);
+
+                var istnieje = await _userManager.FindByNameAsync(dane.Login);
 
                 if (istnieje != null)
                 {
                     continue;
                 }
 
-                var nowyLogin = new LoginUzytkownika
-                {
-                    UserName = login,
-                    Email = email
-                };
+                var nowyLogin = dto.DoEncja();
 
-                var wynik = await _userManager.CreateAsync(
-                    nowyLogin,
-                    haslo);
+
+                var wynik = await _userManager.CreateAsync(nowyLogin, dane.Haslo);
 
                 if (!wynik.Succeeded)
                 {
-                    var bledy = string.Join(
-                        "; ",
-                        wynik.Errors.Select(x =>
-                            $"{x.Code}: {x.Description}"));
-
-                    throw new InvalidOperationException(
-                        $"Nie udało się utworzyć użytkownika '{login}'. " +
-                        $"Błędy: {bledy}");
+                    var bledy = string.Join("; ", wynik.Errors.Select(x => $"{x.Code}: {x.Description}"));
+                    throw new InvalidOperationException($"Nie udało się utworzyć użytkownika '{dto.Login}'. " + $"Błędy: {bledy}");
                 }
             }
         }

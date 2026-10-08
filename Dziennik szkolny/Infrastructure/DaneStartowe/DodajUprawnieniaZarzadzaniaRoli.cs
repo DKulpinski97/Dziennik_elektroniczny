@@ -36,10 +36,10 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
                 if (!istnieje)
                 {
                     _context.UprawnieniaZarzadzaniaRola.Add(new UprawnienieZarzadzaniaRola
-                        {
-                            RolaZarzadzajacaId = rolaZarzadzajaca.Id,
-                            RolaZarzadzanaId = rolaZarzadzana.Id
-                        });
+                    {
+                        RolaZarzadzajacaId = rolaZarzadzajaca.Id,
+                        RolaZarzadzanaId = rolaZarzadzana.Id
+                    });
                 }
             }
 

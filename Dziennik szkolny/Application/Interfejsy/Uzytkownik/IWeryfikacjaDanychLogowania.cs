@@ -6,8 +6,8 @@
 
         Task<bool> CzyIstniejeEmailAsync(string email);
 
-        Task<bool> CzyIstniejeInnyLoginAsync(string login,string idUzytkownika);
+        Task<bool> CzyIstniejeInnyLoginAsync(string login, string idUzytkownika);
 
-        Task<bool> CzyIstniejeInnyEmailAsync(string email,string idUzytkownika);
+        Task<bool> CzyIstniejeInnyEmailAsync(string email, string idUzytkownika);
     }
 }

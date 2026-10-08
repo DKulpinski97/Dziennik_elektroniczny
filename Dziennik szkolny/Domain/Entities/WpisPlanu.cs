@@ -21,6 +21,6 @@ namespace Dziennik_szkolny.Domain.Entities
         public int IdPrzedmiotu { get; set; }
         public string IdNauczyciela { get; set; }
         public virtual PrzypisaniePrzedmiotu PrzypisaniePrzedmiotu { get; set; }
-        
+
     }
 }

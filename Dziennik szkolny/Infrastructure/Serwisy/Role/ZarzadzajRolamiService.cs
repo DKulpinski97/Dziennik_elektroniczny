@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Dziennik_szkolny.Application.Interfejsy.Role;
-using Dziennik_szkolny.Infrastructure.DaneStartowe;
+﻿using Dziennik_szkolny.Application.Interfejsy.Role;
+using Microsoft.AspNetCore.Identity;
 namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
 {
     public class ZarzadzajRolamiService : IZarzadzajRolami
@@ -83,7 +82,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
             var wynik = await _roleManager.DeleteAsync(rola);
 
             return (
-                wynik.Succeeded,wynik.Succeeded? "Rola usunięta pomyślnie.": "Nie udało się usunąć roli."
+                wynik.Succeeded, wynik.Succeeded ? "Rola usunięta pomyślnie." : "Nie udało się usunąć roli."
             );
         }
 

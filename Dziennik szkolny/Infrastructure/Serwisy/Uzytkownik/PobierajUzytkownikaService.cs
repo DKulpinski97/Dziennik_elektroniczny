@@ -1,5 +1,4 @@
 ﻿using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
-using Dziennik_szkolny.Application.Modele;
 using Dziennik_szkolny.Application.ObiektyTransferuDanych;
 using Dziennik_szkolny.Domain.Entities;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
@@ -24,7 +23,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
         }
         public async Task<InformacjeUzytkownik> PobierzInformacjeUzytkownikaPoIdLoginu(string IdUzytkownika)
         {
-            return  await _dbContext.InformacjeUzytkownik.FirstOrDefaultAsync(x => x.IdUzytkownika == IdUzytkownika);
+            return await _dbContext.InformacjeUzytkownik.FirstOrDefaultAsync(x => x.IdUzytkownika == IdUzytkownika);
         }
 
         public async Task<List<LoginUzytkownika>> PobierzWszystkichUzytkownikow()
@@ -46,7 +45,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
 
             foreach (var nazwaRoli in role)
             {
-                var uzytkownicy =await _userManager.GetUsersInRoleAsync(nazwaRoli);
+                var uzytkownicy = await _userManager.GetUsersInRoleAsync(nazwaRoli);
 
                 foreach (var uzytkownik in uzytkownicy)
                 {
@@ -68,6 +67,19 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
             }
 
             return wynik;
+        }
+
+        public async Task<string> PobierzIdUzytkownikaPoLoginieAsync(string login)
+        {
+            var uzytkownik = await _userManager.FindByNameAsync(login);
+            return uzytkownik?.Id;
+        }
+
+        public async Task<bool> SprawdzCzyInformacjeUzytkownikaIstniejaPoIdUzytkownikaAsync(string idUzytkownika)
+        {
+            bool istnieje = await _dbContext.InformacjeUzytkownik.AnyAsync(x => x.IdUzytkownika == idUzytkownika);
+            return istnieje;
+
         }
     }
 }
