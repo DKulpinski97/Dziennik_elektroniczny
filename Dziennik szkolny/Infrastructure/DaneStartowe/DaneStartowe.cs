@@ -142,6 +142,20 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
         (NazwyPrzedmiotu.Chemia, "Nauczyciel3"),
 
         ];
+
+        // Informacje niezbędne do utworzenia WpisyPlanu.
+        // Z powodu tego, że WpisPlanu jest encją powiązaną z innymi encjami, musimy wyliczyć identyfikatory
+        // encji powiązanych: klasa na podstawie oznaczenia i roku rozpoczęcia,
+        // przedmiot na podstawie nazwy przedmiotu i nauczyciel na podstawie loginu.
+        public List<(string NrLekcja, string Dzien, string Oznaczenie, string RokRozpoczecia, string NazwaPrzedmiotu, string LoginNauczyciela)> WpisyPlanu { get; } =
+        [
+        ("1", "Poniedzialek", "A", "2023", NazwyPrzedmiotu.Polski, "Nauczyciel1"),
+        ("1", "Poniedzialek", "B", "2023", NazwyPrzedmiotu.Polski, "Nauczyciel3"),
+        ("2", "Wtorek", "A", "2023", NazwyPrzedmiotu.Matematyka, "Nauczyciel1"),
+        ("3", "Sroda", "A", "2023", NazwyPrzedmiotu.Fizyka, "Nauczyciel2"),
+        ("4", "Czwartek", "A", "2023", NazwyPrzedmiotu.Chemia, "Nauczyciel3"),
+
+        ];
     }
 }
 

@@ -28,14 +28,22 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.ObiektyTransferuDanych
             IdOpiekun1 = idOpiekun1;
             IdOpiekun2 = idOpiekun2;
         }
-        public static DTOUczen Utworz(string pesel, string imie, string nazwisko, DateOnly dataUrodzenia, int idKlasy, string loginOpiekun1, string? loginOpiekun2, Dictionary<string, string> tlumaczenieLoginuNaId)
+        public static DTOUczen Utworz(string pesel, string imie, string nazwisko, DateOnly dataUrodzenia, string loginOpiekun1, string? loginOpiekun2, string oznaczenieKlasy, string rokRozpoczeciaKlasy, Dictionary<string, string> tlumaczenieLoginuNaId, Dictionary<(string, string), string> tlumaczeniaKlasyNaIdKlasy)
         {
             if (!tlumaczenieLoginuNaId.TryGetValue(loginOpiekun1, out string idOpiekun1))
             {
                 throw new InvalidOperationException($"Nie można znaleźć identyfikatora opiekuna1 dla loginu {loginOpiekun1}.");
             }
-            tlumaczenieLoginuNaId.TryGetValue(loginOpiekun2, out string idOpiekun2);
-            return new DTOUczen(pesel, imie, nazwisko, dataUrodzenia, idKlasy, idOpiekun1, idOpiekun2);
+            string? idOpiekun2 = null;
+            if (!string.IsNullOrEmpty(loginOpiekun2) && !tlumaczenieLoginuNaId.TryGetValue(loginOpiekun2, out idOpiekun2))
+            {
+                throw new InvalidOperationException($"Nie można znaleźć identyfikatora opiekuna2 dla loginu {loginOpiekun2}.");
+            }
+            if (!tlumaczeniaKlasyNaIdKlasy.TryGetValue((oznaczenieKlasy, rokRozpoczeciaKlasy), out string idKlasy))
+            {
+                throw new InvalidOperationException($"Nie można znaleźć identyfikatora klasy dla oznaczenia {oznaczenieKlasy} i roku rozpoczęcia {rokRozpoczeciaKlasy}.");
+            }
+            return new DTOUczen(pesel, imie, nazwisko, dataUrodzenia, Convert.ToInt32(idKlasy), idOpiekun1, idOpiekun2);
         }
         public Uczen DoEncja()
         {

@@ -13,6 +13,7 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
         private readonly DodajUczniowStartowych _dodajUczniowStartowych;
         private readonly DodajPrzedmiotyStartowe _dodajPrzedmiotyStartowe;
         private readonly DodajPrzypisaniePrzedmioty _dodajPrzypisaniePrzedmiot;
+        private readonly DodajWpisPlanu _dodajWpisPlanu;
 
         public DodajDaneStartowe(
             DodajRoleStartowe dodajRoleStartowe,
@@ -23,7 +24,8 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
             DodajKlasyStartowe dodajKlasyStartowe,
             DodajUczniowStartowych dodajUczniowStartowych,
             DodajPrzedmiotyStartowe dodajPrzedmiotyStartowe,
-            DodajPrzypisaniePrzedmioty dodajPrzypisaniePrzedmiot)
+            DodajPrzypisaniePrzedmioty dodajPrzypisaniePrzedmiot,
+            DodajWpisPlanu dodajWpisPlanu)
         {
             _dodajRoleStartowe = dodajRoleStartowe;
             _dodajLoginyStartowe = dodajLoginyStartowe;
@@ -34,6 +36,7 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
             _dodajUczniowStartowych = dodajUczniowStartowych;
             _dodajPrzedmiotyStartowe = dodajPrzedmiotyStartowe;
             _dodajPrzypisaniePrzedmiot = dodajPrzypisaniePrzedmiot;
+            _dodajWpisPlanu = dodajWpisPlanu;
         }
 
         public async Task DodajDaneStartoweAsync()
@@ -53,12 +56,16 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
 
 
                 await _dodajKlasyStartowe.PrześlijDaneNaBaze(tlumaczeniaLoginyNaIdUrzytkownika);
-                await _dodajUczniowStartowych.PrzeslijUczniowStartowych(tlumaczeniaLoginyNaIdUrzytkownika);
+
+                var tlumaczeniaKlasyNaIdKlasy = await _dodajUczniowStartowych.PobierzIPrzygotujSlownikTlumaczenAsync();
+                await _dodajUczniowStartowych.PrzeslijUczniowStartowych(tlumaczeniaLoginyNaIdUrzytkownika, tlumaczeniaKlasyNaIdKlasy);
 
                 await _dodajPrzedmiotyStartowe.DodajPrzedmiotyStartoweAsync();
 
                 var tlumaczeniaPrzedmiotNaIdPrzedmiotu = await _dodajPrzypisaniePrzedmiot.PobierzIPrzygotujSlownikTlumaczenAsync();
                 await _dodajPrzypisaniePrzedmiot.PrześlijDaneNaBaze(tlumaczeniaLoginyNaIdUrzytkownika, tlumaczeniaPrzedmiotNaIdPrzedmiotu);
+
+                await _dodajWpisPlanu.PrześlijDaneNaBaze(tlumaczeniaLoginyNaIdUrzytkownika, tlumaczeniaKlasyNaIdKlasy, tlumaczeniaPrzedmiotNaIdPrzedmiotu);
             }
             catch (Exception ex)
             {

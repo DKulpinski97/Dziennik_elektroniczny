@@ -19,28 +19,27 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
             _pobierajKlase = pobierajKlase;
             _pobierajUczen = pobierajUczen;
         }
-        internal async Task<List<DTOUczen>> PrzygotujListe(Dictionary<string, string> tlumaczenieLoginuNaID)
+        public async Task<Dictionary<(string OznaczenieKlasy, string RokRozpoczecia), string>> PobierzIPrzygotujSlownikTlumaczenAsync()
         {
-            var klasy = await _pobierajKlase.PobierzWszystkieKlasy();
+            var result = new Dictionary<(string OznaczenieKlasy, string RokRozpoczecia), string>();
+            foreach (var x in await _pobierajKlase.PobierzWszystkieKlasy())
+            {
+                result.Add((x.Oznaczenie, x.RokRozpoczecia.ToString()), x.IdKlasy.ToString());
+            }
+            return result;
+        }
+        internal  List<DTOUczen> PrzygotujListe(Dictionary<string, string> tlumaczenieLoginuNaID, Dictionary<(string, string), string> tlumaczeniaKlasyNaIdKlasy)
+        {
             List<DTOUczen> przygotowanaLista = new List<DTOUczen>();
             foreach (var x in _daneStartowe.Uczniowie)
             {
-                int idKlasy = klasy.FirstOrDefault(k => k.Oznaczenie == x.OznaczenieKlasy && k.RokRozpoczecia == Convert.ToInt32(x.RokRozpoczeciaKlasy))?.IdKlasy ?? 0;
-                if (idKlasy != 0)
-                {
-                    var dtoUczen = DTOUczen.Utworz(x.Pesel, x.Imie, x.Nazwisko, DateOnly.Parse(x.DataUrodzenia), idKlasy, x.Opiekun1Login, x.Opiekun2Login, tlumaczenieLoginuNaID);
-                    przygotowanaLista.Add(dtoUczen);
-                }
-                else
-                {
-                    throw new InvalidOperationException($"Nie można znaleźć klasy dla ucznia {x.Imie} {x.Nazwisko} z oznaczeniem klasy {x.OznaczenieKlasy} i rokiem rozpoczęcia {x.RokRozpoczeciaKlasy}.");
-                }
+                przygotowanaLista.Add(DTOUczen.Utworz(x.Pesel, x.Imie, x.Nazwisko, DateOnly.Parse(x.DataUrodzenia), x.Opiekun1Login, x.Opiekun2Login, x.OznaczenieKlasy, x.RokRozpoczeciaKlasy, tlumaczenieLoginuNaID, tlumaczeniaKlasyNaIdKlasy));
             }
             return przygotowanaLista;
         }
-        public async Task PrzeslijUczniowStartowych(Dictionary<string, string> tlumaczenieLoginuNaID)
+        public async Task PrzeslijUczniowStartowych(Dictionary<string, string> tlumaczenieLoginuNaID, Dictionary<(string, string), string> tlumaczeniaKlasyNaIdKlasy)
         {
-            var przygotowanaLista = await PrzygotujListe(tlumaczenieLoginuNaID);
+            var przygotowanaLista =  PrzygotujListe(tlumaczenieLoginuNaID, tlumaczeniaKlasyNaIdKlasy);
             foreach (var x in przygotowanaLista)
             {
                 if (!await _pobierajUczen.SprawdzCzyUczenIstniejePoPeselAsync(x.Pesel))

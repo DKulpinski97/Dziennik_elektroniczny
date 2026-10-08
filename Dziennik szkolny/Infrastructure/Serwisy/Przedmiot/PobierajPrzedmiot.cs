@@ -18,7 +18,6 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Przedmiot
 
         public async Task<bool> SprawdzCzyPrzedmiotIstniejePoNazwieAsync(string nazwaPrzedmiotu)
         {
-
             bool istnieje = await _dbContext.Przedmioty.AnyAsync(p => p.NazwaPrzedmiotu == nazwaPrzedmiotu);
             return istnieje;
         }

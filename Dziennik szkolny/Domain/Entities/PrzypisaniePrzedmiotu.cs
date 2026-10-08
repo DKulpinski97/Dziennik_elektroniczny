@@ -18,4 +18,5 @@ namespace Dziennik_szkolny.Domain.Entities
         [ForeignKey(nameof(IdNauczyciela))]
         public virtual LoginUzytkownika Nauczyciel { get; set; }
     }
+
 }
