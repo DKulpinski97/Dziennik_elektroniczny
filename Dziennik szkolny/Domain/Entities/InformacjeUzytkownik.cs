@@ -1,9 +1,11 @@
 ﻿using Dziennik_szkolny.Infrastructure.Identyfikatory;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dziennik_szkolny.Domain.Entities
 {
+    [Index(nameof(Pesel), IsUnique = true)]
     public class InformacjeUzytkownik
     {
 

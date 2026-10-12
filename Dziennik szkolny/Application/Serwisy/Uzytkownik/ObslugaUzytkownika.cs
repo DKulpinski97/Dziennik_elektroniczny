@@ -51,54 +51,56 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
         }
 
 
-        public async Task<(string Komunikat, UzytkownikaViewModel Uzytkownik, bool CzyUdane)> DodajUzytkownikaAsync(UzytkownikaViewModel model, ClaimsPrincipal zalogowanyUzytkownik)
+        public async Task<(string Komunikat, bool CzyUdane)> DodajUzytkownikaAsync(DodajUzytkownikaViewModel dodajUzytkownikaViewModel, ClaimsPrincipal zalogowanyUzytkownik)
         {
-            // TODO: W wersji wdrożeniowej zastosować wymagania silnego hasła
-            // zgodne z konfiguracją ASP.NET Core Identity.
-            /* if (!_walidacjaDanychUzytkownika.CzyHasloPrawidlowe(model.Haslo))
-             {
-                 return ("Hasło musi zawierać co najmniej 3 znaki.", model, false);
-             }*/
-            // Walidacja telefonu
-            if (!_walidacjaDanychUzytkownika.CzyPoprawnyTelefon(model.Telefon))
+            // Sprawdzenie czy istnieją role o podanych identyfikatorach
+            if (!await _pobierajRole.CzyIstniejaRoleAsync(dodajUzytkownikaViewModel.WybraneRole))
             {
-                return ("Telefon musi zawierać dokładnie 9 cyfr.", model, false);
+                return ("Nie znaleziono jednej lub więcej wybranych ról.", false);
+            }
+
+            // Sprawdzanie hasła zgodne z konfiguracją ASP.NET Core Identity.
+            if (!_walidacjaDanychUzytkownika.CzyHasloPrawidlowe(dodajUzytkownikaViewModel.Haslo))
+            {
+                return ("Hasło musi zawierać co najmniej 8 znaków. w tym jedną cyfrę, jedną małą i jedną wielką literę oraz jeden znak specjalny.", false);
+            }
+            // Walidacja telefonu
+            if (!_walidacjaDanychUzytkownika.CzyPoprawnyTelefon(dodajUzytkownikaViewModel.Telefon))
+            {
+                return ("Telefon musi zawierać dokładnie 9 cyfr.", false);
             }
 
 
             // Walidacja PESEL
-            if (!_walidacjaDanychUzytkownika.CzyPoprawnyPesel(model.Pesel))
+            if (!_walidacjaDanychUzytkownika.CzyPoprawnyPesel(dodajUzytkownikaViewModel.Pesel))
             {
-                return ("Podany numer PESEL jest niepoprawny.", model, false);
+                return ("Podany numer PESEL jest niepoprawny.", false);
             }
 
 
             // Sprawdzenie loginu
-            if (await _weryfikacjaDanychLogowania.CzyIstniejeLoginAsync(model.Login))
+            if (await _weryfikacjaDanychLogowania.CzyIstniejeLoginAsync(dodajUzytkownikaViewModel.Login))
             {
-                return ("Użytkownik o takim loginie już istnieje.", model, false);
+                return ("Użytkownik o takim loginie już istnieje.", false);
             }
-
+            // Sprawdzenie Pesla
+            if (await _pobierajUzytkownika.CzyPeselIstniejeAsync(dodajUzytkownikaViewModel.Pesel))
+            {
+                return ("Użytkownik o takim PESELu już istnieje.", false);
+            }
 
             // Sprawdzenie emaila
-            if (await _weryfikacjaDanychLogowania.CzyIstniejeEmailAsync(model.Email))
+            if (await _weryfikacjaDanychLogowania.CzyIstniejeEmailAsync(dodajUzytkownikaViewModel.Email))
             {
-                return ("Użytkownik o takim emailu już istnieje.", model, false);
+                return ("Użytkownik o takim emailu już istnieje.", false);
             }
-
-
-            if (!await _pobierajRole.CzyIstniejaRoleAsync(model.WybraneRole))
-            {
-                return ("Nie znaleziono jednej lub więcej wybranych ról.", model, false);
-            }
-
-            var wybraneNazwyRol = await _pobierajRole.PobierzNazwyRolPoIdAsync(model.WybraneRole);
+            var wybraneNazwyRol = await _pobierajRole.PobierzNazwyRolPoIdAsync(dodajUzytkownikaViewModel.WybraneRole);
             var roleZalogowanego = await _pobierajRole.PobierzRoleZalogowanegoUzytkownikaAsync(zalogowanyUzytkownik);
             var roleDoZarzadzania = await _pobierajUprawnieniaRoli.PobierzRoleKtorymiMozeZarzadzacAsync(roleZalogowanego);
 
             if (wybraneNazwyRol.Any(rola => !roleDoZarzadzania.Contains(rola)))
             {
-                return ("Nie masz uprawnień do nadania jednej lub więcej wybranych ról.", model, false);
+                return ("Nie masz uprawnień do nadania jednej lub więcej wybranych ról.", false);
             }
 
             await _jednostkaPracy.RozpocznijTransakcjeAsync();
@@ -106,90 +108,98 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             try
             {
                 // Dodanie konta
-                if (!await _zarzadzajUzytkownikema.DodajUzytkownikaAsync(model))
+                if (!await _zarzadzajUzytkownikema.DodajUzytkownikaAsync(dodajUzytkownikaViewModel))
                 {
                     await _jednostkaPracy.CofnijAsync();
-                    return ("Nie udało się dodać użytkownika.", model, false);
+                    return ("Nie udało się dodać użytkownika.", false);
                 }
-                var nowyUzytkownik = await _pobierajUzytkownika.PobierzUzytkownikaPoLoginieAsync(model.Login);
+                var nowyUzytkownik = await _pobierajUzytkownika.PobierzUzytkownikaPoLoginieAsync(dodajUzytkownikaViewModel.Login);
                 //Dodaj Role użytkownikowi
                 if (!await _zarzadzajUzytkownikema.DodajRoleUzytkownikowiAsync(nowyUzytkownik, wybraneNazwyRol))
                 {
                     await _jednostkaPracy.CofnijAsync();
-                    return ("Nie udało się przypisać ról.", model, false);
+                    return ("Nie udało się przypisać ról.", false);
                 }
                 // Dodanie informacji użytkownika
-                if (!await _zarzadzajUzytkownikema.DodajInformacjeUzytkownikaAsync(nowyUzytkownik, model))
+                if (!await _zarzadzajUzytkownikema.DodajInformacjeUzytkownikaAsync(nowyUzytkownik, dodajUzytkownikaViewModel))
                 {
                     await _jednostkaPracy.CofnijAsync();
-                    return ("Nie udało się dodać informacji o użytkowniku.", model, false);
+                    return ("Nie udało się dodać informacji o użytkowniku.", false);
                 }
                 await _jednostkaPracy.ZatwierdzAsync();
 
 
-                return ("Użytkownik dodany", model, true);
+                return ("Użytkownik dodany", true);
             }
             catch (Exception ex)
             {
                 await _jednostkaPracy.CofnijAsync();
-                _logger.LogError(ex, "Błąd podczas dodawania użytkownika {Login}", model.Login);
+                _logger.LogError(ex, "Błąd podczas dodawania użytkownika {Login}", dodajUzytkownikaViewModel.Login);
 
-                return ("Błąd: Nie udało się dodać użytkownika. Błąd systemu, spróbuj ponownie.", model, false);
+                return ("Błąd: Nie udało się dodać użytkownika. Błąd systemu, spróbuj ponownie.", false);
             }
         }
 
-        public async Task<(string Komunikat, UzytkownikaViewModel Uzytkownik, bool CzyUdane)> EdytujUzytkownikaAsync(UzytkownikaViewModel uzytkownikaViewModel, ClaimsPrincipal zalogowanyUzytkownik)
+        public async Task<(string Komunikat, bool CzyUdane)> EdytujUzytkownikaAsync(EdytujUzytkownikaViewModel edytujUzytkownikaViewModel, ClaimsPrincipal zalogowanyUzytkownik)
         {
-            //======================Sprawdzanie podstawowych danych=========================
-            // TODO: W wersji wdrożeniowej zastosować wymagania silnego hasła
-            // zgodne z konfiguracją ASP.NET Core Identity.
-            bool zmianaHasla = !string.IsNullOrWhiteSpace(uzytkownikaViewModel.Haslo);
-            /*if (zmianaHasla && !_walidacjaDanychUzytkownika.CzyHasloPrawidlowe(uzytkownikaViewModel.Haslo))
-            {
-                return ("Hasło musi zawierać co najmniej 3 znaki.", uzytkownikaViewModel, false);
+           
 
-            }*/
+            //sprawdzanie czy Email jest unikalny
+            if (!string.IsNullOrEmpty(edytujUzytkownikaViewModel.Email) && await _pobierajUzytkownika.PobierzEmailUzytkownikaAsync(edytujUzytkownikaViewModel.IdUzytkownika) != edytujUzytkownikaViewModel.Email.ToUpper() && await _weryfikacjaDanychLogowania.CzyIstniejeEmailAsync(edytujUzytkownikaViewModel.Email))
+            {
+                return ("Użytkownik o takim emailu już istnieje.", false);
+            }
+            // Sprawdzenie czy istnieją role o podanych identyfikatorach
+            if (!await _pobierajRole.CzyIstniejaRoleAsync(edytujUzytkownikaViewModel.WybraneRole))
+            {
+                return ("Nie znaleziono jednej lub więcej wybranych ról.", false);
+            }
+            bool zmianaHasla = !string.IsNullOrEmpty(edytujUzytkownikaViewModel.Haslo);
+            //======================Sprawdzanie podstawowych danych=========================
+            // zgodne z konfiguracją ASP.NET Core Identity.
+            if (!string.IsNullOrEmpty(edytujUzytkownikaViewModel.Haslo) && !_walidacjaDanychUzytkownika.CzyHasloPrawidlowe(edytujUzytkownikaViewModel.Haslo))
+            {
+                return ("Hasło musi zawierać co najmniej 8 znaków. w tym jedną cyfrę, jedną małą i jedną wielką literę oraz jeden znak specjalny.", false);
+            }
 
             // Walidacja telefonu
-            if (!_walidacjaDanychUzytkownika.CzyPoprawnyTelefon(uzytkownikaViewModel.Telefon))
+            if (!_walidacjaDanychUzytkownika.CzyPoprawnyTelefon(edytujUzytkownikaViewModel.Telefon))
             {
-                return ("Telefon musi zawierać dokładnie 9 cyfr.", uzytkownikaViewModel, false);
+                return ("Telefon musi zawierać dokładnie 9 cyfr.", false);
             }
 
 
             // Walidacja PESEL
-            if (!_walidacjaDanychUzytkownika.CzyPoprawnyPesel(uzytkownikaViewModel.Pesel))
+            if (!_walidacjaDanychUzytkownika.CzyPoprawnyPesel(edytujUzytkownikaViewModel.Pesel))
             {
-                return ("Podany numer PESEL jest niepoprawny.", uzytkownikaViewModel, false);
+                return ("Podany numer PESEL jest niepoprawny.", false);
+            }
+            //sprawdzanie czy pesel jest unikalny
+            if (await _pobierajUzytkownika.CzyIstniejeInnyUzytkownikOTymPeseluAsync(edytujUzytkownikaViewModel.Pesel, edytujUzytkownikaViewModel.IdUzytkownika))
+            {
+                return ("Użytkownik o takim PESELu już istnieje.", false);
             }
 
-
             // Sprawdzenie loginu
-            if (await _weryfikacjaDanychLogowania.CzyIstniejeInnyLoginAsync(uzytkownikaViewModel.Login, uzytkownikaViewModel.idUzytkownika))
+            if (await _weryfikacjaDanychLogowania.CzyIstniejeInnyLoginAsync(edytujUzytkownikaViewModel.Login, edytujUzytkownikaViewModel.IdUzytkownika))
             {
-                return ("Użytkownik o takim loginie już istnieje.", uzytkownikaViewModel, false);
+                return ("Użytkownik o takim loginie już istnieje.", false);
             }
 
 
             // Sprawdzenie emaila
-            if (await _weryfikacjaDanychLogowania.CzyIstniejeInnyEmailAsync(uzytkownikaViewModel.Email, uzytkownikaViewModel.idUzytkownika))
+            if (await _weryfikacjaDanychLogowania.CzyIstniejeInnyEmailAsync(edytujUzytkownikaViewModel.Email, edytujUzytkownikaViewModel.IdUzytkownika))
             {
-                return ("Użytkownik o takim emailu już istnieje.", uzytkownikaViewModel, false);
+                return ("Użytkownik o takim emailu już istnieje.", false);
             }
 
-
-            if (!await _pobierajRole.CzyIstniejaRoleAsync(uzytkownikaViewModel.WybraneRole))
-            {
-                return ("Nie znaleziono jednej lub więcej wybranych ról.", uzytkownikaViewModel, false);
-            }
-
-            var wybraneNazwyRol = await _pobierajRole.PobierzNazwyRolPoIdAsync(uzytkownikaViewModel.WybraneRole);
+            var wybraneNazwyRol = await _pobierajRole.PobierzNazwyRolPoIdAsync(edytujUzytkownikaViewModel.WybraneRole);
             var roleZalogowanego = await _pobierajRole.PobierzRoleZalogowanegoUzytkownikaAsync(zalogowanyUzytkownik);
             var roleDoZarzadzania = await _pobierajUprawnieniaRoli.PobierzRoleKtorymiMozeZarzadzacAsync(roleZalogowanego);
 
             if (wybraneNazwyRol.Any(rola => !roleDoZarzadzania.Contains(rola)))
             {
-                return ("Nie masz uprawnień do nadania jednej lub więcej wybranych ról.", uzytkownikaViewModel, false);
+                return ("Nie masz uprawnień do nadania jednej lub więcej wybranych ról.", false);
             }
 
             await _jednostkaPracy.RozpocznijTransakcjeAsync();
@@ -199,31 +209,31 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
                 // Aktualizacja Identity
                 // =====================
                 // Dodanie konta
-                if (!await _zarzadzajUzytkownikema.EdytujUzytkownikaAsync(uzytkownikaViewModel, zmianaHasla))
+                if (!await _zarzadzajUzytkownikema.EdytujUzytkownikaAsync(edytujUzytkownikaViewModel, zmianaHasla))
                 {
                     await _jednostkaPracy.CofnijAsync();
-                    return ("Nie udało się zaktualizować danych logowania.", uzytkownikaViewModel, false);
+                    return ("Nie udało się zaktualizować danych logowania.", false);
                 }
 
                 // =====================
                 // Aktualizacja danych osobowych
                 // =====================
 
-                var informacje = await _pobierajUzytkownika.PobierzInformacjeUzytkownikaPoIdLoginu(uzytkownikaViewModel.idUzytkownika);
+                var informacje = await _pobierajUzytkownika.PobierzInformacjeUzytkownikaPoIdLoginu(edytujUzytkownikaViewModel.IdUzytkownika);
 
 
                 if (informacje == null)
                 {
                     await _jednostkaPracy.CofnijAsync();
-                    return ("Nie znaleziono danych użytkownika.", uzytkownikaViewModel, false);
+                    return ("Nie znaleziono danych użytkownika.", false);
                 }
-                _mapowanieUzytkownika.MapujNaInformacjeUzytkownika(informacje, uzytkownikaViewModel);
+                _mapowanieUzytkownika.MapujNaInformacjeUzytkownika(informacje, edytujUzytkownikaViewModel);
 
 
                 if (!await _zarzadzajUzytkownikema.EdytujInformacjeUzytkownikaAsync(informacje))
                 {
                     await _jednostkaPracy.CofnijAsync();
-                    return ("Nie znaleziono danych użytkownika.", uzytkownikaViewModel, false);
+                    return ("Nie znaleziono danych użytkownika.", false);
                 }
 
 
@@ -231,22 +241,22 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
                 // Aktualizacja ról
                 // =====================
 
-                LoginUzytkownika uzytkownik = await _pobierajUzytkownika.PobierzUzytkownikaPoLoginieAsync(uzytkownikaViewModel.Login);
+                LoginUzytkownika uzytkownik = await _pobierajUzytkownika.PobierzUzytkownikaPoLoginieAsync(edytujUzytkownikaViewModel.Login);
 
-                if (!await _zarzadzajUzytkownikema.UsunWszystkieRoleUzytkownikowiAsync(uzytkownikaViewModel.Login))
+                if (!await _zarzadzajUzytkownikema.UsunWszystkieRoleUzytkownikowiAsync(edytujUzytkownikaViewModel.Login))
                 {
                     await _jednostkaPracy.CofnijAsync();
-                    return ("Nie udało się zmienić ról.", uzytkownikaViewModel, false);
+                    return ("Nie udało się zmienić ról.", false);
                 }
 
 
-                var noweRole = await _pobierajRole.PobierzNazwyRolPoIdAsync(uzytkownikaViewModel.WybraneRole);
+                var noweRole = await _pobierajRole.PobierzNazwyRolPoIdAsync(edytujUzytkownikaViewModel.WybraneRole);
 
 
                 if (!await _zarzadzajUzytkownikema.DodajRoleUzytkownikowiAsync(uzytkownik, noweRole))
                 {
                     await _jednostkaPracy.CofnijAsync();
-                    return ("Nie udało się zmienić ról lub nie wybrano roli", uzytkownikaViewModel, false);
+                    return ("Nie udało się zmienić ról lub nie wybrano roli", false);
                 }
 
 
@@ -254,14 +264,14 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
 
                 await _jednostkaPracy.ZatwierdzAsync();
 
-                return ("Dane użytkownika zostały zmienione.", uzytkownikaViewModel, true);
+                return ("Dane użytkownika zostały zmienione.", true);
             }
             catch (Exception ex)
             {
                 await _jednostkaPracy.CofnijAsync();
-                _logger.LogError(ex, "Błąd podczas edycji użytkownika {Login}", uzytkownikaViewModel.Login);
+                _logger.LogError(ex, "Błąd podczas edycji użytkownika {Login}", edytujUzytkownikaViewModel.Login);
 
-                return ("Wystąpił błąd podczas edycji użytkownika.", uzytkownikaViewModel, false);
+                return ("Wystąpił błąd podczas edycji użytkownika.", false);
             }
         }
 

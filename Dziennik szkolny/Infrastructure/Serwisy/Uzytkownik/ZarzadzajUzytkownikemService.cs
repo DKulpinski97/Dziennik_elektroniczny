@@ -4,6 +4,7 @@ using Dziennik_szkolny.Domain.Entities;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Dziennik_szkolny.ViewModel;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
 {
@@ -22,7 +23,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
             _dbContext = dbContext;
         }
 
-        public async Task<bool> DodajUzytkownikaAsync(UzytkownikaViewModel model)
+        public async Task<bool> DodajUzytkownikaAsync(DodajUzytkownikaViewModel model)
         {
             var nowyLogin = new LoginUzytkownika
             {
@@ -34,9 +35,9 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
 
             return wynik.Succeeded;
         }
-        public async Task<bool> EdytujUzytkownikaAsync(UzytkownikaViewModel model, bool zmienHaslo)
+        public async Task<bool> EdytujUzytkownikaAsync(EdytujUzytkownikaViewModel model, bool zmienHaslo)
         {
-            var uzytkownik = await _userManager.FindByIdAsync(model.idUzytkownika);
+            var uzytkownik = await _userManager.FindByIdAsync(model.IdUzytkownika);
 
             if (uzytkownik == null)
             {
@@ -53,7 +54,6 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
                         uzytkownik,
                         model.Haslo);
             }
-
             var wynik = await _userManager.UpdateAsync(uzytkownik);
 
             return wynik.Succeeded;
@@ -84,7 +84,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
 
             return true;
         }
-        public async Task<bool> DodajInformacjeUzytkownikaAsync(LoginUzytkownika uzytkownik, UzytkownikaViewModel model)
+        public async Task<bool> DodajInformacjeUzytkownikaAsync(LoginUzytkownika uzytkownik, SzkieletUzytkownikaViewModel model)
         {
             var informacje = new InformacjeUzytkownik
             {
@@ -134,18 +134,33 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
             return wynik.Succeeded;
         }
 
-        public async Task<bool> UsunUzytkownika(string idUzytkownika)
+        public async Task<(bool Stan, string komunikat)> UsunUzytkownika(string idUzytkownika)
         {
-            var uzytkownik = await _userManager.FindByIdAsync(idUzytkownika);
 
-            if (uzytkownik == null)
+
+            try
             {
-                return false;
+                var uzytkownik = await _userManager.FindByIdAsync(idUzytkownika);
+                if(uzytkownik ==null)
+                {
+                    return (false, "Nie znaleziono użytkownika.");
+                }
+                var wynik = await _userManager.DeleteAsync(uzytkownik);
+
+                if (!wynik.Succeeded)
+                {
+                    var komunikat = string.Join("; ",wynik.Errors.Select(e => e.Description));
+
+                    return (false, komunikat);
+                }
+
+
+                return (true, "Użytkownik został usunięty.");
             }
-
-            var wynik = await _userManager.DeleteAsync(uzytkownik);
-
-            return wynik.Succeeded;
+            catch (DbUpdateException)
+            {
+                return (false, "Wystąpił błąd podczas usuwania użytkownika.");
+            }
         }
     }
 }

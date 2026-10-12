@@ -81,5 +81,32 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
             return istnieje;
 
         }
+        public async Task<string> PobierzEmailUzytkownikaAsync(string idUzytkownika)
+        {
+            return await _userManager.Users
+                .Where(u => u.Id == idUzytkownika)
+                .Select(u => u.NormalizedEmail)
+                .FirstOrDefaultAsync();
+        }
+        public async Task<bool> CzyPeselIstniejeAsync(string pesel)
+        {
+            return await _dbContext.InformacjeUzytkownik.AnyAsync(x => x.Pesel == pesel);
+        }
+        public async Task<bool> CzyIstniejeInnyUzytkownikOTymPeseluAsync(string pesel, string idUzytkownika)
+        {
+            return await _dbContext.InformacjeUzytkownik.AnyAsync(x => x.Pesel == pesel && x.IdUzytkownika != idUzytkownika);
+        }
+        public async Task<bool> CzyUzytkownikJestOpiekunemAsync(string idUzytkownika)
+        {
+            return await _dbContext.Uczniowie.AnyAsync(x => x.IdOpiekun1 == idUzytkownika || x.IdOpiekun2 == idUzytkownika);
+        }
+        public async Task<bool> CzyUzytkownikProwadziPrzedmiotAsync(string idUzytkownika)
+        {
+            return await _dbContext.PrzypisanePrzedmioty.AnyAsync(p => p.IdNauczyciela == idUzytkownika);
+        }
+        public async Task<bool> CzyUzytkownikJestWychowawcaAsync(string idUzytkownika)
+        {
+            return await _dbContext.Klasa.AnyAsync(w => w.IdWychowawcy == idUzytkownika);
+        }
     }
 }

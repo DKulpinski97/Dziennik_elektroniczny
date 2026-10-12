@@ -9,11 +9,20 @@ namespace Dziennik_szkolny.Application.Walidacja.Uzytkownik
             return !string.IsNullOrWhiteSpace(telefon)
                 && Regex.IsMatch(telefon, @"^\d{9}$");
         }
-        public bool CzyHasloPrawidlowe(string haslo)
-        {
-            return !string.IsNullOrWhiteSpace(haslo)
-                && haslo.Length >= 3;
-        }
+
+
+          public bool CzyHasloPrawidlowe(string haslo)
+          {
+              if (string.IsNullOrEmpty(haslo) || haslo.Length < 8)
+              {
+                  return false;
+              }
+
+              return haslo.Any(c => c >= '0' && c <= '9')       // cyfra
+                  && haslo.Any(c => c >= 'a' && c <= 'z')       // mała litera
+                  && haslo.Any(c => c >= 'A' && c <= 'Z')       // wielka litera
+                  && haslo.Any(c => !char.IsLetterOrDigit(c));  // znak specjalny
+          }
         public bool CzyPoprawnyPesel(string pesel)
         {
             if (string.IsNullOrWhiteSpace(pesel) || pesel.Length != 11 || !pesel.All(char.IsDigit))

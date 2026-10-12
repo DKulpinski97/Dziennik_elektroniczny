@@ -44,6 +44,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
 
             return await _pobierajRole.PobierzNazwyRolPoIdAsync(wynik);
         }
+        
         public async Task<bool> CzyMozeZarzadzacUzytkownikiemAsync(ClaimsPrincipal user, string idUzytkownika)
         {
             var roleZalogowanego = await _pobierajRole.PobierzRoleZalogowanegoUzytkownikaAsync(user);
@@ -51,8 +52,11 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
             var roleDoZarzadzania = await PobierzRoleKtorymiMozeZarzadzacAsync(roleZalogowanego);
 
             var roleUzytkownika = await _pobierajRole.PobierzRoleUzytkownikaPoIdAsync(idUzytkownika);
-
-            return roleUzytkownika.Any(x => roleDoZarzadzania.Contains(x));
+            if(roleUzytkownika == null || roleUzytkownika.Count == 0)
+            {
+                return (false);
+            }
+            return roleUzytkownika.All(x => roleDoZarzadzania.Contains(x));
         }
         public async Task<bool> CzyRolaJestUzywanaWHierarchiiAsync(string idRoli)
         {

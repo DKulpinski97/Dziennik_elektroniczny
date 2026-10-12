@@ -46,24 +46,14 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
         }
         public async Task<bool> CzyIstniejaRoleAsync(List<string> idRoli)
         {
-            if (idRoli == null || !idRoli.Any())
-            {
-                return true;
-            }
-
-
             foreach (var idRoliItem in idRoli)
             {
                 var rola = await _roleManager.FindByIdAsync(idRoliItem);
-
-
                 if (rola == null)
                 {
                     return false;
                 }
             }
-
-
             return true;
         }
         public async Task<IdentityRole?> PobierzRolePoIdAsync(string idRoli)
@@ -123,7 +113,30 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
 
             return (await _userManager.GetRolesAsync(uzytkownik)).ToList();
         }
+        public async Task<List<string>> PobierzIdRolUzytkownikaAsync(string idUzytkownika)
+        {
+            var uzytkownik = await _userManager.FindByIdAsync(idUzytkownika);
 
+            if (uzytkownik is null)
+            {
+                return new List<string>();
+            }
+
+            var nazwyRol = await _userManager.GetRolesAsync(uzytkownik);
+            var idRol = new List<string>();
+
+            foreach (var nazwaRoli in nazwyRol)
+            {
+                var rola = await _roleManager.FindByNameAsync(nazwaRoli);
+
+                if (rola is not null)
+                {
+                    idRol.Add(rola.Id);
+                }
+            }
+
+            return idRol;
+        }
     }
 
 }

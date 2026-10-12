@@ -1,4 +1,4 @@
-@model Dziennik_szkolny.ViewModel.UzytkownikaViewModel
+@model Dziennik_szkolny.ViewModel.SzkieletUzytkownikaViewModel
 <div class="mb-3">
     @Html.LabelFor(x => x.Login, new { @class = "form-label" })
     @Html.TextBoxFor(x => x.Login, new { @class = "form-control" })
@@ -9,13 +9,6 @@
     @Html.TextBoxFor(x => x.Email, new { @class = "form-control" })
     @Html.ValidationMessageFor(x => x.Email, "", new { @class = "text-danger" })
 </div>
-
-<div class="mb-3">
-    @Html.LabelFor(x => x.Haslo, new { @class = "form-label" })
-    @Html.PasswordFor(x => x.Haslo, new { @class = "form-control" })
-    @Html.ValidationMessageFor(x => x.Haslo, "", new { @class = "text-danger" })
-</div>
-
 <hr />
 
 <div class="mb-3">

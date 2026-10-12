@@ -170,48 +170,26 @@ namespace Dziennik_szkolny.Controllers
         {
             var role = await _pobierajRole.PobierzRole(User);
 
-            UzytkownikaViewModel uzytkownikaViewModel = _mapowanieUzytkownika.MapujDostepneRoleVievModel(role);
-            ViewBag.TrybDodawania = true;
-            return View("DaneUżytkownikaKontrola", uzytkownikaViewModel);
+            DodajUzytkownikaViewModel dodajUzytkownikaViewModel = _mapowanieUzytkownika.MapujDostepneRoleVievModel(role);
+            return View("DodajUzytkownika", dodajUzytkownikaViewModel);
         }
 
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = NazwyRoli.SuperAdminAdminDyrektor)]
-        public async Task<IActionResult> DodajUzytkownika(UzytkownikaViewModel uzytkownikaViewModel)
+        public async Task<IActionResult> DodajUzytkownika(DodajUzytkownikaViewModel dodajUzytkownikaViewModel)
         {
-            ViewBag.TrybDodawania = true;
-            if (uzytkownikaViewModel.WybraneRole == null || uzytkownikaViewModel.WybraneRole.Count == 0)
-            {
-                TempData["TypWiadomosci"] = "info";
-                TempData["Wiadomosc"] = "Musisz wybrać przynajmniej jedną rolę.";
-                var role = await _pobierajRole.PobierzRole(User);
-                _mapowanieUzytkownika.MapujDostepneRoleDoIStniejacegoVievModel(uzytkownikaViewModel, role);
-                return View("DaneUżytkownikaKontrola", uzytkownikaViewModel);
-            }
-            if (string.IsNullOrWhiteSpace(uzytkownikaViewModel.Haslo))
-            {
-                ModelState.AddModelError(
-                    nameof(uzytkownikaViewModel.Haslo),
-                    "Hasło jest nie prawidłowe.");
-
-                TempData["TypWiadomosci"] = "danger";
-                TempData["Wiadomosc"] = "Hasło jest nie prawidłowe.";
-                var role = await _pobierajRole.PobierzRole(User);
-                _mapowanieUzytkownika.MapujDostepneRoleDoIStniejacegoVievModel(uzytkownikaViewModel, role);
-                return View("DaneUżytkownikaKontrola", uzytkownikaViewModel);
-            }
             if (!ModelState.IsValid)
             {
                 TempData["TypWiadomosci"] = "danger";
                 TempData["Wiadomosc"] = "Przynajmiej jedno pole jest nie uzupełnione lub zawiera wadliwe informacjie";
                 var role = await _pobierajRole.PobierzRole(User);
-                _mapowanieUzytkownika.MapujDostepneRoleDoIStniejacegoVievModel(uzytkownikaViewModel, role);
-                return View("DaneUżytkownikaKontrola", uzytkownikaViewModel);
+                _mapowanieUzytkownika.MapujDostepneRoleDoIStniejacegoVievModel(dodajUzytkownikaViewModel, role);
+                return View("DodajUzytkownika", dodajUzytkownikaViewModel);
             }
 
-            var wynik = await _obslugaUzytkownika.DodajUzytkownikaAsync(uzytkownikaViewModel, User);
+            var wynik = await _obslugaUzytkownika.DodajUzytkownikaAsync(dodajUzytkownikaViewModel, User);
 
             if (wynik.CzyUdane)
             {
@@ -225,8 +203,8 @@ namespace Dziennik_szkolny.Controllers
                 TempData["TypWiadomosci"] = "info";
                 TempData["Wiadomosc"] = wynik.Komunikat;
                 var role = await _pobierajRole.PobierzRole(User);
-                _mapowanieUzytkownika.MapujDostepneRoleDoIStniejacegoVievModel(uzytkownikaViewModel, role);
-                return View("DaneUżytkownikaKontrola", uzytkownikaViewModel);
+                _mapowanieUzytkownika.MapujDostepneRoleDoIStniejacegoVievModel(dodajUzytkownikaViewModel, role);
+                return View("DodajUzytkownika", dodajUzytkownikaViewModel);
             }
         }
 
@@ -269,11 +247,7 @@ namespace Dziennik_szkolny.Controllers
             {
                 return Forbid();
             }
-
-
             LoginUzytkownika uzytkownik = await _pobierajUzytkownika.PobierzUzytkownikaPoIDAsync(idUzytkownika);
-
-
             if (uzytkownik == null)
             {
                 TempData["TypWiadomosci"] = "info";
@@ -281,13 +255,7 @@ namespace Dziennik_szkolny.Controllers
 
                 return RedirectToAction(nameof(ZarzadzajUzytkownikem));
             }
-
-
-
             InformacjeUzytkownik informacjeUzytkownik = await _pobierajUzytkownika.PobierzInformacjeUzytkownikaPoIdLoginu(idUzytkownika);
-
-
-
             if (informacjeUzytkownik == null)
             {
                 TempData["TypWiadomosci"] = "info";
@@ -295,37 +263,39 @@ namespace Dziennik_szkolny.Controllers
 
                 return RedirectToAction(nameof(ZarzadzajUzytkownikem));
             }
+            var ListaIdRolUzytkownika = await _pobierajRole.PobierzIdRolUzytkownikaAsync(idUzytkownika);
             var dostempneRole = _mapowanieRoli.MapujRoleNaSelectList(await _pobierajRole.PobierzRole(User));
-            var przypisaneRole = await _pobierajRole.PobierzRoleUzytkownikaPoLoginieAsync(uzytkownik.UserName);
-            var viewModelUzytkownika = _mapowanieUzytkownika.MapujNaUzytkownikaViewModel(informacjeUzytkownik, uzytkownik, przypisaneRole.ToList(), dostempneRole);
-            ViewBag.TrybDodawania = false;
-            return View("DaneUżytkownikaKontrola", viewModelUzytkownika);
+            var viewModelUzytkownika = _mapowanieUzytkownika.MapujNaUzytkownikaViewModel(informacjeUzytkownik, uzytkownik, ListaIdRolUzytkownika.ToList(), dostempneRole);
+            return View("EdytujUzytkownika", viewModelUzytkownika);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = NazwyRoli.SuperAdminAdminDyrektor)]
-        public async Task<IActionResult> EdytujDaneUzytkownika(UzytkownikaViewModel viewModelUzytkownika)
+        public async Task<IActionResult> EdytujDaneUzytkownika(EdytujUzytkownikaViewModel edytujUzytkownikaViewModel)
         {
-            if (viewModelUzytkownika == null)
+
+            if (edytujUzytkownikaViewModel == null)
             {
                 TempData["TypWiadomosci"] = "info";
                 TempData["Wiadomosc"] = "Błąd podczas próby edycji danych użytkownika.";
                 return RedirectToAction(nameof(ZarzadzajUzytkownikem));
-
             }
-
-            var mozeZarzadzac = await _pobierajUprawnieniaRoli
-                .CzyMozeZarzadzacUzytkownikiemAsync(User, viewModelUzytkownika.idUzytkownika);
-
+            var mozeZarzadzac = await _pobierajUprawnieniaRoli.CzyMozeZarzadzacUzytkownikiemAsync(User, edytujUzytkownikaViewModel.IdUzytkownika);
             if (!mozeZarzadzac)
             {
                 return Forbid();
             }
-
-            _mapowanieUzytkownika.MapujDostepneRoleDoIStniejacegoVievModel(viewModelUzytkownika, await _pobierajRole.PobierzRole(User));
-            var wynik = await _obslugaUzytkownika.EdytujUzytkownikaAsync(viewModelUzytkownika, User);
-
+            if (!ModelState.IsValid)
+            {
+                TempData["TypWiadomosci"] = "danger";
+                TempData["Wiadomosc"] = "Przynajmiej jedno pole jest nie uzupełnione lub zawiera wadliwe informacjie";
+                edytujUzytkownikaViewModel.DostepneRole = _mapowanieRoli.MapujRoleNaSelectList(await _pobierajRole.PobierzRole(User));
+                edytujUzytkownikaViewModel.WybraneRole = await _pobierajRole.PobierzIdRolUzytkownikaAsync(edytujUzytkownikaViewModel.IdUzytkownika);
+                return View("EdytujUzytkownika", edytujUzytkownikaViewModel);
+            }
+            _mapowanieUzytkownika.MapujDostepneRoleDoIStniejacegoVievModel(edytujUzytkownikaViewModel, await _pobierajRole.PobierzRole(User));
+            var wynik = await _obslugaUzytkownika.EdytujUzytkownikaAsync(edytujUzytkownikaViewModel, User);
 
             TempData["TypWiadomosci"] = wynik.CzyUdane ? "success" : "danger";
             TempData["Wiadomosc"] = wynik.Komunikat;
@@ -335,7 +305,7 @@ namespace Dziennik_szkolny.Controllers
                 return RedirectToAction(nameof(ZarzadzajUzytkownikem));
             }
 
-            return View("DaneUżytkownikaKontrola", wynik.Uzytkownik);
+            return View("EdytujUzytkownika", edytujUzytkownikaViewModel);
         }
 
         /*=================Usuwanie użytkownika==================*/
@@ -361,17 +331,33 @@ namespace Dziennik_szkolny.Controllers
             {
                 return Forbid();
             }
-
+            if (await _pobierajUzytkownika.CzyUzytkownikJestOpiekunemAsync(IdUzytkownika))
+            {
+                TempData["TypWiadomosci"] = "info";
+                TempData["Wiadomosc"] = "Nie można usunąć użytkownika, który jest opiekunem ucznia.";
+                return RedirectToAction(nameof(ZarzadzajUzytkownikem));
+            }
+            else if (await _pobierajUzytkownika.CzyUzytkownikProwadziPrzedmiotAsync(IdUzytkownika))
+            {
+                TempData["TypWiadomosci"] = "info";
+                TempData["Wiadomosc"] = "Nie można usunąć użytkownika, który prowadzi przedmiot.";
+                return RedirectToAction(nameof(ZarzadzajUzytkownikem));
+            }
+            else if (await _pobierajUzytkownika.CzyUzytkownikJestWychowawcaAsync(IdUzytkownika))
+            {
+                TempData["TypWiadomosci"] = "info";
+                TempData["Wiadomosc"] = "Nie można usunąć użytkownika, który jest wychowawcą klasy.";
+                return RedirectToAction(nameof(ZarzadzajUzytkownikem));
+            }
             var wynik = await _uzytkownikService.UsunUzytkownika(IdUzytkownika);
 
 
-            if (!wynik)
+            if (!wynik.Stan)
             {
                 TempData["TypWiadomosci"] = "danger";
-                TempData["Wiadomosc"] = "Nie udało się usunąć użytkownika.";
+                TempData["Wiadomosc"] = wynik.komunikat;
 
-                return RedirectToAction(
-                    nameof(ZarzadzajUzytkownikem));
+                return RedirectToAction(nameof(ZarzadzajUzytkownikem));
             }
 
 

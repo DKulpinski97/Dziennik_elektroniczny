@@ -11,6 +11,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
         private readonly UserManager<LoginUzytkownika> _userManager;
 
 
+
         public WeryfikacjaDanychLogowaniaService(UserManager<LoginUzytkownika> userManager)
         {
             _userManager = userManager;
@@ -42,5 +43,6 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
         {
             return await _userManager.Users.AnyAsync(x => x.Email == email && x.Id != idUzytkownika);
         }
+
     }
 }
