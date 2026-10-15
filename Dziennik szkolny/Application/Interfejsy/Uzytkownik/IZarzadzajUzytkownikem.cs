@@ -1,6 +1,6 @@
 ﻿using Dziennik_szkolny.Domain.Entities;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
-using Dziennik_szkolny.ViewModel;
+using Dziennik_szkolny.ViewModel.Uzytkownik;
 
 namespace Dziennik_szkolny.Application.Interfejsy.Uzytkownik
 {

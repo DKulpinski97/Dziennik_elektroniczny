@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Dziennik_szkolny.ViewModel
+namespace Dziennik_szkolny.ViewModel.Uzytkownik
 {
     public class DodajUzytkownikaViewModel : SzkieletUzytkownikaViewModel
     {

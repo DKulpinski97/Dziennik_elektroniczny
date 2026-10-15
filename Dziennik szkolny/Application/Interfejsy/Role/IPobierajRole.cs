@@ -16,5 +16,6 @@ namespace Dziennik_szkolny.Application.Interfejsy.Role
         Task<string?> PobierzIdRoliPoNazwieAsync(string nazwaRoli);
         Task<List<string>> PobierzRoleUzytkownikaPoIdAsync(string idUzytkownika);
         Task<List<string>> PobierzIdRolUzytkownikaAsync(string idUzytkownika);
+        Task<List<string>> PobierzIdRolPodlegajacychRoliAsync(string idRoli);
     }
 }

@@ -12,12 +12,7 @@
 
                 <h2 class="text-center">Menu dodawania roli</h2>
 
-               @if (TempData["Wiadomosc"] != null)
-                {
-                    <div class="alert alert-@TempData["TypWiadomosci"]">
-                        @TempData["Wiadomosc"]
-                    </div>
-                }
+                <partial name="_Komunikat"/>
 
 
                 @using (Html.BeginForm("DodajRole", "Admin", FormMethod.Post))
@@ -72,7 +67,7 @@
                     </button>
 
                 }
-                <a asp-controller="Home" asp-action="Index" class="btn btn-warning mt-3 w-100">
+                <a asp-controller="Admin" asp-action="KontrolerZarzadzajRolami" class="btn btn-warning mt-3 w-100">
                     Powrót do poprzedniego menu
                 </a>
             </div>
@@ -84,7 +79,7 @@
             <div class="border rounded p-4 w-100">
 
                 <h2 class="text-center">
-                    Lista wszystkich ról
+                    Lista ról poza systemowych
                 </h2>
 
                 @Html.ListBox("RoleList",new SelectList(Model, "Id", "Nazwa"),new{@class = "form-select",size = 10,id = "ListaRol"})

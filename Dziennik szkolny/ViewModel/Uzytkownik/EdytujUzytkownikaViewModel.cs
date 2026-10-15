@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
-namespace Dziennik_szkolny.ViewModel
+namespace Dziennik_szkolny.ViewModel.Uzytkownik
 {
     public  class EdytujUzytkownikaViewModel : SzkieletUzytkownikaViewModel
     {

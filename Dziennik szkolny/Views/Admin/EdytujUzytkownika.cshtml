@@ -1,4 +1,4 @@
-﻿@model Dziennik_szkolny.ViewModel.EdytujUzytkownikaViewModel
+﻿@model Dziennik_szkolny.ViewModel.Uzytkownik.EdytujUzytkownikaViewModel
 
 @{
     ViewData["Title"] = "Edytuj dane użytkownika";
@@ -6,12 +6,7 @@
 
 <div class="container mt-5">
 
-    @if (TempData["Wiadomosc"] != null)
-    {
-        <div class="alert alert-@TempData["TypWiadomosci"]">
-            @TempData["Wiadomosc"]
-        </div>
-    }
+    <partial name="_Komunikat" />
     <div class="row">
 
         <!-- Formularz użytkownika -->

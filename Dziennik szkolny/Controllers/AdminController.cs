@@ -4,7 +4,9 @@ using Dziennik_szkolny.Application.Mapery;
 using Dziennik_szkolny.Domain;
 using Dziennik_szkolny.Domain.Entities;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
-using Dziennik_szkolny.ViewModel;
+using Dziennik_szkolny.Infrastructure.Serwisy.Role;
+using Dziennik_szkolny.ViewModel.Rola;
+using Dziennik_szkolny.ViewModel.Uzytkownik;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,11 +41,38 @@ namespace Dziennik_szkolny.Controllers
 
         [HttpGet]
         [Authorize(Roles = NazwyRoli.Admin)]
+        public async Task<IActionResult> KontrolerZarzadzajRolami()
+        {
+
+            var role = await _pobierajRole.PobierzRole(User);
+            if(role == null || !role.Any())
+            {
+                TempData["TypWiadomosci"] = "info";
+                TempData["Wiadomosc"] = "Krytyczny błąd: Brak dostępnych ról do zarządzania.Prawdopodonie jest problem z bazą danych.";
+                return RedirectToAction("Index", "Home");
+            }
+            var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
+            WidokRoliViewModel widokRoliViewModel =  new WidokRoliViewModel
+            {
+                RoleSystemowe = tmp.RoleSystemowe,
+                PozostaleRole = tmp.PozostaleRole
+            };
+
+            return View("MenuRol",widokRoliViewModel);
+        }
+        [HttpGet]
+        [Authorize(Roles = NazwyRoli.Admin)]
         public async Task<IActionResult> ZarzadzajRolami()
         {
             var role = await _pobierajRole.PobierzRole(User);
-
-            return View(role);
+            if (role == null || !role.Any())
+            {
+                TempData["TypWiadomosci"] = "info";
+                TempData["Wiadomosc"] = "Krytyczny błąd: Brak dostępnych ról. Prawdopodonie jest problem z bazą danych.";
+                return RedirectToAction(nameof(KontrolerZarzadzajRolami));
+            }
+            var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
+            return View(tmp.PozostaleRole);
         }
 
 
@@ -58,30 +87,30 @@ namespace Dziennik_szkolny.Controllers
                 TempData["Wiadomosc"] = "Nazwa roli nie może być pusta.";
 
                 var role = await _pobierajRole.PobierzRole(User);
-
-                return View("ZarzadzajRolami", role);
+                var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
+                return View("ZarzadzajRolami", tmp.PozostaleRole);
             }
 
+           string idZarzadzajacejRoli = await _pobierajRole.PobierzIdRoliPoNazwieAsync(NazwyRoli.Admin);
+           var wynik = await _roleService.KontrolaDodawaRoliAsync(idZarzadzajacejRoli, nazwaRoli.Trim());
 
-            var wynik = await _roleService.DodajRole(nazwaRoli.Trim());
 
-
-            if (!wynik)
+            if (!wynik.Sukces)
             {
                 TempData["TypWiadomosci"] = "info";
-                TempData["Wiadomosc"] = "Taka rola już istnieje.";
+                TempData["Wiadomosc"] = wynik.Komunikat;
 
                 var role = await _pobierajRole.PobierzRole(User);
-
-                return View("ZarzadzajRolami", role);
+                var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
+                return View("ZarzadzajRolami", tmp.PozostaleRole);
             }
 
             TempData["TypWiadomosci"] = "success";
-            TempData["Wiadomosc"] = "Rola dodana pomyślnie.";
+            TempData["Wiadomosc"] = wynik.Komunikat;
             return RedirectToAction(nameof(ZarzadzajRolami));
         }
 
-
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = NazwyRoli.Admin)]
@@ -93,19 +122,26 @@ namespace Dziennik_szkolny.Controllers
                 TempData["Wiadomosc"] = "Nie wybrano roli.";
 
                 var role = await _pobierajRole.PobierzRole(User);
-
-                return View("ZarzadzajRolami", role);
+                var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
+                return View("ZarzadzajRolami", tmp.PozostaleRole);
             }
             if (NowaNazwaRoli == StaraNazwaRoli)
             {
                 TempData["TypWiadomosci"] = "danger";
                 TempData["Wiadomosc"] = "Nowa nazwa nie może być taka sama jak stara.";
-
                 var role = await _pobierajRole.PobierzRole(User);
-
-                return View("ZarzadzajRolami", role);
+                var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
+                return View("ZarzadzajRolami", tmp.PozostaleRole);
             }
-
+                var Weryfikacja = await _pobierajUprawnieniaRoli.CzyMozeZarzadzacRolaAsync(User, RoleId);
+            if(Weryfikacja.CzyMoze == false)
+            {
+                TempData["TypWiadomosci"] = "danger";
+                TempData["Wiadomosc"] = Weryfikacja.Komunikat;
+                var role = await _pobierajRole.PobierzRole(User);
+                var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
+                return View("ZarzadzajRolami", tmp.PozostaleRole);
+            }
 
             var wynik = await _roleService.ZmienNazweRoli(RoleId, NowaNazwaRoli.Trim(), StaraNazwaRoli);
 
@@ -324,8 +360,7 @@ namespace Dziennik_szkolny.Controllers
                 return RedirectToAction(nameof(ZarzadzajUzytkownikem));
             }
 
-            var mozeZarzadzac = await _pobierajUprawnieniaRoli
-                .CzyMozeZarzadzacUzytkownikiemAsync(User, IdUzytkownika);
+            var mozeZarzadzac = await _pobierajUprawnieniaRoli.CzyMozeZarzadzacUzytkownikiemAsync(User, IdUzytkownika);
 
             if (!mozeZarzadzac)
             {

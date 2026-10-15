@@ -2,7 +2,7 @@
 
 <div class="container mt-5">
     <div class="row g-4" style="min-height: 75vh;">
-
+        <partial name="_Komunikat"/>
         @if (new[] { NazwyRoli.SuperAdmin, NazwyRoli.Admin, NazwyRoli.Dyrektor, NazwyRoli.Sekretarka }.Any(User.IsInRole))
         {
 
@@ -12,7 +12,7 @@
 
                     @if (User.IsInRole(NazwyRoli.Admin))
                     {
-                        @Html.ActionLink("Zarządzaj rolami", "ZarzadzajRolami", "Admin", null, new { @class = "btn btn-primary w-100 mb-3" })
+                        @Html.ActionLink("Zarządzaj rolami", "KontrolerZarzadzajRolami", "Admin", null, new { @class = "btn btn-primary w-100 mb-3" })
                     }
                     @if (new[] { NazwyRoli.SuperAdmin, NazwyRoli.Admin, NazwyRoli.Dyrektor }.Any(User.IsInRole))
                     {

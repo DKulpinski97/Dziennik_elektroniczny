@@ -7,12 +7,7 @@
     <h2 class="mb-4 text-center">
         Zarządzaj danymi użytkowników
     </h2>
-    @if (TempData["Wiadomosc"] != null)
-    {
-        <div class="alert alert-@TempData["TypWiadomosci"]">
-            @TempData["Wiadomosc"]
-        </div>
-    }
+    <partial name="_Komunikat"/>
 
     <div class="row g-4">
         <!-- Panel edycji -->

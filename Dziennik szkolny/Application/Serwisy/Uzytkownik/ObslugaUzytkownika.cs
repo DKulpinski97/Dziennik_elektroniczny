@@ -6,7 +6,7 @@ using Dziennik_szkolny.Application.Modele.Uzytkownik;
 using Dziennik_szkolny.Application.Walidacja.Uzytkownik;
 using Dziennik_szkolny.Infrastructure.DaneStartowe;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
-using Dziennik_szkolny.ViewModel;
+using Dziennik_szkolny.ViewModel.Uzytkownik;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 
@@ -96,7 +96,7 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             }
             var wybraneNazwyRol = await _pobierajRole.PobierzNazwyRolPoIdAsync(dodajUzytkownikaViewModel.WybraneRole);
             var roleZalogowanego = await _pobierajRole.PobierzRoleZalogowanegoUzytkownikaAsync(zalogowanyUzytkownik);
-            var roleDoZarzadzania = await _pobierajUprawnieniaRoli.PobierzRoleKtorymiMozeZarzadzacAsync(roleZalogowanego);
+            var roleDoZarzadzania = await _pobierajUprawnieniaRoli.PobierzNazwyRolKtorymiMozeZarzadzacAsync(roleZalogowanego);
 
             if (wybraneNazwyRol.Any(rola => !roleDoZarzadzania.Contains(rola)))
             {
@@ -195,7 +195,7 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
 
             var wybraneNazwyRol = await _pobierajRole.PobierzNazwyRolPoIdAsync(edytujUzytkownikaViewModel.WybraneRole);
             var roleZalogowanego = await _pobierajRole.PobierzRoleZalogowanegoUzytkownikaAsync(zalogowanyUzytkownik);
-            var roleDoZarzadzania = await _pobierajUprawnieniaRoli.PobierzRoleKtorymiMozeZarzadzacAsync(roleZalogowanego);
+            var roleDoZarzadzania = await _pobierajUprawnieniaRoli.PobierzNazwyRolKtorymiMozeZarzadzacAsync(roleZalogowanego);
 
             if (wybraneNazwyRol.Any(rola => !roleDoZarzadzania.Contains(rola)))
             {
@@ -281,7 +281,7 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
 
             var roleUzytkownika = await _pobierajRole.PobierzRoleZalogowanegoUzytkownikaAsync(user);
 
-            var roleDoZarzadzania = await _pobierajUprawnieniaRoli.PobierzRoleKtorymiMozeZarzadzacAsync(roleUzytkownika);
+            var roleDoZarzadzania = await _pobierajUprawnieniaRoli.PobierzNazwyRolKtorymiMozeZarzadzacAsync(roleUzytkownika);
 
             var uzytkownicy = await _pobierajUzytkownika.PobierzUzytkownikowPoRolachAsync(roleDoZarzadzania);
 

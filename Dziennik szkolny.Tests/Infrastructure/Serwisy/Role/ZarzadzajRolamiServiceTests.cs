@@ -103,7 +103,7 @@ namespace Dziennik_szkolny.Tests.Infrastructure.Serwisy.Role
         {
             // Arrange
             var mockRoleStory = new Mock<IRoleStore<IdentityRole>>();
-            var mockRoleManager = new Mock<RoleManager<IdentityRole>>(mockRoleStory.Object, null, null, null, null);
+            var mockRoleManagerRoleManager = new Mock<RoleManager<IdentityRole>>(mockRoleStory.Object, null, null, null, null);
 
             mockRoleManager.Setup(z => z.RoleExistsAsync("NazwaRolaNieIstnieje")).ReturnsAsync(false);
             mockRoleManager.Setup(z => z.CreateAsync(It.IsAny<IdentityRole>())).ReturnsAsync(IdentityResult.Success);

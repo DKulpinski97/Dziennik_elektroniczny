@@ -1,17 +1,11 @@
-﻿@model Dziennik_szkolny.ViewModel.DodajUzytkownikaViewModel
+﻿@model Dziennik_szkolny.ViewModel.Uzytkownik.DodajUzytkownikaViewModel
 
 @{
     ViewData["Title"] = "Dodaj użytkownika";
 }
 
 <div class="container mt-5">
-
-    @if (TempData["Wiadomosc"] != null)
-    {
-        <div class="alert alert-@TempData["TypWiadomosci"]">
-            @TempData["Wiadomosc"]
-        </div>
-    }
+    <partial name="_Komunikat" />
     <div class="row">
 
         <!-- Formularz użytkownika -->

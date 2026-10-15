@@ -134,8 +134,14 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
                     idRol.Add(rola.Id);
                 }
             }
-
             return idRol;
+        }
+        public async Task<List<string>> PobierzIdRolPodlegajacychRoliAsync(string idRoli)
+        {
+            return await _context.UprawnieniaZarzadzaniaRola
+                .Where(x => x.RolaZarzadzajacaId == idRoli)
+                .Select(x => x.RolaZarzadzanaId)
+                .ToListAsync();
         }
     }
 

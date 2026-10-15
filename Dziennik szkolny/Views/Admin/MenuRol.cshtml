@@ -1,0 +1,60 @@
+﻿@model Dziennik_szkolny.ViewModel.Rola.WidokRoliViewModel
+
+
+@{
+    ViewData["Title"] = "Kontroler zarządzania rolami";
+}
+
+<div class="container mt-5">
+    <div class="row g-4" style="min-height: 75vh;">
+
+        <div class="col d-flex">
+            <div class="border rounded p-4 w-100">
+
+                <h2 class="text-center">Menu działań na rolach</h2>
+
+                @using (Html.BeginForm("ZarzadzajRolami", "Admin", FormMethod.Get))
+                {
+                    <button type="submit" class="btn btn-primary w-100 mb-2">
+                        Zarządzaj rolami
+                    </button>
+                }
+                @using (Html.BeginForm("ZarzadzajHierarchiaRoli", "Admin", FormMethod.Get))
+                {
+                    <button type="submit" class="btn btn-primary w-100 mb-2">
+                        Zarządzaj hierarchią ról
+                    </button>
+                }
+                <a asp-controller="Home" asp-action="Index" class="btn btn-warning mt-3 w-100">
+                    Powrót do poprzedniego menu
+                </a>
+            </div>
+        </div>
+
+
+
+        <div class="col d-flex">
+            <div class="border rounded p-4 w-100">
+
+                <h2 class="text-center">
+                    Lista ról systemowych
+                </h2>
+
+                @Html.ListBox("RoleSystemowe",new SelectList(Model.RoleSystemowe, "Id", "Nazwa"),new{@class = "form-select",size = 10,id = "ListaRoleSystemowe"})
+
+            </div>
+        </div>
+        <div class="col d-flex">
+            <div class="border rounded p-4 w-100">
+
+                <h2 class="text-center">
+                    Lista pozostałych ról w systemie
+                </h2>
+
+                @Html.ListBox("PozostaleRole", new SelectList(Model.PozostaleRole, "Id", "Nazwa"), new { @class = "form-select", size = 10, id = "ListaPozostaleRole" })
+
+            </div>
+        </div>
+
+    </div>
+</div>

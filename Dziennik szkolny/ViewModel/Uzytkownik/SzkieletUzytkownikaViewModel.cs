@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
-namespace Dziennik_szkolny.ViewModel
+namespace Dziennik_szkolny.ViewModel.Uzytkownik
 {
     public abstract class SzkieletUzytkownikaViewModel
     {

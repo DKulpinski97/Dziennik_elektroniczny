@@ -1,7 +1,7 @@
 ﻿using Dziennik_szkolny.Application.ObiektyTransferuDanych;
 using Dziennik_szkolny.Domain.Entities;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
-using Dziennik_szkolny.ViewModel;
+using Dziennik_szkolny.ViewModel.Uzytkownik;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Dziennik_szkolny.Application.Mapery
