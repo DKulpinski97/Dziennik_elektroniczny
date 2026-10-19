@@ -3,6 +3,7 @@ using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
 using Dziennik_szkolny.Application.Mapery;
 using Dziennik_szkolny.Domain;
 using Dziennik_szkolny.Domain.Entities;
+using Dziennik_szkolny.Infrastructure.DaneStartowe;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Dziennik_szkolny.Infrastructure.Serwisy.Role;
 using Dziennik_szkolny.ViewModel.Rola;
@@ -151,8 +152,9 @@ namespace Dziennik_szkolny.Controllers
                 TempData["Wiadomosc"] = wynik.Komunikat;
 
                 var role = await _pobierajRole.PobierzRole(User);
-
-                return View("ZarzadzajRolami", role);
+                var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
+                ViewBag.RolaId = RoleId;
+                return View("ZarzadzajRolami", tmp.PozostaleRole);
             }
 
             TempData["TypWiadomosci"] = "success";
@@ -173,10 +175,11 @@ namespace Dziennik_szkolny.Controllers
                 TempData["Wiadomosc"] = "Należy wybrać rolę do usunięcia.";
 
                 var role = await _pobierajRole.PobierzRole(User);
-                return View("ZarzadzajRolami", role);
+                var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
+                return View("ZarzadzajRolami", tmp.PozostaleRole);
             }
-
-            var wynik = await _roleService.UsunRole(RoleId);
+            string RolaAdminId = await _pobierajRole.PobierzIdRoliPoNazwieAsync(NazwyRoli.Admin);
+            var wynik = await _roleService.UsunRole(RoleId,  RolaAdminId);
 
 
             if (!wynik.Sukces)
@@ -185,8 +188,8 @@ namespace Dziennik_szkolny.Controllers
                 TempData["Wiadomosc"] = wynik.Komunikat;
 
                 var role = await _pobierajRole.PobierzRole(User);
-
-                return View("ZarzadzajRolami", role);
+                var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
+                return View("ZarzadzajRolami", tmp.PozostaleRole);
             }
 
             TempData["TypWiadomosci"] = "success";

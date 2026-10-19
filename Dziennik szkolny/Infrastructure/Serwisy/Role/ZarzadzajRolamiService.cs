@@ -16,14 +16,18 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
         readonly private AppDbContext _context;
         private readonly Dziennik_szkolny.Infrastructure.DaneStartowe.DaneStartowe _daneStartowe;
         private readonly IJednostkaPracy _jednostkaPracy;
+        private readonly IPobierajRole _pobirajRole;
+        private readonly IPobierajUzytkownika _pobierajUzytkownika;
         public ZarzadzajRolamiService(RoleManager<IdentityRole> roleManager, Dziennik_szkolny.Infrastructure.DaneStartowe.DaneStartowe daneStartowe, 
-            IPobierajUprawnieniaRoli pobierajUprawnieniaRoli, AppDbContext dbContext, IJednostkaPracy jednostkaPracy)
+            IPobierajUprawnieniaRoli pobierajUprawnieniaRoli, AppDbContext dbContext, IJednostkaPracy jednostkaPracy, IPobierajRole pobirajRole,IPobierajUzytkownika pobierajUzytkownika)
         {
             _roleManager = roleManager;
             _daneStartowe = daneStartowe;
             _pobierajUprawnieniaRoli = pobierajUprawnieniaRoli;
             _context = dbContext;
             _jednostkaPracy = jednostkaPracy;
+            _pobirajRole = pobirajRole;
+            _pobierajUzytkownika = pobierajUzytkownika;
         }
 
 
@@ -36,7 +40,10 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
             {
                 return (false, "Rola nie została znaleziona.");
             }
-
+            if (await _pobirajRole.CzyIstniejeRolaOTakiejNazwieAsync(nowaNazwa))
+            {
+                return (false, "Rola o takej nazwie już istnieje");
+            }
             if (_daneStartowe.Role.Contains(rola.Name))
             {
                 return (false, "Nie można zmienić nazwy roli, która jest systemowa.");
@@ -46,7 +53,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
             {
                 return (false, "Rola została wcześniej zmieniona. Odśwież stronę i spróbuj ponownie.");
             }
-
+            
             rola.Name = nowaNazwa;
             rola.NormalizedName = nowaNazwa.ToUpperInvariant();
 
@@ -120,12 +127,9 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
         }
 
 
-        public async Task<(bool Sukces, string Komunikat)> UsunRole(string roleId)
+        public async Task<(bool Sukces, string Komunikat)> UsunRole(string roleId,string rolaAdminId)
         {
-            if (await _pobierajUprawnieniaRoli.CzyRolaJestUzywanaWHierarchiiAsync(roleId))
-            {
-                return (false, "Nie można usunąć roli, ponieważ jest częścią hierarchii zarządzania.");
-            }
+           
             var rola = await _roleManager.FindByIdAsync(roleId);
 
             if (rola == null)
@@ -137,12 +141,40 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
             {
                 return (false, "Nie można usunąć roli, która jest systemowa.");
             }
+            if (await _pobierajUprawnieniaRoli.CzyRolaMaPowiazaniaPozaAdminemAsync(roleId, rolaAdminId))
+            {
+                return (false, "Nie można usunąć roli, ponieważ jest częścią hierarchii zarządzania.");
+            }
+            if ( await _pobierajUzytkownika.SprawdzCzyJestUzytkownikKtoryPosiadaTylkoTaRoleAsync(roleId))
+            {
+                return (false, "Nie można usunąć roli, która jest jedyną rolą użytkownika.");
+            }
+            await _jednostkaPracy.RozpocznijTransakcjeAsync();
+            try
+            {
+                var powiazania = await _context.UprawnieniaZarzadzaniaRola.Where(x => x.RolaZarzadzanaId == roleId).ToListAsync();
 
-            var wynik = await _roleManager.DeleteAsync(rola);
+                _context.UprawnieniaZarzadzaniaRola.RemoveRange(powiazania);
 
-            return (
-                wynik.Succeeded, wynik.Succeeded ? "Rola usunięta pomyślnie." : "Nie udało się usunąć roli."
-            );
+                var wynik = await _roleManager.DeleteAsync(rola);
+                if (wynik.Succeeded)
+                {
+                    await _jednostkaPracy.ZatwierdzAsync();
+                    return (true, "Rola usunięta pomyślnie.");
+                }
+                else
+                {
+                    await _jednostkaPracy.CofnijAsync();
+                    return (false, "Nie udało się usunąć roli.");
+                }
+            }
+            catch
+            {
+                await _jednostkaPracy.CofnijAsync();
+                return (false, "Wystąpił błąd podczas usuwania roli.");
+            }
+
+           
         }
 
        public (List<DaneRoli> RoleSystemowe, List<DaneRoli> PozostaleRole) PodzierRoleNaSystemoweIPozostale(ClaimsPrincipal user, List<DaneRoli> wszystkieDostempneRole)

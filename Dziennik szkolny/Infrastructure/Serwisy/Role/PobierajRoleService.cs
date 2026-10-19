@@ -143,6 +143,10 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
                 .Select(x => x.RolaZarzadzanaId)
                 .ToListAsync();
         }
+        public async Task<bool> CzyIstniejeRolaOTakiejNazwieAsync(string NazwaRoli)
+        {
+            return await _roleManager.FindByNameAsync(NazwaRoli) != null;
+        }
     }
 
 }

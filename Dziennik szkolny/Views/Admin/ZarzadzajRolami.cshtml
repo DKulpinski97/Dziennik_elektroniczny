@@ -81,8 +81,8 @@
                 <h2 class="text-center">
                     Lista ról poza systemowych
                 </h2>
-
-                @Html.ListBox("RoleList",new SelectList(Model, "Id", "Nazwa"),new{@class = "form-select",size = 10,id = "ListaRol"})
+                @Html.DropDownList("RoleList",new SelectList(Model, "Id", "Nazwa", (string)ViewBag.RolaId),new { @class = "form-select", size = 10, id = "ListaRol" })
+                
 
             </div>
         </div>

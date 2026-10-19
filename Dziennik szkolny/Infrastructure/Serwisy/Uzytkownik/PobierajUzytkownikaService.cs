@@ -10,11 +10,13 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
     public class PobierajUzytkownikaService : IPobierajUzytkownika
     {
         readonly private UserManager<LoginUzytkownika> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         readonly private AppDbContext _dbContext;
-        public PobierajUzytkownikaService(UserManager<LoginUzytkownika> userManager, AppDbContext dbContext)
+        public PobierajUzytkownikaService(UserManager<LoginUzytkownika> userManager, AppDbContext dbContext, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _dbContext = dbContext;
+            _roleManager = roleManager;
         }
 
         public async Task<LoginUzytkownika> PobierzUzytkownikaPoLoginieAsync(string login)
@@ -107,6 +109,11 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
         public async Task<bool> CzyUzytkownikJestWychowawcaAsync(string idUzytkownika)
         {
             return await _dbContext.Klasa.AnyAsync(w => w.IdWychowawcy == idUzytkownika);
+        }
+        public async Task<bool> SprawdzCzyJestUzytkownikKtoryPosiadaTylkoTaRoleAsync(string idRoli)
+        {
+            return await _dbContext.UserRoles.AnyAsync(ur => ur.RoleId == idRoli 
+            && !_dbContext.UserRoles.Any(ur2 => ur2.UserId == ur.UserId && ur2.RoleId != idRoli));
         }
     }
 }

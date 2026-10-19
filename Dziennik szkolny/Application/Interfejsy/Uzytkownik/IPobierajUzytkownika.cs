@@ -21,6 +21,7 @@ namespace Dziennik_szkolny.Application.Interfejsy.Uzytkownik
         Task<bool> CzyUzytkownikJestOpiekunemAsync(string idUzytkownika);
         Task<bool> CzyUzytkownikProwadziPrzedmiotAsync(string idUzytkownika);
         Task<bool> CzyUzytkownikJestWychowawcaAsync(string idUzytkownika);
+        Task<bool> SprawdzCzyJestUzytkownikKtoryPosiadaTylkoTaRoleAsync(string idRoli);
 
     }
 }

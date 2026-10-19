@@ -103,5 +103,11 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
         {
             return await _context.UprawnieniaZarzadzaniaRola.AnyAsync(x => x.RolaZarzadzajacaId == idRoli || x.RolaZarzadzanaId == idRoli);
         }
+        public async Task<bool> CzyRolaMaPowiazaniaPozaAdminemAsync(string idRoli, string idAdmina)
+        {
+            return await _context.UprawnieniaZarzadzaniaRola.AnyAsync(x =>
+                x.RolaZarzadzajacaId == idRoli ||
+                (x.RolaZarzadzanaId == idRoli && x.RolaZarzadzajacaId != idAdmina));
+        }
     }
 }
