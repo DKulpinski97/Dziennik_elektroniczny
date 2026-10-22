@@ -4,10 +4,12 @@ using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
 using Dziennik_szkolny.Application.Mapery;
 using Dziennik_szkolny.Application.Modele.Uzytkownik;
 using Dziennik_szkolny.Application.Walidacja.Uzytkownik;
+using Dziennik_szkolny.Domain;
 using Dziennik_szkolny.Infrastructure.DaneStartowe;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Dziennik_szkolny.ViewModel.Uzytkownik;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Globalization;
 using System.Security.Claims;
 
 namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
@@ -285,7 +287,7 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
 
             var uzytkownicy = await _pobierajUzytkownika.PobierzUzytkownikowPoRolachAsync(roleDoZarzadzania);
 
-            var informacje = await _pobierajUzytkownika.PobierzWszystkieInformacjeOUzrzytkownikach();
+            var informacje = await _pobierajUzytkownika.PobierzUzytkownikowImieINazwiskoIIDPoLiscieID(uzytkownicy.Select(u => u.Id).ToList());
 
             var informacjePoId = informacje.ToDictionary(x => x.IdUzytkownika);
 
@@ -307,12 +309,18 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
                 {
                     wynik.Pracownicy.Add(element);
                 }
-                else if (uzytkownik.Role.Contains("Rodzic"))
+                else if (uzytkownik.Role.Contains(NazwyRoli.Rodzic))
                 {
                     wynik.Rodzice.Add(element);
                 }
+                else
+                {
+                    wynik.Pracownicy.Add(element);
+                }
             }
-
+            var comparer = StringComparer.Create(new CultureInfo("pl-PL"), false);
+            wynik.Rodzice = wynik.Rodzice.OrderBy(x => x.Text, comparer).ToList();
+            wynik.Pracownicy = wynik.Pracownicy.OrderBy(x => x.Text, comparer).ToList();
             return wynik;
         }
     }

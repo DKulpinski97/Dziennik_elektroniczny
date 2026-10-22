@@ -62,7 +62,14 @@ namespace Dziennik_szkolny.Controllers
         [HttpGet]
         public IActionResult BrakDostepu()
         {
-            TempData["BladDostepu"] = "Nie masz uprawnień do wykonania tej akcji.";
+            TempData["TypWiadomosci"] = "danger";
+            TempData["Wiadomosc"] = "Nie masz uprawnień do wykonania tej akcji.";
+
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             return RedirectToAction("Login");
         }
     }

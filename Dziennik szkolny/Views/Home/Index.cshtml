@@ -1,8 +1,8 @@
 ﻿
 
+<partial name="_Komunikat"/>
 <div class="container mt-5">
     <div class="row g-4" style="min-height: 75vh;">
-        <partial name="_Komunikat"/>
         @if (new[] { NazwyRoli.SuperAdmin, NazwyRoli.Admin, NazwyRoli.Dyrektor, NazwyRoli.Sekretarka }.Any(User.IsInRole))
         {
 

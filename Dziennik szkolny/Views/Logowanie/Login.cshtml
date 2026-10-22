@@ -7,11 +7,8 @@
 <div class="login-page">
     <div class="login-container">
         <div style="color:red">
+            <partial name="_Komunikat"/>
             @Html.ValidationSummary()
-            @if (TempData["BladDostepu"] != null)
-            {
-                <p>@TempData["BladDostepu"]</p>
-            }
         </div>
         @using (Html.BeginForm("Login", "Logowanie", FormMethod.Post))
         {

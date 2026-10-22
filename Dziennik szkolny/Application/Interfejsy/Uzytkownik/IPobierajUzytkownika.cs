@@ -11,6 +11,7 @@ namespace Dziennik_szkolny.Application.Interfejsy.Uzytkownik
         Task<string> PobierzIdUzytkownikaPoLoginieAsync(string login);
         Task<List<LoginUzytkownika>> PobierzWszystkichUzytkownikow();
         Task<List<InformacjeUzytkownik>> PobierzWszystkieInformacjeOUzrzytkownikach();
+        Task<List<InformacjeUzytkownik>> PobierzUzytkownikowImieINazwiskoIIDPoLiscieID(List<string> idUzytkownikow);
         Task<InformacjeUzytkownik> PobierzInformacjeUzytkownikaPoIdLoginu(string IdUzytkownika);
         Task<LoginUzytkownika> PobierzUzytkownikaPoIDAsync(string IdUzytkownika);
         Task<List<UzytkownikZRolamiDto>> PobierzUzytkownikowPoRolachAsync(List<string> role);

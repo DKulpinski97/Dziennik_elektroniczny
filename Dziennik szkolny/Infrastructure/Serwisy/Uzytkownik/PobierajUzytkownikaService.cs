@@ -3,6 +3,7 @@ using Dziennik_szkolny.Application.ObiektyTransferuDanych;
 using Dziennik_szkolny.Domain.Entities;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
@@ -37,38 +38,45 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
         {
             return await _dbContext.InformacjeUzytkownik.ToListAsync();
         }
+        public async Task<List<InformacjeUzytkownik>> PobierzUzytkownikowImieINazwiskoIIDPoLiscieID(List<string> idUzytkownikow)
+        {
+         return await _dbContext.InformacjeUzytkownik
+        .Where(x => idUzytkownikow.Contains(x.IdUzytkownika))
+        .Select(x => new InformacjeUzytkownik
+        {
+            IdUzytkownika = x.IdUzytkownika,
+            Imie = x.Imie,
+            Nazwisko = x.Nazwisko
+        })
+        .ToListAsync();
+        }
         public async Task<LoginUzytkownika> PobierzUzytkownikaPoIDAsync(string IdUzytkownika)
         {
             return await _userManager.FindByIdAsync(IdUzytkownika);
         }
         public async Task<List<UzytkownikZRolamiDto>> PobierzUzytkownikowPoRolachAsync(List<string> role)
         {
-            var wynik = new List<UzytkownikZRolamiDto>();
+            var roleUzytkownikow = await (
+               from ur in _dbContext.UserRoles
+               join r in _dbContext.Roles on ur.RoleId equals r.Id
+               join u in _dbContext.Users on ur.UserId equals u.Id
+               where role.Contains(r.Name)
+               select new
+               {
+                   u.Id,
+                   Login = u.UserName,
+                   NazwaRoli = r.Name
+               }).ToListAsync();
 
-            foreach (var nazwaRoli in role)
-            {
-                var uzytkownicy = await _userManager.GetUsersInRoleAsync(nazwaRoli);
-
-                foreach (var uzytkownik in uzytkownicy)
+            return roleUzytkownikow
+                .GroupBy(x => new { x.Id, x.Login })
+                .Select(g => new UzytkownikZRolamiDto
                 {
-                    var istnieje = wynik.FirstOrDefault(x => x.Id == uzytkownik.Id);
-
-                    if (istnieje != null)
-                    {
-                        istnieje.Role.Add(nazwaRoli);
-                        continue;
-                    }
-
-                    wynik.Add(new UzytkownikZRolamiDto
-                    {
-                        Id = uzytkownik.Id,
-                        Login = uzytkownik.UserName,
-                        Role = [nazwaRoli]
-                    });
-                }
-            }
-
-            return wynik;
+                    Id = g.Key.Id,
+                    Login = g.Key.Login,
+                    Role = g.Select(x => x.NazwaRoli).Distinct().ToList()
+                })
+                .ToList();
         }
 
         public async Task<string> PobierzIdUzytkownikaPoLoginieAsync(string login)
@@ -112,7 +120,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
         }
         public async Task<bool> SprawdzCzyJestUzytkownikKtoryPosiadaTylkoTaRoleAsync(string idRoli)
         {
-            return await _dbContext.UserRoles.AnyAsync(ur => ur.RoleId == idRoli 
+            return await _dbContext.UserRoles.AnyAsync(ur => ur.RoleId == idRoli
             && !_dbContext.UserRoles.Any(ur2 => ur2.UserId == ur.UserId && ur2.RoleId != idRoli));
         }
     }
