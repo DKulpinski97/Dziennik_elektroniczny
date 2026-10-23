@@ -10,6 +10,7 @@ using Dziennik_szkolny.ViewModel.Rola;
 using Dziennik_szkolny.ViewModel.Uzytkownik;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Dziennik_szkolny.Controllers
 {
@@ -280,12 +281,13 @@ namespace Dziennik_szkolny.Controllers
 
                 return RedirectToAction(nameof(ZarzadzajUzytkownikem));
             }
-            var mozeZarzadzac = await _pobierajUprawnieniaRoli.CzyMozeZarzadzacUzytkownikiemAsync(User, idUzytkownika);
-
-            if (!mozeZarzadzac)
+            var brakDostepu = await CzyMozeZarzadzac(User, idUzytkownika);
+            if (brakDostepu != null)
             {
-                return Forbid();
+                return brakDostepu;
             }
+
+
             LoginUzytkownika uzytkownik = await _pobierajUzytkownika.PobierzUzytkownikaPoIDAsync(idUzytkownika);
             if (uzytkownik == null)
             {
@@ -320,10 +322,10 @@ namespace Dziennik_szkolny.Controllers
                 TempData["Wiadomosc"] = "Błąd podczas próby edycji danych użytkownika.";
                 return RedirectToAction(nameof(ZarzadzajUzytkownikem));
             }
-            var mozeZarzadzac = await _pobierajUprawnieniaRoli.CzyMozeZarzadzacUzytkownikiemAsync(User, edytujUzytkownikaViewModel.IdUzytkownika);
-            if (!mozeZarzadzac)
+            var brakDostepu = await CzyMozeZarzadzac(User, edytujUzytkownikaViewModel.IdUzytkownika);
+            if (brakDostepu != null)
             {
-                return Forbid();
+                return brakDostepu;
             }
             if (!ModelState.IsValid)
             {
@@ -353,9 +355,9 @@ namespace Dziennik_szkolny.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = NazwyRoli.SuperAdminAdminDyrektor)]
-        public async Task<IActionResult> UsunUzytkownika(string IdUzytkownika)
+        public async Task<IActionResult> UsunUzytkownika(string idUzytkownika)
         {
-            if (string.IsNullOrEmpty(IdUzytkownika))
+            if (string.IsNullOrEmpty(idUzytkownika))
             {
                 TempData["TypWiadomosci"] = "info";
                 TempData["Wiadomosc"] = "Nie wybrano użytkownika.";
@@ -363,31 +365,31 @@ namespace Dziennik_szkolny.Controllers
                 return RedirectToAction(nameof(ZarzadzajUzytkownikem));
             }
 
-            var mozeZarzadzac = await _pobierajUprawnieniaRoli.CzyMozeZarzadzacUzytkownikiemAsync(User, IdUzytkownika);
 
-            if (!mozeZarzadzac)
+            var brakDostepu = await CzyMozeZarzadzac(User, idUzytkownika);
+            if (brakDostepu != null)
             {
-                return Forbid();
+                return brakDostepu;
             }
-            if (await _pobierajUzytkownika.CzyUzytkownikJestOpiekunemAsync(IdUzytkownika))
+            if (await _pobierajUzytkownika.CzyUzytkownikJestOpiekunemAsync(idUzytkownika))
             {
                 TempData["TypWiadomosci"] = "info";
                 TempData["Wiadomosc"] = "Nie można usunąć użytkownika, który jest opiekunem ucznia.";
                 return RedirectToAction(nameof(ZarzadzajUzytkownikem));
             }
-            else if (await _pobierajUzytkownika.CzyUzytkownikProwadziPrzedmiotAsync(IdUzytkownika))
+            else if (await _pobierajUzytkownika.CzyUzytkownikProwadziPrzedmiotAsync(idUzytkownika))
             {
                 TempData["TypWiadomosci"] = "info";
                 TempData["Wiadomosc"] = "Nie można usunąć użytkownika, który prowadzi przedmiot.";
                 return RedirectToAction(nameof(ZarzadzajUzytkownikem));
             }
-            else if (await _pobierajUzytkownika.CzyUzytkownikJestWychowawcaAsync(IdUzytkownika))
+            else if (await _pobierajUzytkownika.CzyUzytkownikJestWychowawcaAsync(idUzytkownika))
             {
                 TempData["TypWiadomosci"] = "info";
                 TempData["Wiadomosc"] = "Nie można usunąć użytkownika, który jest wychowawcą klasy.";
                 return RedirectToAction(nameof(ZarzadzajUzytkownikem));
             }
-            var wynik = await _uzytkownikService.UsunUzytkownika(IdUzytkownika);
+            var wynik = await _uzytkownikService.UsunUzytkownika(idUzytkownika);
 
 
             if (!wynik.Stan)
@@ -406,5 +408,20 @@ namespace Dziennik_szkolny.Controllers
 
             return RedirectToAction(nameof(ZarzadzajUzytkownikem));
         }
+        private async Task<IActionResult?> CzyMozeZarzadzac(ClaimsPrincipal user, string idUzytkownika)
+        {
+            if (!await _pobierajUprawnieniaRoli.CzyMozeWidziecUzytkownikaAsync(user, idUzytkownika))
+            {
+               return NotFound();
+            }
+            else if (!await _pobierajUprawnieniaRoli.CzyMozeZarzadzacUzytkownikiemAsync(user, idUzytkownika))
+            {
+                TempData["TypWiadomosci"] = "info";
+                TempData["Wiadomosc"] = "Nie możesz zarządzać tym kontem, bo ma rolę spoza Twojego zakresu.";
+                return RedirectToAction(nameof(ZarzadzajUzytkownikem));
+            }
+            return null;
+        }
+
     }
 }
