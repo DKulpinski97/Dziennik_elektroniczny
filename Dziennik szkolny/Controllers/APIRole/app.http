@@ -7,3 +7,12 @@ GET {{host}}/api/role
 # Rola musi być zarządzana przez Admina, a Id w formacie GUID.
 # Generowane automatycznie, więc wymaga ręcznego uzupełnienia. W przypadku braku roli o podanym Id zwracany jest błąd 404.
 GET {{host}}/api/role/d1407732-ac64-44c3-bc8f-c190b1375af9
+
+### Role wyslij post
+# Rola musi być zarządzana przez Admina, a Id w formacie GUID.
+# nie wysyła ciasteczek wiec kod 401.
+POST {{host}}/api/role
+Content-Type: application/json
+{
+    "nazwa": "NowaRola"
+}

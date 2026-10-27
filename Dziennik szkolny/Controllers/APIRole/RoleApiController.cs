@@ -52,18 +52,18 @@ namespace Dziennik_szkolny.Controllers.APIRole
             return Ok(daneRoli);
         }
         [HttpPost]
-
         public async Task<ActionResult<DaneRoli>> UtworzRole([FromBody] NoweDaneRoli noweDaneRoli)
         {
-            string idAdmina = await _pobierajRole.PobierzIdRoliPoNazwieAsync(NazwyRoli.Admin);
-            if (string.IsNullOrEmpty(idAdmina))
+            var czyAdmin = await PobierzIdRoliAdmin();
+
+            if (czyAdmin.komunikat != null)
             {
-                return Problem(detail: "Nie udało się odczytać roli Admin.", statusCode: StatusCodes.Status500InternalServerError);
+                return czyAdmin.komunikat;
             }
-            var wynik = await _zarzadzajRolami.KontrolaDodawaRoliAsync(idAdmina, noweDaneRoli.Nazwa);
+            var wynik = await _zarzadzajRolami.KontrolaDodawaRoliAsync(czyAdmin.IdAdmina, noweDaneRoli.Nazwa);
             if (!wynik.Sukces)
             {
-                return Problem(detail: wynik.Komunikat, statusCode: StatusCodes.Status400BadRequest);
+                return Problem(detail: wynik.Komunikat, statusCode: StatusCodes.Status409Conflict);
             }
             var rola = await _pobierajRole.PobierzRolePoNazwieAsync(noweDaneRoli.Nazwa);
             if (rola == null)
@@ -76,6 +76,39 @@ namespace Dziennik_szkolny.Controllers.APIRole
                 Nazwa = rola.Name
             };
             return CreatedAtAction(nameof(PobierzRole), new { id = rola.Id }, daneRoli);
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> UsunRole(string id)
+        {
+            var uprawnienie = await _pobierajUprawnieniaRoli.CzyMozeZarzadzacRolaAsync(User, id);
+            if (!uprawnienie.CzyMoze)
+            {
+                return NotFound();
+            }
+            var czyAdmin = await PobierzIdRoliAdmin();
+
+            if (czyAdmin.komunikat != null)
+            {
+                return czyAdmin.komunikat;
+            }
+            
+           var wynik = await _zarzadzajRolami.UsunRole(id, czyAdmin.IdAdmina);
+            if (!wynik.Sukces)
+            {
+                return Problem(detail: wynik.Komunikat, statusCode: StatusCodes.Status409Conflict);
+            }
+            return NoContent();
+
+        }
+        private async Task<(ActionResult? komunikat,string? IdAdmina)> PobierzIdRoliAdmin()
+        {
+            string idAdmina = await _pobierajRole.PobierzIdRoliPoNazwieAsync(NazwyRoli.Admin);
+            if (string.IsNullOrEmpty(idAdmina))
+            {
+                return (Problem(detail: "Nie udało się odczytać roli Admin.", statusCode: StatusCodes.Status500InternalServerError), null);
+            }
+            return (null, idAdmina);
+            
         }
     }
 }
