@@ -3,9 +3,7 @@ using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
 using Dziennik_szkolny.Application.Mapery;
 using Dziennik_szkolny.Domain;
 using Dziennik_szkolny.Domain.Entities;
-using Dziennik_szkolny.Infrastructure.DaneStartowe;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
-using Dziennik_szkolny.Infrastructure.Serwisy.Role;
 using Dziennik_szkolny.ViewModel.Rola;
 using Dziennik_szkolny.ViewModel.Uzytkownik;
 using Microsoft.AspNetCore.Authorization;
@@ -47,20 +45,20 @@ namespace Dziennik_szkolny.Controllers
         {
 
             var role = await _pobierajRole.PobierzRole(User);
-            if(role == null || !role.Any())
+            if (role == null || !role.Any())
             {
                 TempData["TypWiadomosci"] = "info";
                 TempData["Wiadomosc"] = "Krytyczny błąd: Brak dostępnych ról do zarządzania.Prawdopodonie jest problem z bazą danych.";
                 return RedirectToAction("Index", "Home");
             }
             var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
-            WidokRoliViewModel widokRoliViewModel =  new WidokRoliViewModel
+            WidokRoliViewModel widokRoliViewModel = new WidokRoliViewModel
             {
                 RoleSystemowe = tmp.RoleSystemowe,
                 PozostaleRole = tmp.PozostaleRole
             };
 
-            return View("MenuRol",widokRoliViewModel);
+            return View("MenuRol", widokRoliViewModel);
         }
         [HttpGet]
         [Authorize(Roles = NazwyRoli.Admin)]
@@ -85,17 +83,16 @@ namespace Dziennik_szkolny.Controllers
         {
             if (string.IsNullOrWhiteSpace(nazwaRoli))
             {
-                TempData["TypWiadomosci"] = "danger";
-                TempData["Wiadomosc"] = "Nazwa roli nie może być pusta.";
+                TempData["TypWiadomosci"] = "info";
+                TempData["Wiadomosc"] = OgraniczeniaNazwyRoli.KomunikatBledu;
 
                 var role = await _pobierajRole.PobierzRole(User);
                 var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
                 return View("ZarzadzajRolami", tmp.PozostaleRole);
             }
 
-           string idZarzadzajacejRoli = await _pobierajRole.PobierzIdRoliPoNazwieAsync(NazwyRoli.Admin);
-           var wynik = await _roleService.KontrolaDodawaRoliAsync(idZarzadzajacejRoli, nazwaRoli.Trim());
-
+            string idZarzadzajacejRoli = await _pobierajRole.PobierzIdRoliPoNazwieAsync(NazwyRoli.Admin);
+            var wynik = await _roleService.KontrolaDodawaRoliAsync(idZarzadzajacejRoli, nazwaRoli);
 
             if (!wynik.Sukces)
             {
@@ -112,7 +109,7 @@ namespace Dziennik_szkolny.Controllers
             return RedirectToAction(nameof(ZarzadzajRolami));
         }
 
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = NazwyRoli.Admin)]
@@ -127,16 +124,8 @@ namespace Dziennik_szkolny.Controllers
                 var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
                 return View("ZarzadzajRolami", tmp.PozostaleRole);
             }
-            if (NowaNazwaRoli == StaraNazwaRoli)
-            {
-                TempData["TypWiadomosci"] = "danger";
-                TempData["Wiadomosc"] = "Nowa nazwa nie może być taka sama jak stara.";
-                var role = await _pobierajRole.PobierzRole(User);
-                var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
-                return View("ZarzadzajRolami", tmp.PozostaleRole);
-            }
-                var Weryfikacja = await _pobierajUprawnieniaRoli.CzyMozeZarzadzacRolaAsync(User, RoleId);
-            if(Weryfikacja.CzyMoze == false)
+            var Weryfikacja = await _pobierajUprawnieniaRoli.CzyMozeZarzadzacRolaAsync(User, RoleId);
+            if (Weryfikacja.CzyMoze == false)
             {
                 TempData["TypWiadomosci"] = "danger";
                 TempData["Wiadomosc"] = Weryfikacja.Komunikat;
@@ -144,12 +133,11 @@ namespace Dziennik_szkolny.Controllers
                 var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
                 return View("ZarzadzajRolami", tmp.PozostaleRole);
             }
-
-            var wynik = await _roleService.ZmienNazweRoli(RoleId, NowaNazwaRoli.Trim(), StaraNazwaRoli);
+            var wynik = await _roleService.ZmienNazweRoli(RoleId, NowaNazwaRoli, StaraNazwaRoli);
 
             if (!wynik.Sukces)
             {
-                TempData["TypWiadomosci"] = "danger";
+                TempData["TypWiadomosci"] = "info";
                 TempData["Wiadomosc"] = wynik.Komunikat;
 
                 var role = await _pobierajRole.PobierzRole(User);
@@ -157,7 +145,6 @@ namespace Dziennik_szkolny.Controllers
                 ViewBag.RolaId = RoleId;
                 return View("ZarzadzajRolami", tmp.PozostaleRole);
             }
-
             TempData["TypWiadomosci"] = "success";
             TempData["Wiadomosc"] = wynik.Komunikat;
 
@@ -180,7 +167,7 @@ namespace Dziennik_szkolny.Controllers
                 return View("ZarzadzajRolami", tmp.PozostaleRole);
             }
             string RolaAdminId = await _pobierajRole.PobierzIdRoliPoNazwieAsync(NazwyRoli.Admin);
-            var wynik = await _roleService.UsunRole(RoleId,  RolaAdminId);
+            var wynik = await _roleService.UsunRole(RoleId, RolaAdminId);
 
 
             if (!wynik.Sukces)
@@ -315,9 +302,10 @@ namespace Dziennik_szkolny.Controllers
         [Authorize(Roles = NazwyRoli.SuperAdminAdminDyrektor)]
         public async Task<IActionResult> EdytujDaneUzytkownika(EdytujUzytkownikaViewModel edytujUzytkownikaViewModel)
         {
-
+            
             if (edytujUzytkownikaViewModel == null)
             {
+
                 TempData["TypWiadomosci"] = "info";
                 TempData["Wiadomosc"] = "Błąd podczas próby edycji danych użytkownika.";
                 return RedirectToAction(nameof(ZarzadzajUzytkownikem));
@@ -329,6 +317,7 @@ namespace Dziennik_szkolny.Controllers
             }
             if (!ModelState.IsValid)
             {
+
                 TempData["TypWiadomosci"] = "danger";
                 TempData["Wiadomosc"] = "Przynajmiej jedno pole jest nie uzupełnione lub zawiera wadliwe informacjie";
                 edytujUzytkownikaViewModel.DostepneRole = _mapowanieRoli.MapujRoleNaSelectList(await _pobierajRole.PobierzRole(User));
@@ -412,7 +401,7 @@ namespace Dziennik_szkolny.Controllers
         {
             if (!await _pobierajUprawnieniaRoli.CzyMozeWidziecUzytkownikaAsync(user, idUzytkownika))
             {
-               return NotFound();
+                return NotFound();
             }
             else if (!await _pobierajUprawnieniaRoli.CzyMozeZarzadzacUzytkownikiemAsync(user, idUzytkownika))
             {

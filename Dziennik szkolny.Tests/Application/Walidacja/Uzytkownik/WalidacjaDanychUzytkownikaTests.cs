@@ -92,7 +92,7 @@ namespace Dziennik_szkolny.Tests.Application.Walidacja.Uzytkownik
             // Arrange
             WalidacjaDanychUzytkownika walidacja = new WalidacjaDanychUzytkownika();
             // Act
-            bool wynik = walidacja.CzyHasloPrawidlowe("123@#$ASDasd");
+            var (wynik, wiadomosc) = walidacja.CzyHasloPrawidlowe("123@#$ASDasd");
             // Assert
             Assert.True(wynik);
         }

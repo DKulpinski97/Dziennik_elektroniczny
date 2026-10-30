@@ -5,6 +5,8 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
 
     public class DaneStartowe
     {
+        //Domyślne hasło dla wszystkich użytkowników demonstracyjnych systemu.
+        private  const string HasloDemonstracyjne = "qweQWE123!@#";
         //Lista ról pracowników w systemie
         public List<string> RolePracownika { get; } =
         [
@@ -73,37 +75,37 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
         //Informacje do tworzenia Loginów
         public List<(string Login, string Email, string Haslo)> Loginy { get; } =
          [
-             ("Admin", "Admin@gmail.com", "Admin"),
-            ("SuperAdmin", "SuperAdmin@gmail.com", "SuperAdmin"),
-            ("Dyrektor", "Dyrektor@gmail.com", "Dyrektor"),
-            ("Sekretarka", "Sekretarka@gmail.com", "Sekretarka"),
+             ("Admin", "Admin@gmail.com", HasloDemonstracyjne),
+            ("SuperAdmin", "SuperAdmin@gmail.com", HasloDemonstracyjne),
+            ("Dyrektor", "Dyrektor@gmail.com", HasloDemonstracyjne),
+            ("Sekretarka", "Sekretarka@gmail.com", HasloDemonstracyjne),
 
-            ("Nauczyciel1", "Nauczyciel1@gmail.com", "Nauczyciel1"),
-            ("Nauczyciel2", "Nauczyciel2@gmail.com", "Nauczyciel2"),
-            ("Nauczyciel3", "Nauczyciel3@gmail.com", "Nauczyciel3"),
+            ("Nauczyciel1", "Nauczyciel1@gmail.com", HasloDemonstracyjne),
+            ("Nauczyciel2", "Nauczyciel2@gmail.com", HasloDemonstracyjne),
+            ("Nauczyciel3", "Nauczyciel3@gmail.com", HasloDemonstracyjne),
 
-            ("Rodzic1", "Rodzic1@gmail.com", "Rodzic1"),
-            ("Rodzic2", "Rodzic2@gmail.com", "Rodzic2"),
-            ("Rodzic3", "Rodzic3@gmail.com", "Rodzic3"),
+            ("Rodzic1", "Rodzic1@gmail.com", HasloDemonstracyjne),
+            ("Rodzic2", "Rodzic2@gmail.com", HasloDemonstracyjne),
+            ("Rodzic3", "Rodzic3@gmail.com", HasloDemonstracyjne),
         ];
         //Dane do utworzenia informacji o użytkowniku.
-        //Hasło i e-mail są dodane dla czytelności i nie są używane przy tworzeniu encji InformacjeUzytkownik,
+        //E-mail został dodany dla czytelności i nie jest wykorzystywany w encji InformacjeUzytkownik.
         //ponieważ znajdują się już w liście Loginy.
         //Login służy do odnalezienia identyfikatora użytkownika w słowniku tłumaczeń (login na Id).
-        public List<(string Login, string Email, string Haslo, string Imie, string Nazwisko, string Pesel, string Telefon, string Miasto, string Ulica, string NrMieszkania)> Informacje { get; } =
+        public List<(string Login, string Email,  string Imie, string Nazwisko, string Pesel, string Telefon, string Miasto, string Ulica, string NrMieszkania)> Informacje { get; } =
          [
-             ("Admin", "Admin@gmail.com", "Admin", "AdminImie", "AdminNaz", "85010112345", "500100100", "Warszawa", "Marszałkowska", "11"),
-            ("SuperAdmin", "SuperAdmin@gmail.com", "SuperAdmin", "SuperAdminImie", "SuperAdminNaz", "92031512342", "500100100", "Warszawa", "Marszałkowska", "11"),
-            ("Dyrektor", "Dyrektor@gmail.com", "Dyrektor", "DyrektorImie", "DyrektorNaz", "82020223452", "500200200", "Warszawa", "Puławska", "14"),
-            ("Sekretarka", "Sekretarka@gmail.com", "Sekretarka", "SekretarkaImie", "SekretarkaNaz", "90030334565", "500300300", "Warszawa", "Grochowska", "24"),
+             ("Admin", "Admin@gmail.com", "AdminImie", "AdminNaz", "85010112345", "500100100", "Warszawa", "Marszałkowska", "11"),
+            ("SuperAdmin", "SuperAdmin@gmail.com", "SuperAdminImie", "SuperAdminNaz", "92031512342", "500100100", "Warszawa", "Marszałkowska", "11"),
+            ("Dyrektor", "Dyrektor@gmail.com", "DyrektorImie", "DyrektorNaz", "82020223452", "500200200", "Warszawa", "Puławska", "14"),
+            ("Sekretarka", "Sekretarka@gmail.com", "SekretarkaImie", "SekretarkaNaz", "90030334565", "500300300", "Warszawa", "Grochowska", "24"),
 
-            ("Nauczyciel1", "Nauczyciel1@gmail.com", "Nauczyciel1", "Nauczyciel1Imie", "Nauczyciel1Naz", "88040445670", "500400400", "Warszawa", "Górczewska", "1"),
-            ("Nauczyciel2", "Nauczyciel2@gmail.com", "Nauczyciel2", "Nauczyciel2Imie", "Nauczyciel2Naz", "87050556781", "500500500", "Warszawa", "Górczewska", "2"),
-            ("Nauczyciel3", "Nauczyciel3@gmail.com", "Nauczyciel3", "Nauczyciel3Imie", "Nauczyciel3Naz", "86060667892", "500600600", "Warszawa", "Targowa", "41"),
+            ("Nauczyciel1", "Nauczyciel1@gmail.com", "Nauczyciel1Imie", "Nauczyciel1Naz", "88040445670", "500400400", "Warszawa", "Górczewska", "1"),
+            ("Nauczyciel2", "Nauczyciel2@gmail.com", "Nauczyciel2Imie", "Nauczyciel2Naz", "87050556781", "500500500", "Warszawa", "Górczewska", "2"),
+            ("Nauczyciel3", "Nauczyciel3@gmail.com", "Nauczyciel3Imie", "Nauczyciel3Naz", "86060667892", "500600600", "Warszawa", "Targowa", "41"),
 
-            ("Rodzic1", "Rodzic1@gmail.com", "Rodzic1", "Rodzic1Imie", "Rodzic1Naz", "85070778903", "500700700", "Warszawa", "Modlińska", "25"),
-            ("Rodzic2", "Rodzic2@gmail.com", "Rodzic2", "Rodzic2Imie", "Rodzic2Naz", "84080889014", "500800800", "Warszawa", "Wawelska", "15"),
-            ("Rodzic3", "Rodzic3@gmail.com", "Rodzic3", "Rodzic3Imie", "Rodzic3Naz", "83090990125", "500900900", "Warszawa", "Białobrzeska", "26"),
+            ("Rodzic1", "Rodzic1@gmail.com", "Rodzic1Imie", "Rodzic1Naz", "85070778903", "500700700", "Warszawa", "Modlińska", "25"),
+            ("Rodzic2", "Rodzic2@gmail.com", "Rodzic2Imie", "Rodzic2Naz", "84080889014", "500800800", "Warszawa", "Wawelska", "15"),
+            ("Rodzic3", "Rodzic3@gmail.com", "Rodzic3Imie", "Rodzic3Naz", "83090990125", "500900900", "Warszawa", "Białobrzeska", "26"),
         ];
         //Informacje niezbędne do utworzenia klasy
         public List<(string Oznaczenie, string RokNauki, string RokRozpoczecia, string? RokZakonczenia, string LoginWychowawcy)> Klasy { get; } =

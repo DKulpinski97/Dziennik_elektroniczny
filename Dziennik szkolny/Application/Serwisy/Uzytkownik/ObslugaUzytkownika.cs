@@ -6,7 +6,6 @@ using Dziennik_szkolny.Application.Modele.Uzytkownik;
 using Dziennik_szkolny.Application.Walidacja.Uzytkownik;
 using Dziennik_szkolny.Domain;
 using Dziennik_szkolny.Infrastructure.DaneStartowe;
-using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Dziennik_szkolny.ViewModel.Uzytkownik;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Globalization;
@@ -19,14 +18,14 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
         private readonly IWeryfikacjaDanychLogowania _weryfikacjaDanychLogowania;
         private readonly IPobierajRole _pobierajRole;
         private readonly WalidacjaDanychUzytkownika _walidacjaDanychUzytkownika;
-        private readonly IZarzadzajUzytkownikem _zarzadzajUzytkownikema;
+        private readonly IZarzadzajUzytkownikem _zarzadzajUzytkownikiem;
         private readonly IPobierajUzytkownika _pobierajUzytkownika;
         private readonly IJednostkaPracy _jednostkaPracy;
         private readonly MapowanieUzytkownika _mapowanieUzytkownika = new MapowanieUzytkownika();
         private readonly DaneStartowe _daneStartowe;
         private readonly IPobierajUprawnieniaRoli _pobierajUprawnieniaRoli;
         private readonly ILogger<ObslugaUzytkownika> _logger;
-
+        private static readonly StringComparer comparer =StringComparer.Create(new CultureInfo("pl-PL"), ignoreCase: false);
 
         public ObslugaUzytkownika(
             IWeryfikacjaDanychLogowania weryfikacjaDanychLogowania,
@@ -42,16 +41,13 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             _weryfikacjaDanychLogowania = weryfikacjaDanychLogowania;
             _pobierajRole = pobierajRole;
             _walidacjaDanychUzytkownika = walidacjaDanychUzytkownika;
-            _zarzadzajUzytkownikema = zarzadzajUzytkownikema;
+            _zarzadzajUzytkownikiem = zarzadzajUzytkownikema;
             _pobierajUzytkownika = pobierajUzytkownika;
             _jednostkaPracy = jednostkaPracy;
             _daneStartowe = daneStartowe;
             _pobierajUprawnieniaRoli = pobierajUprawnieniaRoli;
             _logger = logger;
-
-
         }
-
 
         public async Task<(string Komunikat, bool CzyUdane)> DodajUzytkownikaAsync(DodajUzytkownikaViewModel dodajUzytkownikaViewModel, ClaimsPrincipal zalogowanyUzytkownik)
         {
@@ -60,37 +56,32 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             {
                 return ("Nie znaleziono jednej lub więcej wybranych ról.", false);
             }
-
             // Sprawdzanie hasła zgodne z konfiguracją ASP.NET Core Identity.
-            if (!_walidacjaDanychUzytkownika.CzyHasloPrawidlowe(dodajUzytkownikaViewModel.Haslo))
+            var sprawdzenie = _walidacjaDanychUzytkownika.CzyHasloPrawidlowe(dodajUzytkownikaViewModel.Haslo);
+            if (!sprawdzenie.wynik)
             {
-                return ("Hasło musi zawierać co najmniej 8 znaków. w tym jedną cyfrę, jedną małą i jedną wielką literę oraz jeden znak specjalny.", false);
+                return (sprawdzenie.wiadomosc, false);
             }
             // Walidacja telefonu
             if (!_walidacjaDanychUzytkownika.CzyPoprawnyTelefon(dodajUzytkownikaViewModel.Telefon))
             {
                 return ("Telefon musi zawierać dokładnie 9 cyfr.", false);
             }
-
-
             // Walidacja PESEL
             if (!_walidacjaDanychUzytkownika.CzyPoprawnyPesel(dodajUzytkownikaViewModel.Pesel))
             {
                 return ("Podany numer PESEL jest niepoprawny.", false);
             }
-
-
             // Sprawdzenie loginu
             if (await _weryfikacjaDanychLogowania.CzyIstniejeLoginAsync(dodajUzytkownikaViewModel.Login))
             {
                 return ("Użytkownik o takim loginie już istnieje.", false);
             }
-            // Sprawdzenie Pesla
+            // Sprawdzenie PESEL
             if (await _pobierajUzytkownika.CzyPeselIstniejeAsync(dodajUzytkownikaViewModel.Pesel))
             {
                 return ("Użytkownik o takim PESELu już istnieje.", false);
             }
-
             // Sprawdzenie emaila
             if (await _weryfikacjaDanychLogowania.CzyIstniejeEmailAsync(dodajUzytkownikaViewModel.Email))
             {
@@ -110,26 +101,26 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             try
             {
                 // Dodanie konta
-                if (!await _zarzadzajUzytkownikema.DodajUzytkownikaAsync(dodajUzytkownikaViewModel))
+                if (!await _zarzadzajUzytkownikiem.DodajUzytkownikaAsync(dodajUzytkownikaViewModel))
                 {
                     await _jednostkaPracy.CofnijAsync();
                     return ("Nie udało się dodać użytkownika.", false);
                 }
+
                 var nowyUzytkownik = await _pobierajUzytkownika.PobierzUzytkownikaPoLoginieAsync(dodajUzytkownikaViewModel.Login);
                 //Dodaj Role użytkownikowi
-                if (!await _zarzadzajUzytkownikema.DodajRoleUzytkownikowiAsync(nowyUzytkownik, wybraneNazwyRol))
+                if (!await _zarzadzajUzytkownikiem.DodajRoleUzytkownikowiAsync(nowyUzytkownik, wybraneNazwyRol))
                 {
                     await _jednostkaPracy.CofnijAsync();
                     return ("Nie udało się przypisać ról.", false);
                 }
                 // Dodanie informacji użytkownika
-                if (!await _zarzadzajUzytkownikema.DodajInformacjeUzytkownikaAsync(nowyUzytkownik, dodajUzytkownikaViewModel))
+                if (!await _zarzadzajUzytkownikiem.DodajInformacjeUzytkownikaAsync(nowyUzytkownik, dodajUzytkownikaViewModel))
                 {
                     await _jednostkaPracy.CofnijAsync();
                     return ("Nie udało się dodać informacji o użytkowniku.", false);
                 }
                 await _jednostkaPracy.ZatwierdzAsync();
-
 
                 return ("Użytkownik dodany", true);
             }
@@ -144,13 +135,6 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
 
         public async Task<(string Komunikat, bool CzyUdane)> EdytujUzytkownikaAsync(EdytujUzytkownikaViewModel edytujUzytkownikaViewModel, ClaimsPrincipal zalogowanyUzytkownik)
         {
-           
-
-            //sprawdzanie czy Email jest unikalny
-            if (!string.IsNullOrEmpty(edytujUzytkownikaViewModel.Email) && await _pobierajUzytkownika.PobierzEmailUzytkownikaAsync(edytujUzytkownikaViewModel.IdUzytkownika) != edytujUzytkownikaViewModel.Email.ToUpper() && await _weryfikacjaDanychLogowania.CzyIstniejeEmailAsync(edytujUzytkownikaViewModel.Email))
-            {
-                return ("Użytkownik o takim emailu już istnieje.", false);
-            }
             // Sprawdzenie czy istnieją role o podanych identyfikatorach
             if (!await _pobierajRole.CzyIstniejaRoleAsync(edytujUzytkownikaViewModel.WybraneRole))
             {
@@ -159,9 +143,10 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             bool zmianaHasla = !string.IsNullOrEmpty(edytujUzytkownikaViewModel.Haslo);
             //======================Sprawdzanie podstawowych danych=========================
             // zgodne z konfiguracją ASP.NET Core Identity.
-            if (!string.IsNullOrEmpty(edytujUzytkownikaViewModel.Haslo) && !_walidacjaDanychUzytkownika.CzyHasloPrawidlowe(edytujUzytkownikaViewModel.Haslo))
+            var sprawdzenie = _walidacjaDanychUzytkownika.CzyHasloPrawidlowe(edytujUzytkownikaViewModel.Haslo);
+            if (zmianaHasla && !sprawdzenie.wynik)
             {
-                return ("Hasło musi zawierać co najmniej 8 znaków. w tym jedną cyfrę, jedną małą i jedną wielką literę oraz jeden znak specjalny.", false);
+                return (sprawdzenie.wiadomosc, false);
             }
 
             // Walidacja telefonu
@@ -169,7 +154,6 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             {
                 return ("Telefon musi zawierać dokładnie 9 cyfr.", false);
             }
-
 
             // Walidacja PESEL
             if (!_walidacjaDanychUzytkownika.CzyPoprawnyPesel(edytujUzytkownikaViewModel.Pesel))
@@ -187,7 +171,6 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             {
                 return ("Użytkownik o takim loginie już istnieje.", false);
             }
-
 
             // Sprawdzenie emaila
             if (await _weryfikacjaDanychLogowania.CzyIstniejeInnyEmailAsync(edytujUzytkownikaViewModel.Email, edytujUzytkownikaViewModel.IdUzytkownika))
@@ -207,22 +190,18 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             await _jednostkaPracy.RozpocznijTransakcjeAsync();
             try
             {
-                // =====================
+                // Aktualizacja konta
+
                 // Aktualizacja Identity
-                // =====================
-                // Dodanie konta
-                if (!await _zarzadzajUzytkownikema.EdytujUzytkownikaAsync(edytujUzytkownikaViewModel, zmianaHasla))
+
+                if (!await _zarzadzajUzytkownikiem.EdytujUzytkownikaAsync(edytujUzytkownikaViewModel, zmianaHasla))
                 {
                     await _jednostkaPracy.CofnijAsync();
                     return ("Nie udało się zaktualizować danych logowania.", false);
                 }
 
-                // =====================
                 // Aktualizacja danych osobowych
-                // =====================
-
                 var informacje = await _pobierajUzytkownika.PobierzInformacjeUzytkownikaPoIdLoginu(edytujUzytkownikaViewModel.IdUzytkownika);
-
 
                 if (informacje == null)
                 {
@@ -231,38 +210,26 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
                 }
                 _mapowanieUzytkownika.MapujNaInformacjeUzytkownika(informacje, edytujUzytkownikaViewModel);
 
-
-                if (!await _zarzadzajUzytkownikema.EdytujInformacjeUzytkownikaAsync(informacje))
+                if (!await _zarzadzajUzytkownikiem.EdytujInformacjeUzytkownikaAsync(informacje))
                 {
                     await _jednostkaPracy.CofnijAsync();
-                    return ("Nie znaleziono danych użytkownika.", false);
+                    return ("Nie udało się zaktualizować danych użytkownika.", false);
                 }
 
-
-                // =====================
                 // Aktualizacja ról
-                // =====================
+                var uzytkownik = await _pobierajUzytkownika.PobierzUzytkownikaPoLoginieAsync(edytujUzytkownikaViewModel.Login);
 
-                LoginUzytkownika uzytkownik = await _pobierajUzytkownika.PobierzUzytkownikaPoLoginieAsync(edytujUzytkownikaViewModel.Login);
-
-                if (!await _zarzadzajUzytkownikema.UsunWszystkieRoleUzytkownikowiAsync(edytujUzytkownikaViewModel.Login))
+                if (!await _zarzadzajUzytkownikiem.UsunWszystkieRoleUzytkownikowiAsync(edytujUzytkownikaViewModel.Login))
                 {
                     await _jednostkaPracy.CofnijAsync();
                     return ("Nie udało się zmienić ról.", false);
                 }
 
-
-                var noweRole = await _pobierajRole.PobierzNazwyRolPoIdAsync(edytujUzytkownikaViewModel.WybraneRole);
-
-
-                if (!await _zarzadzajUzytkownikema.DodajRoleUzytkownikowiAsync(uzytkownik, noweRole))
+                if (!await _zarzadzajUzytkownikiem.DodajRoleUzytkownikowiAsync(uzytkownik, wybraneNazwyRol))
                 {
                     await _jednostkaPracy.CofnijAsync();
-                    return ("Nie udało się zmienić ról lub nie wybrano roli", false);
+                    return ("Nie udało się zmienić ról lub nie wybrano roli.", false);
                 }
-
-
-
 
                 await _jednostkaPracy.ZatwierdzAsync();
 
@@ -273,7 +240,7 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
                 await _jednostkaPracy.CofnijAsync();
                 _logger.LogError(ex, "Błąd podczas edycji użytkownika {Login}", edytujUzytkownikaViewModel.Login);
 
-                return ("Wystąpił błąd podczas edycji użytkownika.", false);
+                return ("Błąd: Wystąpił błąd podczas edycji użytkownika.", false);
             }
         }
 
@@ -304,21 +271,16 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
                     Text = $"{dane.Imie} {dane.Nazwisko}"
                 };
 
-                if (uzytkownik.Role.Any(r =>
-                    _daneStartowe.RolePracownika.Contains(r)))
+                if (uzytkownik.Role.Any(r =>_daneStartowe.RolePracownika.Contains(r)) ||
+                    !uzytkownik.Role.Contains(NazwyRoli.Rodzic))
                 {
                     wynik.Pracownicy.Add(element);
-                }
-                else if (uzytkownik.Role.Contains(NazwyRoli.Rodzic))
-                {
-                    wynik.Rodzice.Add(element);
                 }
                 else
                 {
-                    wynik.Pracownicy.Add(element);
+                    wynik.Rodzice.Add(element);
                 }
             }
-            var comparer = StringComparer.Create(new CultureInfo("pl-PL"), false);
             wynik.Rodzice = wynik.Rodzice.OrderBy(x => x.Text, comparer).ToList();
             wynik.Pracownicy = wynik.Pracownicy.OrderBy(x => x.Text, comparer).ToList();
             return wynik;

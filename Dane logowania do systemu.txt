@@ -13,22 +13,22 @@ ADMINISTRACJA
 [ SUPER ADMIN ]
 Login:      SuperAdmin
 E-mail:     SuperAdmin@gmail.com
-Hasło:      SuperAdmin
+Hasło:      qweQWE123!@#
 
 [ ADMIN ]
 Login:      Admin
 E-mail:     Admin@gmail.com
-Hasło:      Admin
+Hasło:      qweQWE123!@#
 
 [ DYREKTOR ]
 Login:      Dyrektor
 E-mail:     Dyrektor@gmail.com
-Hasło:      Dyrektor
+Hasło:      qweQWE123!@#
 
 [ SEKRETARKA ]
 Login:      Sekretarka
 E-mail:     Sekretarka@gmail.com
-Hasło:      Sekretarka
+Hasło:      qweQWE123!@#
 
 
 ------------------------------------------------------------
@@ -38,17 +38,17 @@ NAUCZYCIELE
 [ NAUCZYCIEL 1 ]
 Login:      Nauczyciel1
 E-mail:     Nauczyciel1@gmail.com
-Hasło:      Nauczyciel1
+Hasło:      qweQWE123!@#
 
 [ NAUCZYCIEL 2 ]
 Login:      Nauczyciel2
 E-mail:     Nauczyciel2@gmail.com
-Hasło:      Nauczyciel2
+Hasło:      qweQWE123!@#
 
 [ NAUCZYCIEL 3 ]
 Login:      Nauczyciel3
 E-mail:     Nauczyciel3@gmail.com
-Hasło:      Nauczyciel3
+Hasło:      qweQWE123!@#
 
 
 ------------------------------------------------------------
@@ -58,17 +58,17 @@ RODZICE
 [ RODZIC 1 ]
 Login:      Rodzic1
 E-mail:     Rodzic1@gmail.com
-Hasło:      Rodzic1
+Hasło:      qweQWE123!@#
 
 [ RODZIC 2 ]
 Login:      Rodzic2
 E-mail:     Rodzic2@gmail.com
-Hasło:      Rodzic2
+Hasło:      qweQWE123!@#
 
 [ RODZIC 3 ]
 Login:      Rodzic3
 E-mail:     Rodzic3@gmail.com
-Hasło:      Rodzic3
+Hasło:      qweQWE123!@#
 
 
 ============================================================
@@ -78,7 +78,5 @@ Hasło:      Rodzic3
 Powyższe dane są danymi demonstracyjnymi przeznaczonymi
 wyłącznie do projektu pokazowego.
 
-Hasła zostały celowo uproszczone na potrzeby prezentacji
-i nie powinny być stosowane w środowisku produkcyjnym.
-
+Wszystkie konta korzystają z jednego hasła demonstracyjne: qweQWE123!@#
 ============================================================

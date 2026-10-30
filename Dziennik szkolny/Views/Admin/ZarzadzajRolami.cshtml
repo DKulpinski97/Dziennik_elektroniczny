@@ -12,14 +12,17 @@
 
                 <h2 class="text-center">Menu dodawania roli</h2>
 
-                <partial name="_Komunikat"/>
+                <partial name="_Komunikat" />
 
 
                 @using (Html.BeginForm("DodajRole", "Admin", FormMethod.Post))
                 {
                     @Html.AntiForgeryToken()
+                    @Html.TextBox("NazwaRoli", "", new { @class = "form-control", id = "NazwaRoli", placeholder = "np. Nauczyciel", maxlength = Dziennik_szkolny.Domain.OgraniczeniaNazwyRoli.MaksymalnaDlugosc })
+                    <small class="text-muted">@Dziennik_szkolny.Domain.OgraniczeniaNazwyRoli.KomunikatBledu</small>
+                    <br />
+                    <small class="text-muted">@Dziennik_szkolny.Domain.OgraniczeniaNazwyRoli.Podpowiedz</small> 
 
-                    @Html.TextBox("NazwaRoli","",new{@class = "form-control",id = "NazwaRoli",placeholder = "np. Nauczyciel"})
 
                     <button type="submit" class="btn btn-warning mt-3 w-100">
                         Dodaj rolę
@@ -32,18 +35,25 @@
 
                 <h2 class="text-center">Zmiana nazwy roli</h2>
 
+                <p>
+                    Wybierz rolę z listy po prawej,
+                    aby zmienić jej nazwę lub ją usunąć.
+                </p>
 
                 @using (Html.BeginForm("ZmienNazweRoli", "Admin", FormMethod.Post))
                 {
                     @Html.AntiForgeryToken()
 
-                    @Html.Hidden("StaraNazwaRoli","",new { id = "StaraNazwaRoli" })
+                    @Html.Hidden("StaraNazwaRoli", "", new { id = "StaraNazwaRoli" })
 
-                    @Html.TextBox("NowaNazwaRoli","",new{ @class = "form-control",id = "NowaNazwaRoli",placeholder = "Nowa nazwa roli"})
+                    @Html.TextBox("NowaNazwaRoli", "", new { @class = "form-control", id = "NowaNazwaRoli", placeholder = "Nowa nazwa roli", maxlength = Dziennik_szkolny.Domain.OgraniczeniaNazwyRoli.MaksymalnaDlugosc })
+                    <small class="text-muted">@Dziennik_szkolny.Domain.OgraniczeniaNazwyRoli.KomunikatBledu</small>
+                    <br />
+                    <small class="text-muted">@Dziennik_szkolny.Domain.OgraniczeniaNazwyRoli.Podpowiedz</small>
 
-                    @Html.Hidden("RoleId","",new { id = "RoleIdZmiana" })
+                    @Html.Hidden("RoleId", "", new { id = "RoleIdZmiana" })
 
-                    <button type="submit" class="btn btn-warning mt-3 w-100">
+                    <button type="submit" id="btnEdytujRole" class="btn btn-warning mt-3 w-100" disabled>
                         Zmień nazwę
                     </button>
                 }
@@ -60,9 +70,9 @@
                         Brak wybranej roli
                     </label>
                     <br />
-                    @Html.Hidden("RoleId","",new { id = "RoleIdUsun" })
+                    @Html.Hidden("RoleId", "", new { id = "RoleIdUsun" })
 
-                    <button type="submit" class="btn btn-warning mt-3 w-100">
+                    <button type="submit" id="btnUsunRole" class="btn btn-warning mt-3 w-100" disabled onclick="return confirm('Czy na pewno chcesz usunąć rolę: ' + document.getElementById('NazwaDoUsuniecia').textContent.trim() + '?');">
                         Usuń
                     </button>
 
@@ -81,9 +91,9 @@
                 <h2 class="text-center">
                     Lista ról poza systemowych
                 </h2>
-                @Html.DropDownList("RoleList",new SelectList(Model, "Id", "Nazwa", (string)ViewBag.RolaId),new { @class = "form-select", size = 10, id = "ListaRol" })
-                
+                @Html.DropDownList("RoleList", new SelectList(Model, "Id", "Nazwa", (string)ViewBag.RolaId), new { @class = "form-select", size = 10, id = "ListaRol" })
 
+                
             </div>
         </div>
 
@@ -94,14 +104,20 @@
 
 <script>
 
+
+    const btnEdytuj = document.getElementById("btnEdytujRole");
+    const btnUsun = document.getElementById("btnUsunRole");
+
     document.getElementById("ListaRol")
     .addEventListener("change", function () {
 
-        let wybranaOpcja = this.options[this.selectedIndex];
+            let wybranaOpcja = this.options[this.selectedIndex];
 
             let nazwaRoli = wybranaOpcja.text;
             let idRoli = wybranaOpcja.value;
-
+            // włączanie przycisków
+            btnEdytuj.disabled = !idRoli;
+            btnUsun.disabled = !idRoli;
 
             // etykieta usuwania
             document.getElementById("NazwaDoUsuniecia")
@@ -112,7 +128,7 @@
             document.getElementById("StaraNazwaRoli")
                 .value = nazwaRoli;
 
-        document.getElementById("NowaNazwaRoli")
+            document.getElementById("NowaNazwaRoli")
                 .value = nazwaRoli;
 
             document.getElementById("RoleIdZmiana")
@@ -122,6 +138,8 @@
             // formularz usuwania
             document.getElementById("RoleIdUsun")
                 .value = idRoli;
+
+      
 
         });
 

@@ -38,14 +38,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
-
-// Identity
-// TODO: Przed wdrożeniem włączyć wymagania silnego hasła.
-// TODO: Przed wdrożeniem włączyć blokadę konta po nieudanych próbach logowania.
-
 builder.Services.AddIdentity<LoginUzytkownika, IdentityRole>(options =>
 {
-    /*
+ 
     options.Password.RequiredLength = 8;          // Minimalna długość hasła
     options.Password.RequireDigit = true;         // Wymagana cyfra
     options.Password.RequireLowercase = true;     // Wymagana mała litera
@@ -54,16 +49,9 @@ builder.Services.AddIdentity<LoginUzytkownika, IdentityRole>(options =>
     options.Lockout.MaxFailedAccessAttempts = 5;                       // Liczba prób przed blokadą
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);  // Czas trwania blokady
     options.Lockout.AllowedForNewUsers = true;                        // Blokada dotyczy też nowych kont
-     * */
-    options.Password.RequiredLength = 1;
-    options.Password.RequireDigit = false;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireLowercase = false;
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
-
 
 // Własne serwisy
 //Generowanie danych startowych

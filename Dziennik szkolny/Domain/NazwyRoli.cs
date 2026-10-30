@@ -6,6 +6,7 @@ namespace Dziennik_szkolny.Domain
     /// do tych stałych. Literówka w nazwie stałej jest błędem kompilacji, a nie cichym
     /// błędem w runtime.
     /// </summary>
+
     public static class NazwyRoli
     {
         public const string Admin = "Admin";

@@ -12,6 +12,7 @@
         </div>
         @using (Html.BeginForm("Login", "Logowanie", FormMethod.Post))
         {
+        @Html.Hidden("returnUrl", ViewData["ReturnUrl"])
             @Html.ValidationMessageFor(m => m.LoginUzytkownika, "", new { @class = "validation-error" })
             <label>Login</label><br />
             @Html.TextBoxFor(m => m.LoginUzytkownika, new { @class = "form-control" })

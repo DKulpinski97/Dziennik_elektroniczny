@@ -53,5 +53,13 @@ namespace Dziennik_szkolny.Application.Mapery
 
             uzytkownikaViewModel.DostepneRole = wszystkieRole;
         }
+        public PrzywitanieUzytkownikaViewModel MapowanieDanePodstawowe (string imie, string nazwisko)
+        {
+            return new PrzywitanieUzytkownikaViewModel
+            {
+                Imie = imie,
+                Nazwisko = nazwisko
+            };
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
+using Dziennik_szkolny.Application.Modele;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -44,5 +45,11 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
             return await _userManager.Users.AnyAsync(x => x.Email == email && x.Id != idUzytkownika);
         }
 
+        public async Task<DateTimeOffset> PobranieDoKiedyBlokadaAsync(string login)
+        {
+            var user = await _userManager.FindByNameAsync(login);
+            var lockoutEnd = await _userManager.GetLockoutEndDateAsync(user);
+            return lockoutEnd.Value;    
+        }
     }
 }

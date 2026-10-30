@@ -3,7 +3,6 @@ using Dziennik_szkolny.Application.ObiektyTransferuDanych;
 using Dziennik_szkolny.Domain.Entities;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
@@ -11,13 +10,11 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
     public class PobierajUzytkownikaService : IPobierajUzytkownika
     {
         readonly private UserManager<LoginUzytkownika> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
         readonly private AppDbContext _dbContext;
-        public PobierajUzytkownikaService(UserManager<LoginUzytkownika> userManager, AppDbContext dbContext, RoleManager<IdentityRole> roleManager)
+        public PobierajUzytkownikaService(UserManager<LoginUzytkownika> userManager, AppDbContext dbContext)
         {
             _userManager = userManager;
             _dbContext = dbContext;
-            _roleManager = roleManager;
         }
 
         public async Task<LoginUzytkownika> PobierzUzytkownikaPoLoginieAsync(string login)
@@ -28,15 +25,19 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
         {
             return await _dbContext.InformacjeUzytkownik.FirstOrDefaultAsync(x => x.IdUzytkownika == IdUzytkownika);
         }
+        public async Task<(string? imie, string? nazwisko)> PobierzImieINazwiskoPoIdUzytkownikaAsync(string IdUzytkownika)
+        {
+            var informacjeUzytkownik = await _dbContext.InformacjeUzytkownik.Where(x => x.IdUzytkownika == IdUzytkownika).Select(x => new { x.Imie, x.Nazwisko }).FirstOrDefaultAsync();
+            if (informacjeUzytkownik != null)
+            {
+                return (informacjeUzytkownik.Imie, informacjeUzytkownik.Nazwisko);
+            }
+            return (null, null);
+        }
 
         public async Task<List<LoginUzytkownika>> PobierzWszystkichUzytkownikow()
         {
             return await _userManager.Users.ToListAsync();
-        }
-
-        public async Task<List<InformacjeUzytkownik>> PobierzWszystkieInformacjeOUzrzytkownikach()
-        {
-            return await _dbContext.InformacjeUzytkownik.ToListAsync();
         }
         public async Task<List<InformacjeUzytkownik>> PobierzUzytkownikowImieINazwiskoIIDPoLiscieID(List<string> idUzytkownikow)
         {
@@ -77,12 +78,6 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
                     Role = g.Select(x => x.NazwaRoli).Distinct().ToList()
                 })
                 .ToList();
-        }
-
-        public async Task<string> PobierzIdUzytkownikaPoLoginieAsync(string login)
-        {
-            var uzytkownik = await _userManager.FindByNameAsync(login);
-            return uzytkownik?.Id;
         }
 
         public async Task<bool> SprawdzCzyInformacjeUzytkownikaIstniejaPoIdUzytkownikaAsync(string idUzytkownika)
