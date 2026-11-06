@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using Dziennik_szkolny.Domain.reguly;
+using System.Text.RegularExpressions;
 
 namespace Dziennik_szkolny.Application.Walidacja.Uzytkownik
 {
@@ -11,18 +12,19 @@ namespace Dziennik_szkolny.Application.Walidacja.Uzytkownik
         }
 
 
-          public (bool wynik, string wiadomosc) CzyHasloPrawidlowe(string haslo)
-          {
-              if (string.IsNullOrEmpty(haslo) || haslo.Length < 8)
-              {
-                  return (false, "Hasło musi zawierać co najmniej 8 znaków, w tym: jedną cyfrę, jedną małą literę, jedną wielką literę oraz jeden znak specjalny.");
-              }
+        public bool CzyHasloPrawidlowe(string? haslo)
+        {
+            if (string.IsNullOrEmpty(haslo) || haslo.Length < OgraniczeniaHasla.MinimalnaDlugosc)
+            {
+                return false;
+            }
 
-              return (haslo.Any(c => c >= '0' && c <= '9')       // cyfra
-                  && haslo.Any(c => c >= 'a' && c <= 'z')       // mała litera
-                  && haslo.Any(c => c >= 'A' && c <= 'Z')       // wielka litera
-                  && haslo.Any(c => !char.IsLetterOrDigit(c)), "");  // znak specjalny
-          }
+            return haslo.Any(c => c >= '0' && c <= '9')       // cyfra
+                && haslo.Any(c => c >= 'a' && c <= 'z')       // mała litera
+                && haslo.Any(c => c >= 'A' && c <= 'Z')       // wielka litera
+                && haslo.Any(c => !char.IsLetterOrDigit(c));  // znak specjalny
+        }
+
         public bool CzyPoprawnyPesel(string pesel)
         {
             if (string.IsNullOrWhiteSpace(pesel) || pesel.Length != 11 || !pesel.All(char.IsDigit))

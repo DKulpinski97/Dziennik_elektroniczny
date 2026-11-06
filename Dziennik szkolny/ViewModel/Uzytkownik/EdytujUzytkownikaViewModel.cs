@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace Dziennik_szkolny.ViewModel.Uzytkownik
 {
@@ -6,7 +7,7 @@ namespace Dziennik_szkolny.ViewModel.Uzytkownik
     {
         [ValidateNever]
         public string IdUzytkownika { get; set; }
-
+        [Display(Name = "Hasło")]
         public string? Haslo { get; set; }
     }
 }

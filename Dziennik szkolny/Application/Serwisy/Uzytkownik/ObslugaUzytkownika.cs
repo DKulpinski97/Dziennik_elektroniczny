@@ -5,6 +5,7 @@ using Dziennik_szkolny.Application.Mapery;
 using Dziennik_szkolny.Application.Modele.Uzytkownik;
 using Dziennik_szkolny.Application.Walidacja.Uzytkownik;
 using Dziennik_szkolny.Domain;
+using Dziennik_szkolny.Domain.reguly;
 using Dziennik_szkolny.Infrastructure.DaneStartowe;
 using Dziennik_szkolny.ViewModel.Uzytkownik;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -57,10 +58,9 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
                 return ("Nie znaleziono jednej lub więcej wybranych ról.", false);
             }
             // Sprawdzanie hasła zgodne z konfiguracją ASP.NET Core Identity.
-            var sprawdzenie = _walidacjaDanychUzytkownika.CzyHasloPrawidlowe(dodajUzytkownikaViewModel.Haslo);
-            if (!sprawdzenie.wynik)
+            if (!_walidacjaDanychUzytkownika.CzyHasloPrawidlowe(dodajUzytkownikaViewModel.Haslo))
             {
-                return (sprawdzenie.wiadomosc, false);
+                return (OgraniczeniaHasla.KomunikatBledu,false);
             }
             // Walidacja telefonu
             if (!_walidacjaDanychUzytkownika.CzyPoprawnyTelefon(dodajUzytkownikaViewModel.Telefon))
@@ -143,10 +143,9 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             bool zmianaHasla = !string.IsNullOrEmpty(edytujUzytkownikaViewModel.Haslo);
             //======================Sprawdzanie podstawowych danych=========================
             // zgodne z konfiguracją ASP.NET Core Identity.
-            var sprawdzenie = _walidacjaDanychUzytkownika.CzyHasloPrawidlowe(edytujUzytkownikaViewModel.Haslo);
-            if (zmianaHasla && !sprawdzenie.wynik)
+            if (zmianaHasla && !_walidacjaDanychUzytkownika.CzyHasloPrawidlowe(edytujUzytkownikaViewModel.Haslo))
             {
-                return (sprawdzenie.wiadomosc, false);
+                return (OgraniczeniaHasla.KomunikatBledu, false);
             }
 
             // Walidacja telefonu

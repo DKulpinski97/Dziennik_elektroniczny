@@ -1,4 +1,5 @@
-﻿@model Dziennik_szkolny.ViewModel.Uzytkownik.EdytujUzytkownikaViewModel
+﻿@using Dziennik_szkolny.Domain.reguly
+@model Dziennik_szkolny.ViewModel.Uzytkownik.EdytujUzytkownikaViewModel
 
 @{
     ViewData["Title"] = "Edytuj dane użytkownika";
@@ -21,6 +22,9 @@
                         @Html.LabelFor(x => x.Haslo, new { @class = "form-label" })
                         @Html.PasswordFor(x => x.Haslo, new { @class = "form-control" })
                         @Html.ValidationMessageFor(x => x.Haslo, "", new { @class = "text-danger" })
+                        <small class="text-muted">@OgraniczeniaHasla.PodpowiedzEdycji</small>
+                        <br />
+                        <small class="text-muted">@OgraniczeniaHasla.RegulyHasla</small>
                     </div>
                     @Html.AntiForgeryToken()
                     @Html.HiddenFor(x => x.IdUzytkownika)

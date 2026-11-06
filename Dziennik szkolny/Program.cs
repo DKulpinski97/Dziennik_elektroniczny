@@ -8,6 +8,7 @@ using Dziennik_szkolny.Application.Interfejsy.Uczen;
 using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
 using Dziennik_szkolny.Application.Serwisy.Uzytkownik;
 using Dziennik_szkolny.Application.Walidacja.Uzytkownik;
+using Dziennik_szkolny.Domain.reguly;
 using Dziennik_szkolny.Infrastructure;
 using Dziennik_szkolny.Infrastructure.DaneStartowe;
 using Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy;
@@ -41,7 +42,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddIdentity<LoginUzytkownika, IdentityRole>(options =>
 {
  
-    options.Password.RequiredLength = 8;          // Minimalna długość hasła
+    options.Password.RequiredLength = OgraniczeniaHasla.MinimalnaDlugosc;          // Minimalna długość hasła
     options.Password.RequireDigit = true;         // Wymagana cyfra
     options.Password.RequireLowercase = true;     // Wymagana mała litera
     options.Password.RequireUppercase = true;     // Wymagana wielka litera

@@ -1,4 +1,5 @@
 using Dziennik_szkolny.Application.Walidacja.Uzytkownik;
+using Dziennik_szkolny.Domain.reguly;
 
 namespace Dziennik_szkolny.Tests.Application.Walidacja.Uzytkownik
 {
@@ -60,23 +61,20 @@ namespace Dziennik_szkolny.Tests.Application.Walidacja.Uzytkownik
             Assert.True(wynik);
         }
 
-       /* 
-        * ToDo 
-        * Wymaga poprawy zasad na docelową architekture teraz zawsze da błąd
-        * [Theory]
+        [Theory]
         [InlineData("")]                  // wartość pusta
         [InlineData(null)]                // brak wartości
-        [InlineData("asdfghj")]           // krótsze niż 8
+        [InlineData("A1a@")]              // wszystkie 4 rodzaje, ale tylko 4 znaki
+        [InlineData("Ab1@cde")]           // wszystkie 4 rodzaje, za krótkie (7 znaków)
         [InlineData("asdfghjk")]          // długość ok, sama mała litera
         [InlineData("Asdfghjk")]          // mała i wielka litera
         [InlineData("1sdfghjk")]          // mała litera i cyfra
-        [InlineData("Asdfghjk1")]         // mała, wielka litera i cyfra (brak znaku specjalnego)
+        [InlineData("Asdfghjk1")]         // brak znaku specjalnego
         [InlineData("#sdfghjk")]          // mała litera i znak specjalny
-        [InlineData("Asdfghjk#")]         // mała, wielka litera i znak specjalny (brak cyfry)
-        [InlineData("1#dfghjk")]          // mała litera, cyfra i znak specjalny (brak wielkiej litery)
-        [InlineData("12@#qwA")]           // wszystkie 4 rodzaje znaków, ale za krótkie (7 znaków)
-        [InlineData("QWE123@#$")]         // cyfra, wielka litera, znak specjalny, długość ok (brak małej litery)
-        public void CzyHasloPrawidlowe_SprawdzamHaslo_ZwracaFalse(string haslo)
+        [InlineData("Asdfghjk#")]         // brak cyfry
+        [InlineData("1#dfghjk")]          // brak wielkiej litery
+        [InlineData("QWE123@#$")]         // brak małej litery
+        public void CzyHasloPrawidlowe_SprawdzamHaslo_ZwracaFalse(string? haslo)
         {
             // Arrange
             WalidacjaDanychUzytkownika walidacja = new WalidacjaDanychUzytkownika();
@@ -84,17 +82,26 @@ namespace Dziennik_szkolny.Tests.Application.Walidacja.Uzytkownik
             bool wynik = walidacja.CzyHasloPrawidlowe(haslo);
             // Assert
             Assert.False(wynik);
-        }*/
+        }
 
-        [Fact]
-        public void CzyHasloPrawidlowe_SprawdzamHaslo_ZwracaTrue()
+        [Theory]
+        [InlineData("Ab1@cdef")]          // dokładnie 8 znaków (granica), wszystkie 4 rodzaje
+        [InlineData("123@#$ASDasd")]      // dłuższe, wszystkie 4 rodzaje
+        public void CzyHasloPrawidlowe_SprawdzamHaslo_ZwracaTrue(string haslo)
         {
             // Arrange
             WalidacjaDanychUzytkownika walidacja = new WalidacjaDanychUzytkownika();
             // Act
-            var (wynik, wiadomosc) = walidacja.CzyHasloPrawidlowe("123@#$ASDasd");
+            bool wynik = walidacja.CzyHasloPrawidlowe(haslo);
             // Assert
             Assert.True(wynik);
+        }
+
+        [Fact]
+        public void OgraniczeniaHasla_KomunikatBledu_ZawieraMinimalnaDlugosc()
+        {
+            // Assert
+            Assert.Contains(OgraniczeniaHasla.MinimalnaDlugosc.ToString(), OgraniczeniaHasla.KomunikatBledu);
         }
     }
 }
