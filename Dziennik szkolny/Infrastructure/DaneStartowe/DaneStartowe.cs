@@ -119,7 +119,7 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
         //Informacje do tworzenia ucznia
         public List<(string Pesel, string Imie, string Nazwisko, string DataUrodzenia, string OznaczenieKlasy, string RokRozpoczeciaKlasy, string Opiekun1Login, string Opiekun2Login)> Uczniowie { get; } =
         [
-        ("13241265419", "Jan", "Kowalski", "2010-03-15", "A", "2023", "Rodzic1", ""),
+        ("13241265419", "Jan", "Kowalski", "2010-03-15", "A", "2023", "Rodzic1", "Nauczyciel1"),
         ("12290302544", "Anna", "Nowak", "2010-07-22", "A", "2023", "Rodzic2", ""),
         ("14212725033", "Piotr", "Wiśniewski", "2009-11-05", "Chemiczno fizyczna", "2024", "Rodzic3", ""),
         ("13311514209", "Katarzyna", "Lewandowska", "2008-01-30", "Matematyczna", "2025", "Rodzic1", "Rodzic2"),
