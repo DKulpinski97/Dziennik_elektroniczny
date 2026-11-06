@@ -302,7 +302,7 @@ namespace Dziennik_szkolny.Controllers
         [Authorize(Roles = NazwyRoli.SuperAdminAdminDyrektor)]
         public async Task<IActionResult> EdytujDaneUzytkownika(EdytujUzytkownikaViewModel edytujUzytkownikaViewModel)
         {
-            
+
             if (edytujUzytkownikaViewModel == null)
             {
 
@@ -323,6 +323,37 @@ namespace Dziennik_szkolny.Controllers
                 edytujUzytkownikaViewModel.DostepneRole = _mapowanieRoli.MapujRoleNaSelectList(await _pobierajRole.PobierzRole(User));
                 edytujUzytkownikaViewModel.WybraneRole = await _pobierajRole.PobierzIdRolUzytkownikaAsync(edytujUzytkownikaViewModel.IdUzytkownika);
                 return View("EdytujUzytkownika", edytujUzytkownikaViewModel);
+            }
+            var obecneRole = await _pobierajRole.PobierzIdRolUzytkownikaAsync(edytujUzytkownikaViewModel.IdUzytkownika);
+
+            var odbieraneRole = obecneRole.Except(edytujUzytkownikaViewModel.WybraneRole).ToList();
+
+            var idRoliRodzica = await _pobierajRole.PobierzIdRoliPoNazwieAsync(NazwyRoli.Rodzic);
+            var idRoliNauczyciela = await _pobierajRole.PobierzIdRoliPoNazwieAsync(NazwyRoli.Nauczyciel);
+
+            if (odbieraneRole.Contains(idRoliRodzica) &&
+                await _pobierajUzytkownika.CzyUzytkownikJestOpiekunemAsync(edytujUzytkownikaViewModel.IdUzytkownika))
+            {
+                TempData["TypWiadomosci"] = "info";
+                TempData["Wiadomosc"] = "Nie można pozbawić roli opiekuna użytkownika, który jest opiekunem ucznia.";
+                return RedirectToAction(nameof(ZarzadzajUzytkownikem));
+            }
+
+            if (odbieraneRole.Contains(idRoliNauczyciela))
+            {
+                if (await _pobierajUzytkownika.CzyUzytkownikProwadziPrzedmiotAsync(edytujUzytkownikaViewModel.IdUzytkownika))
+                {
+                    TempData["TypWiadomosci"] = "info";
+                    TempData["Wiadomosc"] = "Nie można pozbawić roli nauczyciela, który prowadzi przedmiot.";
+                    return RedirectToAction(nameof(ZarzadzajUzytkownikem));
+                }
+
+                if (await _pobierajUzytkownika.CzyUzytkownikJestWychowawcaAsync(edytujUzytkownikaViewModel.IdUzytkownika))
+                {
+                    TempData["TypWiadomosci"] = "info";
+                    TempData["Wiadomosc"] = "Nie można pozbawić roli nauczyciela, który jest wychowawcą klasy.";
+                    return RedirectToAction(nameof(ZarzadzajUzytkownikem));
+                }
             }
             _mapowanieUzytkownika.MapujDostepneRoleDoIStniejacegoVievModel(edytujUzytkownikaViewModel, await _pobierajRole.PobierzRole(User));
             var wynik = await _obslugaUzytkownika.EdytujUzytkownikaAsync(edytujUzytkownikaViewModel, User);
