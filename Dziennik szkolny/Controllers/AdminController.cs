@@ -357,12 +357,19 @@ namespace Dziennik_szkolny.Controllers
                 return RedirectToAction(nameof(ZarzadzajUzytkownikem));
             }
 
-
             var brakDostepu = await CzyMozeZarzadzac(User, idUzytkownika);
             if (brakDostepu != null)
             {
                 return brakDostepu;
             }
+            if ((await _pobierajRole.PobierzRoleUzytkownikaPoIdUzytkownikaAsync(idUzytkownika)).Contains(NazwyRoli.Admin) &&
+                (await _pobierajUzytkownika.PobierzUzytkownikowPoRolachAsync(new List<string> { NazwyRoli.Admin })).Count == 1)
+            {
+                TempData["TypWiadomosci"] = "info";
+                TempData["Wiadomosc"] = "Nie można usunąć ostatniego administratora.";
+                return RedirectToAction(nameof(ZarzadzajUzytkownikem));
+            }
+
             if (await _pobierajUzytkownika.CzyUzytkownikJestOpiekunemAsync(idUzytkownika))
             {
                 TempData["TypWiadomosci"] = "info";
