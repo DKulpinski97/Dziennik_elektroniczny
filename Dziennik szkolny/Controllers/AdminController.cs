@@ -48,7 +48,7 @@ namespace Dziennik_szkolny.Controllers
             if (role == null || !role.Any())
             {
                 TempData["TypWiadomosci"] = "info";
-                TempData["Wiadomosc"] = "Krytyczny błąd: Brak dostępnych ról do zarządzania.Prawdopodonie jest problem z bazą danych.";
+                TempData["Wiadomosc"] = "Krytyczny błąd: Brak dostępnych ról do zarządzania. Prawdopodobnie wystąpił problem z bazą danych.";
                 return RedirectToAction("Index", "Home");
             }
             var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
@@ -68,7 +68,7 @@ namespace Dziennik_szkolny.Controllers
             if (role == null || !role.Any())
             {
                 TempData["TypWiadomosci"] = "info";
-                TempData["Wiadomosc"] = "Krytyczny błąd: Brak dostępnych ról. Prawdopodonie jest problem z bazą danych.";
+                TempData["Wiadomosc"] = "Krytyczny błąd: Brak dostępnych ról do zarządzania. Prawdopodobnie wystąpił problem z bazą danych.";
                 return RedirectToAction(nameof(KontrolerZarzadzajRolami));
             }
             var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
@@ -83,8 +83,8 @@ namespace Dziennik_szkolny.Controllers
         {
             if (string.IsNullOrWhiteSpace(nazwaRoli))
             {
-                TempData["TypWiadomosci"] = "info";
-                TempData["Wiadomosc"] = OgraniczeniaNazwyRoli.KomunikatBledu;
+                ViewData["TypWiadomosci"] = "info";
+                ViewData["Wiadomosc"] = OgraniczeniaNazwyRoli.KomunikatBledu;
 
                 var role = await _pobierajRole.PobierzRole(User);
                 var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
@@ -96,8 +96,8 @@ namespace Dziennik_szkolny.Controllers
 
             if (!wynik.Sukces)
             {
-                TempData["TypWiadomosci"] = "info";
-                TempData["Wiadomosc"] = wynik.Komunikat;
+                ViewData["TypWiadomosci"] = "info";
+                ViewData["Wiadomosc"] = wynik.Komunikat;
 
                 var role = await _pobierajRole.PobierzRole(User);
                 var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
@@ -117,8 +117,8 @@ namespace Dziennik_szkolny.Controllers
         {
             if (string.IsNullOrWhiteSpace(RoleId))
             {
-                TempData["TypWiadomosci"] = "info";
-                TempData["Wiadomosc"] = "Nie wybrano roli.";
+                ViewData["TypWiadomosci"] = "info";
+                ViewData["Wiadomosc"] = "Nie wybrano roli.";
 
                 var role = await _pobierajRole.PobierzRole(User);
                 var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
@@ -127,8 +127,8 @@ namespace Dziennik_szkolny.Controllers
             var Weryfikacja = await _pobierajUprawnieniaRoli.CzyMozeZarzadzacRolaAsync(User, RoleId);
             if (Weryfikacja.CzyMoze == false)
             {
-                TempData["TypWiadomosci"] = "danger";
-                TempData["Wiadomosc"] = Weryfikacja.Komunikat;
+                ViewData["TypWiadomosci"] = "danger";
+                ViewData["Wiadomosc"] = Weryfikacja.Komunikat;
                 var role = await _pobierajRole.PobierzRole(User);
                 var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
                 return View("ZarzadzajRolami", tmp.PozostaleRole);
@@ -137,8 +137,8 @@ namespace Dziennik_szkolny.Controllers
 
             if (!wynik.Sukces)
             {
-                TempData["TypWiadomosci"] = "info";
-                TempData["Wiadomosc"] = wynik.Komunikat;
+                ViewData["TypWiadomosci"] = "info";
+                ViewData["Wiadomosc"] = wynik.Komunikat;
 
                 var role = await _pobierajRole.PobierzRole(User);
                 var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
@@ -159,8 +159,8 @@ namespace Dziennik_szkolny.Controllers
         {
             if (string.IsNullOrWhiteSpace(RoleId))
             {
-                TempData["TypWiadomosci"] = "danger";
-                TempData["Wiadomosc"] = "Należy wybrać rolę do usunięcia.";
+                ViewData["TypWiadomosci"] = "danger";
+                ViewData["Wiadomosc"] = "Należy wybrać rolę do usunięcia.";
 
                 var role = await _pobierajRole.PobierzRole(User);
                 var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
@@ -172,8 +172,8 @@ namespace Dziennik_szkolny.Controllers
 
             if (!wynik.Sukces)
             {
-                TempData["TypWiadomosci"] = "danger";
-                TempData["Wiadomosc"] = wynik.Komunikat;
+                ViewData["TypWiadomosci"] = "danger";
+                ViewData["Wiadomosc"] = wynik.Komunikat;
 
                 var role = await _pobierajRole.PobierzRole(User);
                 var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
@@ -209,8 +209,8 @@ namespace Dziennik_szkolny.Controllers
         {
             if (!ModelState.IsValid)
             {
-                TempData["TypWiadomosci"] = "danger";
-                TempData["Wiadomosc"] = "Przynajmiej jedno pole jest nie uzupełnione lub zawiera wadliwe informacjie";
+                ViewData["TypWiadomosci"] = "danger";
+                ViewData["Wiadomosc"] = "Przynajmniej jedno pole nie zostało uzupełnione lub zawiera nieprawidłowe informacje.";
                 var role = await _pobierajRole.PobierzRole(User);
                 _mapowanieUzytkownika.MapujDostepneRoleDoIStniejacegoVievModel(dodajUzytkownikaViewModel, role);
                 return View("DodajUzytkownika", dodajUzytkownikaViewModel);
@@ -227,8 +227,8 @@ namespace Dziennik_szkolny.Controllers
             }
             else
             {
-                TempData["TypWiadomosci"] = "info";
-                TempData["Wiadomosc"] = wynik.Komunikat;
+                ViewData["TypWiadomosci"] = "info";
+                ViewData["Wiadomosc"] = wynik.Komunikat;
                 var role = await _pobierajRole.PobierzRole(User);
                 _mapowanieUzytkownika.MapujDostepneRoleDoIStniejacegoVievModel(dodajUzytkownikaViewModel, role);
                 return View("DodajUzytkownika", dodajUzytkownikaViewModel);
@@ -318,8 +318,8 @@ namespace Dziennik_szkolny.Controllers
             if (!ModelState.IsValid)
             {
 
-                TempData["TypWiadomosci"] = "danger";
-                TempData["Wiadomosc"] = "Przynajmiej jedno pole jest nie uzupełnione lub zawiera wadliwe informacjie";
+                ViewData["TypWiadomosci"] = "danger";
+                ViewData["Wiadomosc"] = "Przynajmniej jedno pole nie zostało uzupełnione lub zawiera nieprawidłowe informacje.";
                 edytujUzytkownikaViewModel.DostepneRole = _mapowanieRoli.MapujRoleNaSelectList(await _pobierajRole.PobierzRole(User));
                 edytujUzytkownikaViewModel.WybraneRole = await _pobierajRole.PobierzIdRolUzytkownikaAsync(edytujUzytkownikaViewModel.IdUzytkownika);
                 return View("EdytujUzytkownika", edytujUzytkownikaViewModel);
@@ -327,15 +327,18 @@ namespace Dziennik_szkolny.Controllers
             _mapowanieUzytkownika.MapujDostepneRoleDoIStniejacegoVievModel(edytujUzytkownikaViewModel, await _pobierajRole.PobierzRole(User));
             var wynik = await _obslugaUzytkownika.EdytujUzytkownikaAsync(edytujUzytkownikaViewModel, User);
 
-            TempData["TypWiadomosci"] = wynik.CzyUdane ? "success" : "danger";
-            TempData["Wiadomosc"] = wynik.Komunikat;
-
             if (wynik.CzyUdane)
             {
+                TempData["TypWiadomosci"] = "success";
+                TempData["Wiadomosc"] = wynik.Komunikat;
                 return RedirectToAction(nameof(ZarzadzajUzytkownikem));
             }
-
-            return View("EdytujUzytkownika", edytujUzytkownikaViewModel);
+            else
+            {
+                ViewData["TypWiadomosci"] = "info";
+                ViewData["Wiadomosc"] = wynik.Komunikat;
+                return View("EdytujUzytkownika", edytujUzytkownikaViewModel);
+            }
         }
 
         /*=================Usuwanie użytkownika==================*/

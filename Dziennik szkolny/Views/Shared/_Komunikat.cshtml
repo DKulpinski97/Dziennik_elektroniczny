@@ -1,6 +1,13 @@
-﻿@if (TempData["Wiadomosc"] != null)
+﻿@if (ViewData["Wiadomosc"] != null)
+{
+    <div class="alert alert-@ViewData["TypWiadomosci"]">
+        @ViewData["Wiadomosc"]
+    </div>
+}
+else if (TempData["Wiadomosc"] != null)
 {
     <div class="alert alert-@TempData["TypWiadomosci"]">
         @TempData["Wiadomosc"]
     </div>
 }
+
