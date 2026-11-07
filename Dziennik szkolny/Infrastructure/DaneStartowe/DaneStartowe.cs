@@ -25,7 +25,6 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
         NazwyRoli.SuperAdmin,
         NazwyRoli.Nauczyciel,
         NazwyRoli.Uczen,
-        NazwyRoli.BrakRoli,
         NazwyRoli.Dyrektor,
         NazwyRoli.ViceDyrektor,
         NazwyRoli.Sekretarka,
