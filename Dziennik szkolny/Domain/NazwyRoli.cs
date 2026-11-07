@@ -19,6 +19,6 @@ namespace Dziennik_szkolny.Domain
         public const string Uczen = "Uczen";
         // Gotowe kombinacje ról do użycia w [Authorize(Roles = "...")],
         // które wymaga stałej znanej w czasie kompilacji.
-        public const string SuperAdminAdminDyrektor = SuperAdmin + "," + Admin + "," + Dyrektor;
+        public const string RolePanelAdministracyjnego = SuperAdmin + "," + Admin + "," + Dyrektor + "," + ViceDyrektor;
     }
 }

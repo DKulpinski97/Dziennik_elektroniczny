@@ -193,7 +193,7 @@ namespace Dziennik_szkolny.Controllers
 
 
         [HttpGet]
-        [Authorize(Roles = NazwyRoli.SuperAdminAdminDyrektor)]
+        [Authorize(Roles = NazwyRoli.RolePanelAdministracyjnego)]
         public async Task<IActionResult> DodajUzytkownika()
         {
             var role = await _pobierajRole.PobierzRole(User);
@@ -205,7 +205,7 @@ namespace Dziennik_szkolny.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = NazwyRoli.SuperAdminAdminDyrektor)]
+        [Authorize(Roles = NazwyRoli.RolePanelAdministracyjnego)]
         public async Task<IActionResult> DodajUzytkownika(DodajUzytkownikaViewModel dodajUzytkownikaViewModel)
         {
             if (!ModelState.IsValid)
@@ -241,7 +241,7 @@ namespace Dziennik_szkolny.Controllers
 
 
         [HttpGet]
-        [Authorize(Roles = NazwyRoli.SuperAdminAdminDyrektor)]
+        [Authorize(Roles = NazwyRoli.RolePanelAdministracyjnego)]
         public async Task<IActionResult> ZarzadzajUzytkownikem()
         {
             var wynik = await _obslugaUzytkownika.PodzielUzytkownikowNaRodzicowIPracownikowAsync(User);
@@ -259,7 +259,7 @@ namespace Dziennik_szkolny.Controllers
 
 
         [HttpGet]
-        [Authorize(Roles = NazwyRoli.SuperAdminAdminDyrektor)]
+        [Authorize(Roles = NazwyRoli.RolePanelAdministracyjnego)]
         public async Task<IActionResult> PrzygotujUzytkownikaDoEdycji(string idUzytkownika)
         {
             if (string.IsNullOrEmpty(idUzytkownika))
@@ -300,7 +300,7 @@ namespace Dziennik_szkolny.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = NazwyRoli.SuperAdminAdminDyrektor)]
+        [Authorize(Roles = NazwyRoli.RolePanelAdministracyjnego)]
         public async Task<IActionResult> EdytujDaneUzytkownika(EdytujUzytkownikaViewModel edytujUzytkownikaViewModel)
         {
 
@@ -382,7 +382,7 @@ namespace Dziennik_szkolny.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = NazwyRoli.SuperAdminAdminDyrektor)]
+        [Authorize(Roles = NazwyRoli.RolePanelAdministracyjnego)]
         public async Task<IActionResult> UsunUzytkownika(string idUzytkownika)
         {
             if (string.IsNullOrEmpty(idUzytkownika))

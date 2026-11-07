@@ -63,10 +63,13 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
         [NazwyRoli.Admin],
         [NazwyRoli.SuperAdmin],
         [NazwyRoli.Dyrektor],
+        [NazwyRoli.ViceDyrektor],
         [NazwyRoli.Sekretarka],
+
         [NazwyRoli.Nauczyciel, NazwyRoli.Rodzic],
         [NazwyRoli.Nauczyciel],
         [NazwyRoli.Nauczyciel],
+
         [NazwyRoli.Rodzic],
         [NazwyRoli.Rodzic],
         [NazwyRoli.Rodzic]
@@ -77,6 +80,7 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
              ("Admin", "Admin@gmail.com", HasloDemonstracyjne),
             ("SuperAdmin", "SuperAdmin@gmail.com", HasloDemonstracyjne),
             ("Dyrektor", "Dyrektor@gmail.com", HasloDemonstracyjne),
+            ("ViceDyrektor", "ViceDyrektor@gmail.com", HasloDemonstracyjne),
             ("Sekretarka", "Sekretarka@gmail.com", HasloDemonstracyjne),
 
             ("Nauczyciel1", "Nauczyciel1@gmail.com", HasloDemonstracyjne),
@@ -96,6 +100,7 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
              ("Admin", "Admin@gmail.com", "AdminImie", "AdminNaz", "85010112345", "500100100", "Warszawa", "Marszałkowska", "11"),
             ("SuperAdmin", "SuperAdmin@gmail.com", "SuperAdminImie", "SuperAdminNaz", "92031512342", "500100100", "Warszawa", "Marszałkowska", "11"),
             ("Dyrektor", "Dyrektor@gmail.com", "DyrektorImie", "DyrektorNaz", "82020223452", "500200200", "Warszawa", "Puławska", "14"),
+            ("ViceDyrektor", "ViceDyrektor@gmail.com", "ViceDyrektorImie", "ViceDyrektorNaz", "78062859454", "600200200", "Warszawa", "Puławska", "21"),
             ("Sekretarka", "Sekretarka@gmail.com", "SekretarkaImie", "SekretarkaNaz", "90030334565", "500300300", "Warszawa", "Grochowska", "24"),
 
             ("Nauczyciel1", "Nauczyciel1@gmail.com", "Nauczyciel1Imie", "Nauczyciel1Naz", "88040445670", "500400400", "Warszawa", "Górczewska", "1"),

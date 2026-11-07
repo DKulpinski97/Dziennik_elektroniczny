@@ -7,7 +7,7 @@
     </div>
     <div class="row g-4" style="min-height: 75vh;">
         
-        @if (new[] { NazwyRoli.SuperAdmin, NazwyRoli.Admin, NazwyRoli.Dyrektor}.Any(User.IsInRole))
+        @if (new[] { NazwyRoli.SuperAdmin, NazwyRoli.Admin, NazwyRoli.Dyrektor, NazwyRoli.ViceDyrektor }.Any(User.IsInRole))
         {
             <div class="col d-flex">
                 <div class="border rounded p-4 w-100">
@@ -17,11 +17,7 @@
                     {
                         @Html.ActionLink("Zarządzaj rolami", "KontrolerZarzadzajRolami", "Admin", null, new { @class = "btn btn-primary w-100 mb-3" })
                     }
-
-                    @if (new[] { NazwyRoli.SuperAdmin, NazwyRoli.Admin, NazwyRoli.Dyrektor }.Any(User.IsInRole))
-                    {
                         @Html.ActionLink("Zarządzaj użytkownikami", "ZarzadzajUzytkownikem", "Admin", null, new { @class = "btn btn-primary w-100 mb-3" })
-                    }
                 </div>
             </div>
         }
@@ -34,7 +30,7 @@
                 </div>
             </div>
         }
-        @if (User.IsInRole(NazwyRoli.Nauczyciel) || User.IsInRole(NazwyRoli.Dyrektor))
+        @if (User.IsInRole(NazwyRoli.Nauczyciel) || User.IsInRole(NazwyRoli.Dyrektor) || User.IsInRole(NazwyRoli.ViceDyrektor))
         {
             <div class="col d-flex">
                 <div class="border rounded p-4 w-100">
