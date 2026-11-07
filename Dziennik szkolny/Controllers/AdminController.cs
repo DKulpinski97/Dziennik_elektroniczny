@@ -3,6 +3,7 @@ using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
 using Dziennik_szkolny.Application.Mapery;
 using Dziennik_szkolny.Domain;
 using Dziennik_szkolny.Domain.Entities;
+using Dziennik_szkolny.Domain.reguly;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Dziennik_szkolny.ViewModel.Rola;
 using Dziennik_szkolny.ViewModel.Uzytkownik;
@@ -330,32 +331,32 @@ namespace Dziennik_szkolny.Controllers
 
             var idRoliRodzica = await _pobierajRole.PobierzIdRoliPoNazwieAsync(NazwyRoli.Rodzic);
             var idRoliNauczyciela = await _pobierajRole.PobierzIdRoliPoNazwieAsync(NazwyRoli.Nauczyciel);
+            _mapowanieUzytkownika.MapujDostepneRoleDoIStniejacegoVievModel(edytujUzytkownikaViewModel, await _pobierajRole.PobierzRole(User));
 
             if (odbieraneRole.Contains(idRoliRodzica) &&
                 await _pobierajUzytkownika.CzyUzytkownikJestOpiekunemAsync(edytujUzytkownikaViewModel.IdUzytkownika))
             {
-                TempData["TypWiadomosci"] = "info";
-                TempData["Wiadomosc"] = "Nie można pozbawić roli opiekuna użytkownika, który jest opiekunem ucznia.";
-                return RedirectToAction(nameof(ZarzadzajUzytkownikem));
+                ViewData["TypWiadomosci"] = "info";
+                ViewData["Wiadomosc"] = "Nie można pozbawić roli opiekuna użytkownika, który jest opiekunem ucznia.";
+                return View("EdytujUzytkownika", edytujUzytkownikaViewModel);
             }
 
             if (odbieraneRole.Contains(idRoliNauczyciela))
             {
                 if (await _pobierajUzytkownika.CzyUzytkownikProwadziPrzedmiotAsync(edytujUzytkownikaViewModel.IdUzytkownika))
                 {
-                    TempData["TypWiadomosci"] = "info";
-                    TempData["Wiadomosc"] = "Nie można pozbawić roli nauczyciela, który prowadzi przedmiot.";
-                    return RedirectToAction(nameof(ZarzadzajUzytkownikem));
+                    ViewData["TypWiadomosci"] = "info";
+                    ViewData["Wiadomosc"] = "Nie można pozbawić roli nauczyciela, który prowadzi przedmiot.";
+                    return View("EdytujUzytkownika", edytujUzytkownikaViewModel);
                 }
 
                 if (await _pobierajUzytkownika.CzyUzytkownikJestWychowawcaAsync(edytujUzytkownikaViewModel.IdUzytkownika))
                 {
-                    TempData["TypWiadomosci"] = "info";
-                    TempData["Wiadomosc"] = "Nie można pozbawić roli nauczyciela, który jest wychowawcą klasy.";
-                    return RedirectToAction(nameof(ZarzadzajUzytkownikem));
+                    ViewData["TypWiadomosci"] = "info";
+                    ViewData["Wiadomosc"] = "Nie można pozbawić roli nauczyciela, który jest wychowawcą klasy.";
+                    return View("EdytujUzytkownika", edytujUzytkownikaViewModel);
                 }
             }
-            _mapowanieUzytkownika.MapujDostepneRoleDoIStniejacegoVievModel(edytujUzytkownikaViewModel, await _pobierajRole.PobierzRole(User));
             var wynik = await _obslugaUzytkownika.EdytujUzytkownikaAsync(edytujUzytkownikaViewModel, User);
 
             if (wynik.CzyUdane)
@@ -368,6 +369,10 @@ namespace Dziennik_szkolny.Controllers
             {
                 ViewData["TypWiadomosci"] = "info";
                 ViewData["Wiadomosc"] = wynik.Komunikat;
+                if (wynik.Komunikat == OgraniczeniaHasla.KomunikatBledu)
+                {
+                    ModelState.AddModelError(nameof(edytujUzytkownikaViewModel.Haslo), "Nieprawidłowe hasło");
+                }
                 return View("EdytujUzytkownika", edytujUzytkownikaViewModel);
             }
         }
@@ -452,6 +457,5 @@ namespace Dziennik_szkolny.Controllers
             }
             return null;
         }
-
     }
 }

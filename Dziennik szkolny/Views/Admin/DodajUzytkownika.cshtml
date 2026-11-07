@@ -20,7 +20,7 @@
                     <div class="mb-3">
                         @Html.LabelFor(x => x.Haslo, new { @class = "form-label" })
                         @Html.PasswordFor(x => x.Haslo, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(x => x.Haslo, "", new { @class = "text-danger" })
+                        @Html.ValidationMessageFor(x => x.Haslo, "", new { @class = "text-danger d-block"})
                         <small class="text-muted">@OgraniczeniaHasla.RegulyHasla</small>
                     </div>
                    
