@@ -7,6 +7,7 @@ namespace Dziennik_szkolny.Application.Interfejsy.Uzytkownik
 {
     public interface IPobierajUzytkownika
     {
+        Task<bool> CzyIstniejaUzytkownicyAsync();
         Task<LoginUzytkownika> PobierzUzytkownikaPoLoginieAsync(string login);
         Task<List<LoginUzytkownika>> PobierzWszystkichUzytkownikow();
         Task<List<InformacjeUzytkownik>> PobierzUzytkownikowImieINazwiskoIIDPoLiscieID(List<string> idUzytkownikow);

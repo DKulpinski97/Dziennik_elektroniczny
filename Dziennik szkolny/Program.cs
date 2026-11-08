@@ -68,7 +68,6 @@ builder.Services.AddScoped<DodajUczniowStartowych>();
 builder.Services.AddScoped<DodajPrzedmiotyStartowe>();
 builder.Services.AddScoped<DodajPrzypisaniePrzedmioty>();
 builder.Services.AddScoped<DodajWpisPlanu>();
-builder.Services.AddScoped<DodajDaneStartowe>();
 
 //zażądzanie użytkownikami
 builder.Services.AddScoped<IZarzadzajRolami, ZarzadzajRolamiService>();
@@ -106,10 +105,13 @@ using (var scope = app.Services.CreateScope())
 {
     try
     {
-        var seeder = scope.ServiceProvider
-            .GetRequiredService<IDodajDaneStartowe>();
+        var seeder = scope.ServiceProvider.GetRequiredService<IDodajDaneStartowe>();
+        var serwis = scope.ServiceProvider.GetRequiredService<IPobierajUzytkownika>();
 
-        await seeder.DodajDaneStartoweAsync();
+        if(!await serwis.CzyIstniejaUzytkownicyAsync())
+        {
+            await seeder.DodajDaneStartoweAsync();
+        }
     }
     catch (Exception ex)
     {

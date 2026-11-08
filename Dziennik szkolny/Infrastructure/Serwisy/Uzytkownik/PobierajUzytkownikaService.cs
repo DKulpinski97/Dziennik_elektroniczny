@@ -16,7 +16,10 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
             _userManager = userManager;
             _dbContext = dbContext;
         }
-
+        public async Task<bool> CzyIstniejaUzytkownicyAsync()
+        {
+            return await _userManager.Users.AnyAsync();
+        }
         public async Task<LoginUzytkownika> PobierzUzytkownikaPoLoginieAsync(string login)
         {
             return await _userManager.FindByNameAsync(login);

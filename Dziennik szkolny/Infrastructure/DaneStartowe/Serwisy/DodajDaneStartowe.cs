@@ -1,4 +1,6 @@
-﻿using Dziennik_szkolny.Application.Interfejsy.DaneStartowe;
+﻿using Dziennik_szkolny.Application.Interfejsy;
+using Dziennik_szkolny.Application.Interfejsy.DaneStartowe;
+using Dziennik_szkolny.Infrastructure.Serwisy;
 
 namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
 {
@@ -14,6 +16,7 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
         private readonly DodajPrzedmiotyStartowe _dodajPrzedmiotyStartowe;
         private readonly DodajPrzypisaniePrzedmioty _dodajPrzypisaniePrzedmiot;
         private readonly DodajWpisPlanu _dodajWpisPlanu;
+        private readonly IJednostkaPracy _jednostkaPracy;
 
         public DodajDaneStartowe(
             DodajRoleStartowe dodajRoleStartowe,
@@ -25,7 +28,8 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
             DodajUczniowStartowych dodajUczniowStartowych,
             DodajPrzedmiotyStartowe dodajPrzedmiotyStartowe,
             DodajPrzypisaniePrzedmioty dodajPrzypisaniePrzedmiot,
-            DodajWpisPlanu dodajWpisPlanu)
+            DodajWpisPlanu dodajWpisPlanu,
+            IJednostkaPracy jednostkaPracy)
         {
             _dodajRoleStartowe = dodajRoleStartowe;
             _dodajLoginyStartowe = dodajLoginyStartowe;
@@ -37,10 +41,12 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
             _dodajPrzedmiotyStartowe = dodajPrzedmiotyStartowe;
             _dodajPrzypisaniePrzedmiot = dodajPrzypisaniePrzedmiot;
             _dodajWpisPlanu = dodajWpisPlanu;
+            _jednostkaPracy = jednostkaPracy;
         }
 
         public async Task DodajDaneStartoweAsync()
         {
+            await _jednostkaPracy.RozpocznijTransakcjeAsync();
             try
             {
                 await _dodajRoleStartowe.DodajRoleStartoweAsync();
@@ -54,7 +60,6 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
 
                 await _przypiszUprawnieniaZarzadzaniaRoli.DodajUprawnieniaZarzadzaniaRoliAsync();
 
-
                 await _dodajKlasyStartowe.PrześlijDaneNaBaze(tlumaczeniaLoginyNaIdUrzytkownika);
 
                 var tlumaczeniaKlasyNaIdKlasy = await _dodajUczniowStartowych.PobierzIPrzygotujSlownikTlumaczenAsync();
@@ -66,12 +71,12 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe.Serwisy
                 await _dodajPrzypisaniePrzedmiot.PrześlijDaneNaBaze(tlumaczeniaLoginyNaIdUrzytkownika, tlumaczeniaPrzedmiotNaIdPrzedmiotu);
 
                 await _dodajWpisPlanu.PrześlijDaneNaBaze(tlumaczeniaLoginyNaIdUrzytkownika, tlumaczeniaKlasyNaIdKlasy, tlumaczeniaPrzedmiotNaIdPrzedmiotu);
+                await _jednostkaPracy.ZatwierdzAsync();
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException(
-                    $"Wystąpił błąd podczas dodawania danych startowych: {ex.Message}",
-                    ex);
+                await _jednostkaPracy.CofnijAsync();
+                throw new InvalidOperationException($"Wystąpił błąd podczas dodawania danych startowych: {ex.Message}",ex);
             }
         }
     }
