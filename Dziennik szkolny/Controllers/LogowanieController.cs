@@ -55,10 +55,16 @@ namespace Dziennik_szkolny.Controllers
             if (result.IsLockedOut)
             {
                 var doKiedyBlokada = await _weryfikacjaDanychLogowania.PobranieDoKiedyBlokadaAsync(Login.LoginUzytkownika);
+                if (doKiedyBlokada != null)
+                {
+                    var czasPolski = TimeZoneInfo.ConvertTime((DateTimeOffset)doKiedyBlokada, TimeZoneInfo.FindSystemTimeZoneById("Europe/Warsaw"));
 
-                var czasPolski = TimeZoneInfo.ConvertTime(doKiedyBlokada,TimeZoneInfo.FindSystemTimeZoneById("Europe/Warsaw"));
-
-                ModelState.AddModelError("", $"Blokada konta do {czasPolski:yyyy-MM-dd HH:mm:ss}");
+                    ModelState.AddModelError("", $"Blokada konta do {czasPolski:yyyy-MM-dd HH:mm:ss}");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Twoje konto jest zablokowane.");
+                }
             }
             else
             {

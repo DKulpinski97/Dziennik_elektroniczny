@@ -45,11 +45,15 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
             return await _userManager.Users.AnyAsync(x => x.Email == email && x.Id != idUzytkownika);
         }
 
-        public async Task<DateTimeOffset> PobranieDoKiedyBlokadaAsync(string login)
+        public async Task<DateTimeOffset?> PobranieDoKiedyBlokadaAsync(string login)
         {
             var user = await _userManager.FindByNameAsync(login);
+            if(user == null)
+            {
+                return null;
+            }
             var lockoutEnd = await _userManager.GetLockoutEndDateAsync(user);
-            return lockoutEnd.Value;    
+            return lockoutEnd;    
         }
     }
 }

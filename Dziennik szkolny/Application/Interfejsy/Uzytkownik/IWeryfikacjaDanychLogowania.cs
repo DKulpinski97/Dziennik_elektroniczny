@@ -9,6 +9,6 @@
         Task<bool> CzyIstniejeInnyLoginAsync(string login, string idUzytkownika);
 
         Task<bool> CzyIstniejeInnyEmailAsync(string email, string idUzytkownika);
-        Task<DateTimeOffset> PobranieDoKiedyBlokadaAsync(string login);
+        Task<DateTimeOffset?> PobranieDoKiedyBlokadaAsync(string login);
     }
 }
