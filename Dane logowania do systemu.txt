@@ -25,6 +25,11 @@ Login:      Dyrektor
 E-mail:     Dyrektor@gmail.com
 Hasło:      qweQWE123!@#
 
+[ VICE DYREKTOR ]
+Login:      ViceDyrektor
+E-mail:     ViceDyrektor@gmail.com
+Hasło:      qweQWE123!@#
+
 [ SEKRETARKA ]
 Login:      Sekretarka
 E-mail:     Sekretarka@gmail.com
@@ -78,5 +83,5 @@ Hasło:      qweQWE123!@#
 Powyższe dane są danymi demonstracyjnymi przeznaczonymi
 wyłącznie do projektu pokazowego.
 
-Wszystkie konta korzystają z jednego hasła demonstracyjne: qweQWE123!@#
+Wszystkie konta korzystają z jednego hasła demonstracyjnego: qweQWE123!@#
 ============================================================

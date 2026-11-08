@@ -21,12 +21,12 @@ System zarządzania użytkownikami i rolami w środowisku szkolnym z wielopoziom
 1. Sklonuj repozytorium.
 2. W `Dziennik szkolny/appsettings.json` ustaw `ConnectionStrings:DefaultConnection`. Wartość domyślna wskazuje lokalny serwer (`server=localhost;port=3306;database=dziennik;user=root;password=`) i jest przeznaczona wyłącznie do środowiska deweloperskiego.
 3. Utwórz schemat bazy z migracji: `dotnet ef database update --project "Dziennik szkolny"`.
-4. Uruchom aplikację: `dotnet run --project "Dziennik szkolny"`. Przy starcie aplikacja zasila bazę danymi startowymi (istniejące rekordy są pomijane).
+4. Uruchom aplikację: `dotnet run --project "Dziennik szkolny"`. Przy pierwszym starcie na pustej bazie aplikacja zasila ją danymi startowymi; przy kolejnych startach dane startowe nie są ponownie dodawane.
 5. Zaloguj się jednym z kont demonstracyjnych (niżej).
 
 ## Konta demonstracyjne
 
-Konta tworzone przez seed: `SuperAdmin`, `Admin`, `Dyrektor`, `Sekretarka`, `Nauczyciel1`, `Nauczyciel2`, `Nauczyciel3`, `Rodzic1`, `Rodzic2`, `Rodzic3`. Wszystkie mają to samo hasło demonstracyjne (stała w `DaneStartowe.cs`, spełnia reguły siły hasła); aktualne dane są w pliku `Dane logowania do systemu.txt`. To konta wyłącznie pokazowe; w prawdziwym systemie konta administracyjne powinny być imienne (zob. niżej).
+Konta tworzone przez seed: `SuperAdmin`, `Admin`, `Dyrektor`, `ViceDyrektor`, `Sekretarka`, `Nauczyciel1`, `Nauczyciel2`, `Nauczyciel3`, `Rodzic1`, `Rodzic2`, `Rodzic3`. Wszystkie mają to samo hasło demonstracyjne (stała w `DaneStartowe.cs`, spełnia reguły siły hasła); aktualne dane są w pliku `Dane logowania do systemu.txt`. To konta wyłącznie pokazowe; w prawdziwym systemie konta administracyjne powinny być imienne (zob. niżej).
 
 Konto `Nauczyciel1` ma role Nauczyciel i Rodzic, jest wychowawcą klas A i B, prowadzi polski i matematykę oraz jest opiekunem ucznia, więc na tym koncie widać wszystkie blokady zmiany ról i usuwania.
 
@@ -34,7 +34,7 @@ Konto `Nauczyciel1` ma role Nauczyciel i Rodzic, jest wychowawcą klas A i B, pr
 
 - Logowanie z przekierowaniem do strony, o którą użytkownik pierwotnie prosił (`ReturnUrl`, tylko adresy lokalne).
 - Blokada konta po 5 nieudanych próbach na 5 minut; komunikat podaje godzinę końca blokady w czasie polskim.
-- Panel administracyjny: dodawanie, edycja i usuwanie użytkowników oraz dodawanie, zmiana nazwy i usuwanie ról.
+- Panel administracyjny: dodawanie, edycja i usuwanie użytkowników oraz dodawanie, zmiana nazwy i usuwanie ról. Panel użytkowników jest dostępny dla SuperAdmina, Admina, Dyrektora i ViceDyrektora, a zarządzanie rolami tylko dla Admina.
 - Hierarchiczny model uprawnień: użytkownik widzi i zarządza tylko osobami, których role są mu podporządkowane w hierarchii (widoczność: co najmniej jedna rola podległa, zarządzanie: wszystkie role podległe).
 - Walidacja danych użytkownika: m.in. suma kontrolna numeru PESEL, telefon, unikalność loginu, e-maila i numeru PESEL.
 - Reguły haseł: co najmniej 8 znaków, cyfra, mała i wielka litera oraz znak specjalny. Reguły są zapisane w jednym miejscu (`Domain/reguly/OgraniczeniaHasla.cs`) i używane przez konfigurację Identity, walidację i widoki.
@@ -63,11 +63,11 @@ Celem było praktyczne zastosowanie zasad bezpiecznego dostępu do danych (broke
 
 ## Architektura
 
-Podział na warstwy (Domain, Application, Infrastructure) inspirowany Clean Architecture, z rozdzieleniem logiki biznesowej od kontrolerów oraz wzorcem Unit of Work do zarządzania transakcjami. Niektóre uproszczenia zastosowano świadomie, aby projekt pozostał czytelny jako materiał demonstracyjny.
+Podział na warstwy (Domain, Application, Infrastructure) inspirowany Clean Architecture, z rozdzieleniem logiki biznesowej od kontrolerów oraz wzorcem Unit of Work do zarządzania transakcjami. Niektóre uproszczenia zastosowano świadomie, aby projekt pozostał czytelny jako materiał demonstracyjny. Największe z nich: ASP.NET Core Identity (`LoginUzytkownika`) jest używane bezpośrednio w Domain i Application zamiast własnego modelu użytkownika mapowanego w Infrastructure, więc zależności nie są w pełni odwrócone; w jednym projekcie, z Identity jako podstawą logowania, uznałem to za rozsądny kompromis.
 
 ## Dane startowe
 
-Przy starcie aplikacja zasila bazę rolami systemowymi, hierarchią uprawnień, kontami demonstracyjnymi, klasami, uczniami, przedmiotami i planem zajęć. Istniejące rekordy są pomijane, więc ponowne uruchomienie nie duplikuje danych.
+Przy starcie aplikacja sprawdza, czy w bazie są użytkownicy. Jeśli ich nie ma, w jednej transakcji zasila bazę rolami systemowymi, hierarchią uprawnień, kontami demonstracyjnymi, klasami, uczniami, przedmiotami i planem zajęć; błąd w trakcie cofa całość, więc kolejny start spróbuje ponownie. Jeśli użytkownicy już istnieją, dane startowe nie są dodawane, więc zmiany wprowadzone w panelu (usunięte konta, zmienione role) nie są cofane przy restarcie. Skutek: nowe dane startowe dodane w kodzie trafiają tylko do świeżej bazy (`dotnet ef database drop`, potem `update`).
 
 ## Hierarchia ról
 
@@ -92,10 +92,11 @@ Testy jednostkowe (xUnit, Moq) obejmują walidację danych użytkownika (w tym s
 
 - Reguły ochrony powiązań użytkownika (opiekun, przedmiot, wychowawca) oraz reguła ostatniego administratora są zapisane w kontrolerze i nie mają testów jednostkowych.
 - Brak edycji własnego hasła i podglądu własnych danych (planowane).
+- Rola Sekretarka nie ma jeszcze dostępu do panelu użytkowników; jej panel (zarządzanie Uczniem i Rodzicem) jest planowany, na stronie głównej widzi na razie pusty panel.
 - Logowanie błędów (`ILogger`) jest tylko w obsłudze użytkownika; brak logów działań administratorów i odmów.
 - Brak testów dla reguł widoczności i zarządzania (Any/All) oraz dla usuwania ról powiązanych z hierarchią.
 - Panel nie pozwala tworzyć relacji hierarchii między rolami; powstają one tylko z danych startowych.
-- Dane startowe są uruchamiane przy każdym starcie, w każdym środowisku.
+- Dane startowe, w tym konta demonstracyjne ze wspólnym hasłem, są dodawane do każdej pustej bazy, w każdym środowisku (także produkcyjnym); aktualizacja bazy po zmianie danych startowych wymaga jej odtworzenia.
 
 ## Planowane dalsze prace
 
@@ -107,9 +108,55 @@ Testy jednostkowe (xUnit, Moq) obejmują walidację danych użytkownika (w tym s
 
 **Funkcjonalne:**
 - edycja własnego hasła i podgląd własnych danych
+- panel Sekretarki: zarządzanie Uczniem i Rodzicem
 - dodanie ucznia, klas i łączenie nauczycieli z klasami
 - plan zajęć
 
 ## Zrzuty ekranu
 
-*(do dodania)*
+Wszystkie zrzuty pochodzą z danych demonstracyjnych.
+
+### Logowanie i strony główne według ról
+
+![Ekran logowania](docs/zrzuty/ekran-logowania.png)
+*Ekran logowania.*
+
+![Strona główna Admina](docs/zrzuty/index-admin.png)
+*Strona główna Admina: panel administratora z zarządzaniem rolami i użytkownikami.*
+
+![Strona główna Dyrektora](docs/zrzuty/index-dyrektor-vice-dyrektor.png)
+*Strona główna Dyrektora (identycznie ViceDyrektora): zarządzanie użytkownikami bez zarządzania rolami.*
+
+![Strona główna użytkownika z rolami Nauczyciel i Rodzic](docs/zrzuty/index-nauczyciel-rodzic.png)
+*Użytkownik z dwiema rolami widzi panele obu.*
+
+![Strona główna Nauczyciela](docs/zrzuty/index-nauczyciel.png)
+*Strona główna Nauczyciela.*
+
+![Strona główna Rodzica](docs/zrzuty/index-rodzic.png)
+*Strona główna Rodzica.*
+
+### Zarządzanie rolami (Admin)
+
+![Menu ról](docs/zrzuty/menu-roli.png)
+*Lista ról systemowych i pozostałych.*
+
+![Zarządzanie rolami](docs/zrzuty/menu-zarzadzania-rolami.png)
+*Dodawanie, zmiana nazwy i usuwanie ról spoza systemowych, z podpowiedzią reguł nazw.*
+
+### Zarządzanie użytkownikami
+
+![Lista użytkowników widziana przez Admina](docs/zrzuty/menu-zarzadzania-uzytkownikem-admin.png)
+*Widok Admina: wśród pracowników widoczni są także Dyrektor i ViceDyrektor.*
+
+![Lista użytkowników widziana przez Dyrektora](docs/zrzuty/menu-zarzadzania-uzytkownikem-dyrektor.png)
+*Widok Dyrektora: tylko role mu podległe, bez Dyrektora, ViceDyrektora i Admina.*
+
+![Dodawanie użytkownika](docs/zrzuty/dodawanie-uzytkownika.png)
+*Dodawanie użytkownika; lista ról zawiera tylko role, którymi zalogowany użytkownik może zarządzać.*
+
+![Edycja użytkownika](docs/zrzuty/edycja-uzytkownika.png)
+*Edycja użytkownika z opcjonalną zmianą hasła i zaznaczonymi rolami.*
+
+![Blokada zmiany roli](docs/zrzuty/przykladowy-blad-edycji-uzytkownika.png)
+*Ochrona powiązań: nie można odebrać roli Rodzic opiekunowi ucznia. Formularz zostaje na ekranie, a zaznaczenie ról jest zachowane.*
