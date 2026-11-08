@@ -1,30 +1,58 @@
-﻿using Dziennik_szkolny.Application.Interfejsy.Role;
+﻿using Dziennik_szkolny.Application.Interfejsy;
+using Dziennik_szkolny.Application.Interfejsy.Role;
+using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
+using Dziennik_szkolny.Application.ObiektyTransferuDanych;
+using Dziennik_szkolny.Domain;
+using Dziennik_szkolny.Domain.Entities;
+using Dziennik_szkolny.ViewModel;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
 {
     public class ZarzadzajRolamiService : IZarzadzajRolami
     {
         private readonly IPobierajUprawnieniaRoli _pobierajUprawnieniaRoli;
         private readonly RoleManager<IdentityRole> _roleManager;
+        readonly private AppDbContext _context;
         private readonly Dziennik_szkolny.Infrastructure.DaneStartowe.DaneStartowe _daneStartowe;
-        public ZarzadzajRolamiService(RoleManager<IdentityRole> roleManager, Dziennik_szkolny.Infrastructure.DaneStartowe.DaneStartowe daneStartowe, IPobierajUprawnieniaRoli pobierajUprawnieniaRoli)
+        private readonly IJednostkaPracy _jednostkaPracy;
+        private readonly IPobierajRole _pobirajRole;
+        private readonly IPobierajUzytkownika _pobierajUzytkownika;
+        public ZarzadzajRolamiService(RoleManager<IdentityRole> roleManager, Dziennik_szkolny.Infrastructure.DaneStartowe.DaneStartowe daneStartowe,
+            IPobierajUprawnieniaRoli pobierajUprawnieniaRoli, AppDbContext dbContext, IJednostkaPracy jednostkaPracy, IPobierajRole pobirajRole, IPobierajUzytkownika pobierajUzytkownika)
         {
             _roleManager = roleManager;
             _daneStartowe = daneStartowe;
             _pobierajUprawnieniaRoli = pobierajUprawnieniaRoli;
+            _context = dbContext;
+            _jednostkaPracy = jednostkaPracy;
+            _pobirajRole = pobirajRole;
+            _pobierajUzytkownika = pobierajUzytkownika;
         }
 
 
 
         public async Task<(bool Sukces, string Komunikat)> ZmienNazweRoli(string roleId, string nowaNazwa, string staraNazwa)
         {
+            nowaNazwa = SprawdzDlugoscIPrzygotujNapis(nowaNazwa);
+            if (nowaNazwa == null)
+            {
+                return (false, OgraniczeniaNazwyRoli.KomunikatBledu);
+            }
+            if (nowaNazwa == staraNazwa)
+            {
+                return (false, "Nowa nazwa nie może być taka sama jak stara.");
+            }
             var rola = await _roleManager.FindByIdAsync(roleId);
-
             if (rola == null)
             {
                 return (false, "Rola nie została znaleziona.");
             }
-
+            if (await _pobirajRole.CzyIstniejeRolaOTakiejNazwieAsync(nowaNazwa))
+            {
+                return (false, "Rola o takiej nazwie już istnieje.");
+            }
             if (_daneStartowe.Role.Contains(rola.Name))
             {
                 return (false, "Nie można zmienić nazwy roli, która jest systemowa.");
@@ -44,29 +72,78 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
         }
 
 
-        public async Task<bool> DodajRole(string nazwaRoli)
+        public async Task<(bool Sukces, string Komunikat)> DodajRole(string nazwaRoli)
         {
+
             var istnieje = await _roleManager.RoleExistsAsync(nazwaRoli);
 
             if (istnieje)
             {
-                return false;
+                return (false, "Rola o takiej nazwie już istnieje.");
             }
 
-            var wynik = await _roleManager.CreateAsync(
-                new IdentityRole(nazwaRoli)
+            var wynik = await _roleManager.CreateAsync(new IdentityRole(nazwaRoli)
             );
 
-            return wynik.Succeeded;
+            return (wynik.Succeeded, wynik.Succeeded ? "Rola dodana pomyślnie." : "Nie udało się dodać roli.");
+        }
+        public async Task<bool> PolaczRoleZarzadzanaZZarzadzajacaAsync(string idRoliZarzadzajacej, string idRoliZarzadzanej)
+        {
+
+
+            var istnieje = await _context.UprawnieniaZarzadzaniaRola.AnyAsync(x =>
+                        x.RolaZarzadzajacaId == idRoliZarzadzajacej &&
+                        x.RolaZarzadzanaId == idRoliZarzadzanej);
+
+            if (!istnieje)
+            {
+                _context.UprawnieniaZarzadzaniaRola.Add(new UprawnienieZarzadzaniaRola
+                {
+                    RolaZarzadzajacaId = idRoliZarzadzajacej,
+                    RolaZarzadzanaId = idRoliZarzadzanej
+                });
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+        public async Task<(bool Sukces, string Komunikat)> KontrolaDodawaRoliAsync(string iDZarzadzajacaRola, string nazwaNowejRoli)
+        {
+            nazwaNowejRoli = SprawdzDlugoscIPrzygotujNapis(nazwaNowejRoli);
+            if (nazwaNowejRoli == null)
+            {
+                return (false, OgraniczeniaNazwyRoli.KomunikatBledu);
+            }
+            await _jednostkaPracy.RozpocznijTransakcjeAsync();
+            try
+            {
+                var tmp = await DodajRole(nazwaNowejRoli);
+                if (!tmp.Sukces)
+                {
+                    await _jednostkaPracy.CofnijAsync();
+                    return (false, tmp.Komunikat);
+                }
+                var zarzadzanaRola = await _roleManager.FindByNameAsync(nazwaNowejRoli);
+                if (!await PolaczRoleZarzadzanaZZarzadzajacaAsync(iDZarzadzajacaRola, zarzadzanaRola.Id))
+                {
+                    await _jednostkaPracy.CofnijAsync();
+                    return (false, "Takie połączenie ról już istnieje.");
+                }
+                await _jednostkaPracy.ZatwierdzAsync();
+                return (true, "Rola dodana pomyślnie.");
+            }
+            catch
+            {
+                await _jednostkaPracy.CofnijAsync();
+                return (false, "Wystąpił błąd podczas dodawania roli.");
+            }
+
         }
 
 
-        public async Task<(bool Sukces, string Komunikat)> UsunRole(string roleId)
+        public async Task<(bool Sukces, string Komunikat)> UsunRole(string roleId, string rolaAdminId)
         {
-            if (await _pobierajUprawnieniaRoli.CzyRolaJestUzywanaWHierarchiiAsync(roleId))
-            {
-                return (false, "Nie można usunąć roli, ponieważ jest częścią hierarchii zarządzania.");
-            }
+
             var rola = await _roleManager.FindByIdAsync(roleId);
 
             if (rola == null)
@@ -78,13 +155,69 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
             {
                 return (false, "Nie można usunąć roli, która jest systemowa.");
             }
+            if (await _pobierajUprawnieniaRoli.CzyRolaMaPowiazaniaPozaAdminemAsync(roleId, rolaAdminId))
+            {
+                return (false, "Nie można usunąć roli, ponieważ jest częścią hierarchii zarządzania.");
+            }
+            if (await _pobierajUzytkownika.SprawdzCzyJestUzytkownikKtoryPosiadaTylkoTaRoleAsync(roleId))
+            {
+                return (false, "Nie można usunąć roli, która jest jedyną rolą użytkownika.");
+            }
+            await _jednostkaPracy.RozpocznijTransakcjeAsync();
+            try
+            {
+                var powiazania = await _context.UprawnieniaZarzadzaniaRola.Where(x => x.RolaZarzadzanaId == roleId).ToListAsync();
 
-            var wynik = await _roleManager.DeleteAsync(rola);
+                _context.UprawnieniaZarzadzaniaRola.RemoveRange(powiazania);
 
-            return (
-                wynik.Succeeded, wynik.Succeeded ? "Rola usunięta pomyślnie." : "Nie udało się usunąć roli."
-            );
+                var wynik = await _roleManager.DeleteAsync(rola);
+                if (wynik.Succeeded)
+                {
+                    await _jednostkaPracy.ZatwierdzAsync();
+                    return (true, "Rola usunięta pomyślnie.");
+                }
+                else
+                {
+                    await _jednostkaPracy.CofnijAsync();
+                    return (false, "Nie udało się usunąć roli.");
+                }
+            }
+            catch
+            {
+                await _jednostkaPracy.CofnijAsync();
+                return (false, "Wystąpił błąd podczas usuwania roli.");
+            }
+
+
         }
 
+        public (List<DaneRoli> RoleSystemowe, List<DaneRoli> PozostaleRole) PodzierRoleNaSystemoweIPozostale(ClaimsPrincipal user, List<DaneRoli> wszystkieDostempneRole)
+        {
+            var roleSystemowe = wszystkieDostempneRole
+                .Where(r => _daneStartowe.Role.Contains(r.Nazwa))
+                .ToList();
+            var pozostaleRole = wszystkieDostempneRole
+                .Where(r => !_daneStartowe.Role.Contains(r.Nazwa))
+                .ToList();
+            return (roleSystemowe, pozostaleRole);
+        }
+
+        private string? SprawdzDlugoscIPrzygotujNapis(string nazwa)
+        {
+            nazwa = nazwa?.Trim();
+
+            if (nazwa?.Length < OgraniczeniaNazwyRoli.MinimalnaDlugosc ||
+                nazwa?.Length > OgraniczeniaNazwyRoli.MaksymalnaDlugosc ||
+                string.IsNullOrEmpty(nazwa))
+                return null;
+
+            return string.Concat(nazwa.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(Wyraz));
+        }
+        private static string Wyraz(string s)
+        {
+            var reszta = s[1..];
+            bool mieszane = reszta.Any(char.IsUpper) && reszta.Any(char.IsLower);
+            return char.ToUpperInvariant(s[0]) + (mieszane ? reszta : reszta.ToLowerInvariant());
+        }
     }
 }

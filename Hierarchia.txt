@@ -6,25 +6,22 @@ Użytkownik może zarządzać użytkownikami posiadającymi role, które został
 HIERARCHIA
 
 SuperAdmin
-|
-+-- Admin
-|
-+-- Dyrektor
-| |
-| +-- Sekretarka
-| +-- Nauczyciel
-| +-- Rodzic
-|
-+-- ViceDyrektor
-|
-+-- Sekretarka
-+-- Nauczyciel
-+-- Rodzic
+  +-- Admin
+        +-- Dyrektor
+        |     +-- Sekretarka
+        |     +-- Nauczyciel
+        |     +-- Rodzic
+        +-- ViceDyrektor
+        |     +-- Sekretarka
+        |     +-- Nauczyciel
+        |     +-- Rodzic
+        +-- Sekretarka
+        +-- Nauczyciel
+        +-- Rodzic
 
 Sekretarka
-|
-+-- Uczen
-+-- Rodzic
+  +-- Uczen
+  +-- Rodzic
 
 UPRAWNIENIA
 

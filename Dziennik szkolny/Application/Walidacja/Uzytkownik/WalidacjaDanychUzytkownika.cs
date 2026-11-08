@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using Dziennik_szkolny.Domain.reguly;
+using System.Text.RegularExpressions;
 
 namespace Dziennik_szkolny.Application.Walidacja.Uzytkownik
 {
@@ -7,16 +8,26 @@ namespace Dziennik_szkolny.Application.Walidacja.Uzytkownik
         public bool CzyPoprawnyTelefon(string telefon)
         {
             return !string.IsNullOrWhiteSpace(telefon)
-                && Regex.IsMatch(telefon, @"^\d{9}$");
+                && Regex.IsMatch(telefon, @"^[0-9]{9}\z");
         }
-        public bool CzyHasloPrawidlowe(string haslo)
+
+
+        public bool CzyHasloPrawidlowe(string? haslo)
         {
-            return !string.IsNullOrWhiteSpace(haslo)
-                && haslo.Length >= 3;
+            if (string.IsNullOrEmpty(haslo) || haslo.Length < OgraniczeniaHasla.MinimalnaDlugosc)
+            {
+                return false;
+            }
+
+            return haslo.Any(c => c >= '0' && c <= '9')       // cyfra
+                && haslo.Any(c => c >= 'a' && c <= 'z')       // mała litera
+                && haslo.Any(c => c >= 'A' && c <= 'Z')       // wielka litera
+                && haslo.Any(c => !char.IsLetterOrDigit(c));  // znak specjalny
         }
+
         public bool CzyPoprawnyPesel(string pesel)
         {
-            if (string.IsNullOrWhiteSpace(pesel) || pesel.Length != 11 || !pesel.All(char.IsDigit))
+            if (string.IsNullOrWhiteSpace(pesel) || pesel.Length != 11 || !pesel.All(c => c is >= '0' and <= '9'))
             {
                 return false;
             }

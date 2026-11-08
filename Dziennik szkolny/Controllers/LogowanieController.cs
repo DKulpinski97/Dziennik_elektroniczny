@@ -1,4 +1,5 @@
-﻿using Dziennik_szkolny.Application.Modele;
+﻿using Dziennik_szkolny.Application.Interfejsy.Uzytkownik;
+using Dziennik_szkolny.Application.Modele;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -8,52 +9,72 @@ namespace Dziennik_szkolny.Controllers
     public class LogowanieController : Controller
     {
         private readonly SignInManager<LoginUzytkownika> _signInManager;
-        public LogowanieController(SignInManager<LoginUzytkownika> signInManager)
+        private readonly IWeryfikacjaDanychLogowania _weryfikacjaDanychLogowania;
+        public LogowanieController(SignInManager<LoginUzytkownika> signInManager, IWeryfikacjaDanychLogowania weryfikacjaDanychLogowania)
         {
             _signInManager = signInManager;
+            _weryfikacjaDanychLogowania = weryfikacjaDanychLogowania;
         }
         [HttpGet]
-        public IActionResult Login()
+        public IActionResult Login(string? returnUrl = null)
         {
             if (User.Identity?.IsAuthenticated == true)
             {
                 return RedirectToAction("Index", "Home");
             }
+
+            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(Login Login)
+        public async Task<IActionResult> Login(Login Login, string? returnUrl = null)
         {
-            // TODO: Przed wdrożeniem włączyć lockoutOnFailure (wymaga też
-            // odkomentowania sekcji Lockout w Program.cs).
-            /*
+            if (!ModelState.IsValid)
+            {
+                ViewData["ReturnUrl"] = returnUrl;
+                return View(Login);
+            }
+
             var result = await _signInManager.PasswordSignInAsync(
                 Login.LoginUzytkownika,
                 Login.HasloUzytkownika,
                 false,
-                true // lockoutOnFailure
-            );
-            */
-            var result = await _signInManager.PasswordSignInAsync(
-                Login.LoginUzytkownika,
-                Login.HasloUzytkownika,
-                false,
-                false
+                true
             );
 
             if (result.Succeeded)
             {
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                {
+                    return LocalRedirect(returnUrl);
+                }
+
                 return RedirectToAction("Index", "Home");
             }
+            if (result.IsLockedOut)
+            {
+                var doKiedyBlokada = await _weryfikacjaDanychLogowania.PobranieDoKiedyBlokadaAsync(Login.LoginUzytkownika);
+                if (doKiedyBlokada != null)
+                {
+                    var czasPolski = TimeZoneInfo.ConvertTime((DateTimeOffset)doKiedyBlokada, TimeZoneInfo.FindSystemTimeZoneById("Europe/Warsaw"));
 
-            ModelState.AddModelError("", "Nieprawidłowy login lub hasło");
+                    ModelState.AddModelError("", $"Blokada konta do {czasPolski:yyyy-MM-dd HH:mm:ss}");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Twoje konto jest zablokowane.");
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "Nieprawidłowy login lub hasło");
+            }
 
+            ViewData["ReturnUrl"] = returnUrl;
             return View(Login);
-
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Wyloguj()
         {
             await _signInManager.SignOutAsync();
@@ -62,7 +83,14 @@ namespace Dziennik_szkolny.Controllers
         [HttpGet]
         public IActionResult BrakDostepu()
         {
-            TempData["BladDostepu"] = "Nie masz uprawnień do wykonania tej akcji.";
+            TempData["TypWiadomosci"] = "danger";
+            TempData["Wiadomosc"] = "Nie masz uprawnień do wykonania tej akcji.";
+
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             return RedirectToAction("Login");
         }
     }

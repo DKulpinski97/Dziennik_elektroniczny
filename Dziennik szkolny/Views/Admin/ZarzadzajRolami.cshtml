@@ -12,19 +12,17 @@
 
                 <h2 class="text-center">Menu dodawania roli</h2>
 
-               @if (TempData["Wiadomosc"] != null)
-                {
-                    <div class="alert alert-@TempData["TypWiadomosci"]">
-                        @TempData["Wiadomosc"]
-                    </div>
-                }
+                <partial name="_Komunikat" />
 
 
                 @using (Html.BeginForm("DodajRole", "Admin", FormMethod.Post))
                 {
                     @Html.AntiForgeryToken()
+                    @Html.TextBox("NazwaRoli", "", new { @class = "form-control", id = "NazwaRoli", placeholder = "np. Nauczyciel", maxlength = Dziennik_szkolny.Domain.OgraniczeniaNazwyRoli.MaksymalnaDlugosc })
+                    <small class="text-muted">@Dziennik_szkolny.Domain.OgraniczeniaNazwyRoli.KomunikatBledu</small>
+                    <br />
+                    <small class="text-muted">@Dziennik_szkolny.Domain.OgraniczeniaNazwyRoli.Podpowiedz</small>
 
-                    @Html.TextBox("NazwaRoli","",new{@class = "form-control",id = "NazwaRoli",placeholder = "np. Nauczyciel"})
 
                     <button type="submit" class="btn btn-warning mt-3 w-100">
                         Dodaj rolę
@@ -37,18 +35,25 @@
 
                 <h2 class="text-center">Zmiana nazwy roli</h2>
 
+                <p>
+                    Wybierz rolę z listy po prawej,
+                    aby zmienić jej nazwę lub ją usunąć.
+                </p>
 
                 @using (Html.BeginForm("ZmienNazweRoli", "Admin", FormMethod.Post))
                 {
                     @Html.AntiForgeryToken()
 
-                    @Html.Hidden("StaraNazwaRoli","",new { id = "StaraNazwaRoli" })
+                    @Html.Hidden("StaraNazwaRoli", "", new { id = "StaraNazwaRoli" })
 
-                    @Html.TextBox("NowaNazwaRoli","",new{ @class = "form-control",id = "NowaNazwaRoli",placeholder = "Nowa nazwa roli"})
+                    @Html.TextBox("NowaNazwaRoli", "", new { @class = "form-control", id = "NowaNazwaRoli", placeholder = "Nowa nazwa roli", maxlength = Dziennik_szkolny.Domain.OgraniczeniaNazwyRoli.MaksymalnaDlugosc })
+                    <small class="text-muted">@Dziennik_szkolny.Domain.OgraniczeniaNazwyRoli.KomunikatBledu</small>
+                    <br />
+                    <small class="text-muted">@Dziennik_szkolny.Domain.OgraniczeniaNazwyRoli.Podpowiedz</small>
 
-                    @Html.Hidden("RoleId","",new { id = "RoleIdZmiana" })
+                    @Html.Hidden("RoleId", "", new { id = "RoleIdZmiana" })
 
-                    <button type="submit" class="btn btn-warning mt-3 w-100">
+                    <button type="submit" id="btnEdytujRole" class="btn btn-warning mt-3 w-100" disabled>
                         Zmień nazwę
                     </button>
                 }
@@ -65,14 +70,14 @@
                         Brak wybranej roli
                     </label>
                     <br />
-                    @Html.Hidden("RoleId","",new { id = "RoleIdUsun" })
+                    @Html.Hidden("RoleId", "", new { id = "RoleIdUsun" })
 
-                    <button type="submit" class="btn btn-warning mt-3 w-100">
+                    <button type="submit" id="btnUsunRole" class="btn btn-warning mt-3 w-100" disabled onclick="return confirm('Czy na pewno chcesz usunąć rolę: ' + document.getElementById('NazwaDoUsuniecia').textContent.trim() + '?');">
                         Usuń
                     </button>
 
                 }
-                <a asp-controller="Home" asp-action="Index" class="btn btn-warning mt-3 w-100">
+                <a asp-controller="Admin" asp-action="KontrolerZarzadzajRolami" class="btn btn-warning mt-3 w-100">
                     Powrót do poprzedniego menu
                 </a>
             </div>
@@ -84,11 +89,11 @@
             <div class="border rounded p-4 w-100">
 
                 <h2 class="text-center">
-                    Lista wszystkich ról
+                    Lista ról poza systemowych
                 </h2>
+                @Html.DropDownList("RoleList", new SelectList(Model, "Id", "Nazwa", (string)ViewBag.RolaId), new { @class = "form-select", size = 10, id = "ListaRol" })
 
-                @Html.ListBox("RoleList",new SelectList(Model, "Id", "Nazwa"),new{@class = "form-select",size = 10,id = "ListaRol"})
-
+                
             </div>
         </div>
 
@@ -98,36 +103,39 @@
 
 
 <script>
+    const listaRol = document.getElementById("ListaRol");
+    const btnEdytuj = document.getElementById("btnEdytujRole");
+    const btnUsun = document.getElementById("btnUsunRole");
 
-    document.getElementById("ListaRol")
-    .addEventListener("change", function () {
+    function AktualizujPrzyciski(event) {
+        let wybranaOpcja = listaRol.options[listaRol.selectedIndex];
 
-        let wybranaOpcja = this.options[this.selectedIndex];
+        if (!wybranaOpcja || !wybranaOpcja.value) {
+            btnEdytuj.disabled = true;
+            btnUsun.disabled = true;
+            return;
+        }
 
-            let nazwaRoli = wybranaOpcja.text;
-            let idRoli = wybranaOpcja.value;
+        btnEdytuj.disabled = false;
+        btnUsun.disabled = false;
 
+        let nazwaRoli = wybranaOpcja.text;
+        let idRoli = wybranaOpcja.value;
 
-            // etykieta usuwania
-            document.getElementById("NazwaDoUsuniecia")
-            .textContent = nazwaRoli;
+        document.getElementById("NazwaDoUsuniecia").textContent = nazwaRoli;
+        document.getElementById("StaraNazwaRoli").value = nazwaRoli;
 
+        if (event?.isTrusted) {
+            document.getElementById("NowaNazwaRoli").value = nazwaRoli;
+        }
 
-        // formularz zmiany nazwy
-            document.getElementById("StaraNazwaRoli")
-                .value = nazwaRoli;
+        document.getElementById("RoleIdZmiana").value = idRoli;
+        document.getElementById("RoleIdUsun").value = idRoli;
+    }
 
-        document.getElementById("NowaNazwaRoli")
-                .value = nazwaRoli;
+    listaRol.addEventListener("change", AktualizujPrzyciski);
 
-            document.getElementById("RoleIdZmiana")
-                .value = idRoli;
-
-
-            // formularz usuwania
-            document.getElementById("RoleIdUsun")
-                .value = idRoli;
-
-        });
+    // Inicjalizacja przycisków i pól po załadowaniu widoku
+    AktualizujPrzyciski();
 
 </script>

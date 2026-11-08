@@ -1,7 +1,7 @@
 ﻿using Dziennik_szkolny.Application.ObiektyTransferuDanych;
 using Dziennik_szkolny.Domain.Entities;
 using Dziennik_szkolny.Infrastructure.Identyfikatory;
-using Dziennik_szkolny.ViewModel;
+using Dziennik_szkolny.ViewModel.Uzytkownik;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Dziennik_szkolny.Application.Mapery
@@ -10,9 +10,9 @@ namespace Dziennik_szkolny.Application.Mapery
     {
         private readonly MapowanieRoli _mapowanieRoli = new MapowanieRoli();
 
-        public UzytkownikaViewModel MapujNaUzytkownikaViewModel(InformacjeUzytkownik informacjeUzytkownik, LoginUzytkownika login, List<string> wybraneRole, List<SelectListItem> dostepneRole)
+        public EdytujUzytkownikaViewModel MapujNaUzytkownikaViewModel(InformacjeUzytkownik informacjeUzytkownik, LoginUzytkownika login, List<string> wybraneRole, List<SelectListItem> dostepneRole)
         {
-            return new UzytkownikaViewModel
+            return new EdytujUzytkownikaViewModel
             {
                 Login = login.UserName,
                 Email = login.Email,
@@ -26,10 +26,10 @@ namespace Dziennik_szkolny.Application.Mapery
                 NrMieszkania = informacjeUzytkownik.NrMieszkania,
                 DostepneRole = dostepneRole,
                 WybraneRole = wybraneRole,
-                idUzytkownika = login.Id
+                IdUzytkownika = login.Id
             };
         }
-        public void MapujNaInformacjeUzytkownika(InformacjeUzytkownik informacjeUzytkownik, UzytkownikaViewModel uzytkownikaViewModel)
+        public void MapujNaInformacjeUzytkownika(InformacjeUzytkownik informacjeUzytkownik, SzkieletUzytkownikaViewModel uzytkownikaViewModel)
         {
             informacjeUzytkownik.Imie = uzytkownikaViewModel.Imie;
             informacjeUzytkownik.Nazwisko = uzytkownikaViewModel.Nazwisko;
@@ -39,19 +39,27 @@ namespace Dziennik_szkolny.Application.Mapery
             informacjeUzytkownik.Ulica = uzytkownikaViewModel.Ulica;
             informacjeUzytkownik.NrMieszkania = uzytkownikaViewModel.NrMieszkania;
         }
-        public UzytkownikaViewModel MapujDostepneRoleVievModel(List<DaneRoli> dostepneRole)
+        public DodajUzytkownikaViewModel MapujDostepneRoleVievModel(List<DaneRoli> dostepneRole)
         {
             var wszystkieRole = _mapowanieRoli.MapujRoleNaSelectList(dostepneRole);
-            return new UzytkownikaViewModel
+            return new DodajUzytkownikaViewModel
             {
                 DostepneRole = wszystkieRole
             };
         }
-        public void MapujDostepneRoleDoIStniejacegoVievModel(UzytkownikaViewModel uzytkownikaViewModel, List<DaneRoli> dostepneRole)
+        public void MapujDostepneRoleDoIStniejacegoVievModel(SzkieletUzytkownikaViewModel uzytkownikaViewModel, List<DaneRoli> dostepneRole)
         {
             var wszystkieRole = _mapowanieRoli.MapujRoleNaSelectList(dostepneRole);
 
             uzytkownikaViewModel.DostepneRole = wszystkieRole;
+        }
+        public PrzywitanieUzytkownikaViewModel MapowanieDanePodstawowe (string imie, string nazwisko)
+        {
+            return new PrzywitanieUzytkownikaViewModel
+            {
+                Imie = imie,
+                Nazwisko = nazwisko
+            };
         }
     }
 }
