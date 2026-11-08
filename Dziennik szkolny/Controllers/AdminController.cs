@@ -304,7 +304,7 @@ namespace Dziennik_szkolny.Controllers
         public async Task<IActionResult> EdytujDaneUzytkownika(EdytujUzytkownikaViewModel edytujUzytkownikaViewModel)
         {
 
-            if (edytujUzytkownikaViewModel == null)
+            if (edytujUzytkownikaViewModel == null || string.IsNullOrEmpty(edytujUzytkownikaViewModel.IdUzytkownika))
             {
 
                 TempData["TypWiadomosci"] = "info";
