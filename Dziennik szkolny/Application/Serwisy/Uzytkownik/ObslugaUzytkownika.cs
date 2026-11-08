@@ -7,7 +7,9 @@ using Dziennik_szkolny.Application.Walidacja.Uzytkownik;
 using Dziennik_szkolny.Domain;
 using Dziennik_szkolny.Domain.reguly;
 using Dziennik_szkolny.Infrastructure.DaneStartowe;
+using Dziennik_szkolny.Infrastructure.Identyfikatory;
 using Dziennik_szkolny.ViewModel.Uzytkownik;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Globalization;
 using System.Security.Claims;
@@ -27,6 +29,7 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
         private readonly IPobierajUprawnieniaRoli _pobierajUprawnieniaRoli;
         private readonly ILogger<ObslugaUzytkownika> _logger;
         private static readonly StringComparer comparer =StringComparer.Create(new CultureInfo("pl-PL"), ignoreCase: false);
+        private readonly UserManager<LoginUzytkownika> _userManager;
 
         public ObslugaUzytkownika(
             IWeryfikacjaDanychLogowania weryfikacjaDanychLogowania,
@@ -37,7 +40,8 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             IJednostkaPracy jednostkaPracy,
             DaneStartowe daneStartowe,
             IPobierajUprawnieniaRoli pobierajUprawnieniaRoli,
-            ILogger<ObslugaUzytkownika> logger)
+            ILogger<ObslugaUzytkownika> logger,
+            UserManager<LoginUzytkownika> userManager)
         {
             _weryfikacjaDanychLogowania = weryfikacjaDanychLogowania;
             _pobierajRole = pobierajRole;
@@ -48,6 +52,7 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
             _daneStartowe = daneStartowe;
             _pobierajUprawnieniaRoli = pobierajUprawnieniaRoli;
             _logger = logger;
+            _userManager = userManager;
         }
 
         public async Task<(string Komunikat, bool CzyUdane)> DodajUzytkownikaAsync(DodajUzytkownikaViewModel dodajUzytkownikaViewModel, ClaimsPrincipal zalogowanyUzytkownik)
@@ -218,6 +223,18 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
                 // Aktualizacja ról
                 var uzytkownik = await _pobierajUzytkownika.PobierzUzytkownikaPoLoginieAsync(edytujUzytkownikaViewModel.Login);
 
+                if (uzytkownik == null)
+                {
+                    await _jednostkaPracy.CofnijAsync();
+                    return ("Nie znaleziono użytkownika.", false);
+                }
+
+                //pobranie obecnych ról
+                var obecneRole = await _pobierajRole.PobierzRoleUzytkownikaPoIdUzytkownikaAsync(edytujUzytkownikaViewModel.IdUzytkownika);
+
+                //sprawdzenie, czy zestaw ról uległ zmianie
+                bool zmianaRol = !obecneRole.ToHashSet(StringComparer.OrdinalIgnoreCase).SetEquals(wybraneNazwyRol);
+
                 if (!await _zarzadzajUzytkownikiem.UsunWszystkieRoleUzytkownikowiAsync(edytujUzytkownikaViewModel.Login))
                 {
                     await _jednostkaPracy.CofnijAsync();
@@ -229,9 +246,18 @@ namespace Dziennik_szkolny.Application.Serwisy.Uzytkownik
                     await _jednostkaPracy.CofnijAsync();
                     return ("Nie udało się zmienić ról lub nie wybrano roli.", false);
                 }
+                // Aktualizacja stempla bezpieczeństwa w przypadku zmiany hasła lub przypisanych ról
+                if (zmianaHasla || zmianaRol)
+                {
+                    var wynikStamp = await _userManager.UpdateSecurityStampAsync(uzytkownik);
 
+                    if (!wynikStamp.Succeeded)
+                    {
+                        await _jednostkaPracy.CofnijAsync();
+                        return ("Nie udało się zaktualizować zabezpieczeń konta użytkownika.", false);
+                    }
+                }
                 await _jednostkaPracy.ZatwierdzAsync();
-
                 return ("Dane użytkownika zostały zmienione.", true);
             }
             catch (Exception ex)

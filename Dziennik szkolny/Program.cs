@@ -29,7 +29,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // MVC
 builder.Services.AddControllersWithViews();
-
+// rest cookie
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+{
+    options.ValidationInterval = TimeSpan.Zero;
+});
 
 // Konfiguracja bazy danych MySQL z włączonym Lazy Loading
 builder.Services.AddDbContext<AppDbContext>(options =>
