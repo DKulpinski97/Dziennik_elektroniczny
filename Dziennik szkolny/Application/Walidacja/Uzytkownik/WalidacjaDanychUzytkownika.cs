@@ -8,7 +8,7 @@ namespace Dziennik_szkolny.Application.Walidacja.Uzytkownik
         public bool CzyPoprawnyTelefon(string telefon)
         {
             return !string.IsNullOrWhiteSpace(telefon)
-                && Regex.IsMatch(telefon, @"^\d{9}$");
+                && Regex.IsMatch(telefon, @"^[0-9]{9}\z");
         }
 
 
@@ -27,7 +27,7 @@ namespace Dziennik_szkolny.Application.Walidacja.Uzytkownik
 
         public bool CzyPoprawnyPesel(string pesel)
         {
-            if (string.IsNullOrWhiteSpace(pesel) || pesel.Length != 11 || !pesel.All(char.IsDigit))
+            if (string.IsNullOrWhiteSpace(pesel) || pesel.Length != 11 || !pesel.All(c => c is >= '0' and <= '9'))
             {
                 return false;
             }

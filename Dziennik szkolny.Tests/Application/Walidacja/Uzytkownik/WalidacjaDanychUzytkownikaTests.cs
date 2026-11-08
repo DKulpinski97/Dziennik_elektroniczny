@@ -13,6 +13,7 @@ namespace Dziennik_szkolny.Tests.Application.Walidacja.Uzytkownik
         [InlineData("00251512341")]      // poprawny format i data, zła cyfra kontrolna
         [InlineData("50053200001")]      // poprawny miesiąc, niepoprawny dzień (32)
         [InlineData("0025151234A")]      // 11 znaków, litera zamiast cyfry
+        [InlineData("\u0660\u0661\u0662\u0665\u0661\u0665\u0661\u0662\u0663\u0664\u0665")] // cyfry Unicode zamiast ASCII
         public void CzyPoprawnyPesel_SprawdzaPoprawnoscWartosci_ZwracaFalse(string wartość)
         {
             // Arrange
@@ -40,6 +41,8 @@ namespace Dziennik_szkolny.Tests.Application.Walidacja.Uzytkownik
         [InlineData("49585216")]         // za krótki numer
         [InlineData("8528528529")]       // za długi numer
         [InlineData("743-75384")]        // 9 znaków, ale zawiera niedozwolony znak
+        [InlineData("\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669")] // cyfry Unicode zamiast ASCII
+        [InlineData("123456789\n")] // zawiera znak specjalny (nowa linia)
         public void CzyPoprawnyTelefon_SprawdzamNumer_ZwracaFalse(string telefon)
         {
             // Arrange

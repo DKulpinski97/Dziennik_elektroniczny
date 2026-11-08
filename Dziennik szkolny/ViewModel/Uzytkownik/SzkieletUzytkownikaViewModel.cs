@@ -34,7 +34,7 @@ namespace Dziennik_szkolny.ViewModel.Uzytkownik
 
         [Required(ErrorMessage = "Telefon jest wymagany.")]
         [StringLength(9, MinimumLength = 9, ErrorMessage = "Telefon musi mieć dokładnie 9 cyfr.")]
-        [RegularExpression(@"^\d{9}$", ErrorMessage = "Telefon może składać się wyłącznie z cyfr.")]
+        [RegularExpression(@"^[0-9]{9}$", ErrorMessage = "Telefon może składać się wyłącznie z cyfr.")]
         public string Telefon { get; set; }
 
 
