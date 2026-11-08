@@ -19,7 +19,7 @@
             <br />
 
             <label>Hasło</label><br />
-            @Html.PasswordFor(m => m.HasloUzytkownika, new { @class = "form-control" })
+            @Html.PasswordFor(m => m.HasloUzytkownika, new { @class = "form-control", autocomplete = "current-password" })
             @Html.ValidationMessageFor(m => m.HasloUzytkownika, "", new { @class = "validation-error" })
             <br />
 
