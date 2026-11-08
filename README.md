@@ -96,6 +96,7 @@ Testy jednostkowe (xUnit, Moq) obejmują walidację danych użytkownika (w tym s
 - Logowanie błędów (`ILogger`) jest tylko w obsłudze użytkownika; brak logów działań administratorów i odmów.
 - Brak testów dla reguł widoczności i zarządzania (Any/All) oraz dla usuwania ról powiązanych z hierarchią.
 - Panel nie pozwala tworzyć relacji hierarchii między rolami; powstają one tylko z danych startowych.
+- Po zmianie hasła lub ról użytkownika jego sesja jest unieważniana; walidacja stempla zabezpieczeń odbywa się przy każdym żądaniu, co dodaje zapytania do bazy (kompromis na korzyść bezpieczeństwa w projekcie demonstracyjnym).
 - Dane startowe, w tym konta demonstracyjne ze wspólnym hasłem, są dodawane do każdej pustej bazy, w każdym środowisku (także produkcyjnym); aktualizacja bazy po zmianie danych startowych wymaga jej odtworzenia.
 
 ## Planowane dalsze prace
