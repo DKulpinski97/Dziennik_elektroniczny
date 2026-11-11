@@ -38,7 +38,7 @@
                     {
                         @Html.Hidden("IdUzytkownika", null, new { id = "EdytujId" })
 
-                        <button type="submit" id="btnEdytujUzytkownika" class="btn btn-primary w-100 mb-2"disabled>
+                        <button type="submit" id="btnEdytujUzytkownika" class="btn btn-primary w-100 mb-2" disabled>
                             Edytuj dane
                         </button>
                     }
@@ -50,11 +50,7 @@
 
                         @Html.Hidden("IdUzytkownika", null, new { id = "UsunId" })
 
-                        <button type="submit"
-                                id="btnUsunUzytkownika"
-                                class="btn btn-danger w-100"
-                                disabled
-                                onclick="return confirm('Czy na pewno chcesz usunąć użytkownika: ' + wybranyUzytkownik + '?');">
+                        <button type="submit" id="btnUsunUzytkownika" class="btn btn-danger w-100" disabled onclick="return confirm('Czy na pewno chcesz usunąć użytkownika: ' + wybranyUzytkownik + '?');">
                             Usuń użytkownika
                         </button>
                     }
@@ -76,21 +72,24 @@
                     Rodzice
                 </div>
 
+                <!-- ViewBag zamiast VievModel bo to projekt pokazowy i nie ma potrzeby nadmiernie komplikować systemu  -->
                 <div class="card-body">
+                    @if (ViewBag.Rodzice != null && ViewBag.Rodzice.Count > 0)
+                    {
+                        <select class="form-select" id="Rodzice" name="RodzicId" size="12">
+                            @foreach (var rodzic in ViewBag.Rodzice)
+                            {
+                                <option value="@rodzic.Value">
+                                    @rodzic.Text
+                                </option>
+                            }
 
-                    <select class="form-select"
-                            id="Rodzice"
-                            name="RodzicId"
-                            size="12">
-                        <!-- ViewBag zamiast VievModel bo to projekt pokazowy i nie ma potrzeby nadmiernie komplikować systemu  -->
-                        @foreach (var rodzic in ViewBag.Rodzice)
-                        {
-                            <option value="@rodzic.Value">
-                                @rodzic.Text
-                            </option>
-                        }
-
-                    </select>
+                        </select>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Brak rodziców w systemie.</p>
+                    }
 
                 </div>
 
@@ -109,22 +108,25 @@
                     Pracownicy
                 </div>
 
+                 <!-- ViewBag zamiast VievModel bo to projekt pokazowy i nie ma potrzeby nadmiernie komplikować systemu  -->
                 <div class="card-body">
+                    @if (ViewBag.Pracownicy != null && ViewBag.Pracownicy.Count > 0)
+                    {
+                        <select class="form-select" id="Pracownicy" name="PracownikId" size="12">
+                            @foreach (var pracownik in ViewBag.Pracownicy)
+                            {
+                                <option value="@pracownik.Value">
+                                    @pracownik.Text
+                                </option>
+                            }
 
-                    <select class="form-select"
-                            id="Pracownicy"
-                            name="PracownikId"
-                            size="12">
-                        <!-- ViewBag zamiast VievModel bo to projekt pokazowy i nie ma potrzeby nadmiernie komplikować systemu  -->
-                        @foreach (var pracownik in ViewBag.Pracownicy)
-                        {
-                            <option value="@pracownik.Value">
-                                @pracownik.Text
-                            </option>
-                        }
+                        </select>
 
-                    </select>
-
+                    }
+                    else
+                    {
+                        <p class="text-muted">Brak pracowników w systemie.</p>
+                    }
                 </div>
 
             </div>
@@ -132,52 +134,56 @@
         </div>
     </div>
 </div>
-
-</div>
-
 <script>
-    let wybranyUzytkownik = "";
+  let wybranyUzytkownik = "";
 
-    const rodzice = document.getElementById("Rodzice");
-    const pracownicy = document.getElementById("Pracownicy");
+const rodzice = document.getElementById("Rodzice");
+const pracownicy = document.getElementById("Pracownicy");
 
-    const edytujId = document.getElementById("EdytujId");
-    const usunId = document.getElementById("UsunId");
+const edytujId = document.getElementById("EdytujId");
+const usunId = document.getElementById("UsunId");
 
-    const btnEdytuj = document.getElementById("btnEdytujUzytkownika");
-    const btnUsun = document.getElementById("btnUsunUzytkownika");
+const btnEdytuj = document.getElementById("btnEdytujUzytkownika");
+const btnUsun = document.getElementById("btnUsunUzytkownika");
 
-    function ustawIdUzytkownika(lista, drugaLista) {
-        const id = lista.value;
+function ustawIdUzytkownika(lista, drugaLista) {
+    const id = lista.value;
 
-        if (!id) {
-            wybranyUzytkownik = "";
-            edytujId.value = "";
-            usunId.value = "";
+    if (!id) {
+        wybranyUzytkownik = "";
+        edytujId.value = "";
+        usunId.value = "";
 
-            btnEdytuj.disabled = true;
-            btnUsun.disabled = true;
+        btnEdytuj.disabled = true;
+        btnUsun.disabled = true;
 
-            return;
-        }
-
-        const option = lista.options[lista.selectedIndex];
-
-        wybranyUzytkownik = option.text.trim();
-
-
-        edytujId.value = id;
-        usunId.value = id;
-        drugaLista.selectedIndex = -1;
-        btnEdytuj.disabled = false;
-        btnUsun.disabled = false;
+        return;
     }
 
+    const option = lista.options[lista.selectedIndex];
+
+    wybranyUzytkownik = option.text.trim();
+
+    edytujId.value = id;
+    usunId.value = id;
+
+    if (drugaLista) {
+        drugaLista.selectedIndex = -1;
+    }
+
+    btnEdytuj.disabled = false;
+    btnUsun.disabled = false;
+}
+
+if (rodzice) {
     rodzice.addEventListener("change", function () {
         ustawIdUzytkownika(rodzice, pracownicy);
     });
+}
 
+if (pracownicy) {
     pracownicy.addEventListener("change", function () {
         ustawIdUzytkownika(pracownicy, rodzice);
     });
+}
 </script>

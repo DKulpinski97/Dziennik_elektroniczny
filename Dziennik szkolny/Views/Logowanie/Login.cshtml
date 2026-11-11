@@ -8,21 +8,26 @@
     <div class="login-container">
         <div style="color:red">
             <partial name="_Komunikat"/>
-            @Html.ValidationSummary()
+            @Html.ValidationSummary(excludePropertyErrors: true)
         </div>
         @using (Html.BeginForm("Login", "Logowanie", FormMethod.Post))
         {
-            @Html.ValidationMessageFor(m => m.LoginUzytkownika, "", new { @class = "validation-error" })
+        @Html.Hidden("returnUrl", ViewData["ReturnUrl"])
             <label>Login</label><br />
             @Html.TextBoxFor(m => m.LoginUzytkownika, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.LoginUzytkownika, "", new { @class = "validation-error" })
             <br />
 
-            @Html.ValidationMessageFor(m => m.HasloUzytkownika, "", new { @class = "validation-error" })
             <label>Hasło</label><br />
-            @Html.PasswordFor(m => m.HasloUzytkownika, new { @class = "form-control" })
+            @Html.PasswordFor(m => m.HasloUzytkownika, new { @class = "form-control", autocomplete = "current-password" })
+            @Html.ValidationMessageFor(m => m.HasloUzytkownika, "", new { @class = "validation-error" })
             <br />
 
             <button type="submit" class="btn-login">Zaloguj</button>
         }
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

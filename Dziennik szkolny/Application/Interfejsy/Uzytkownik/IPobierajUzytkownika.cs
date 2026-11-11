@@ -7,12 +7,12 @@ namespace Dziennik_szkolny.Application.Interfejsy.Uzytkownik
 {
     public interface IPobierajUzytkownika
     {
+        Task<bool> CzyIstniejaUzytkownicyAsync();
         Task<LoginUzytkownika> PobierzUzytkownikaPoLoginieAsync(string login);
-        Task<string> PobierzIdUzytkownikaPoLoginieAsync(string login);
         Task<List<LoginUzytkownika>> PobierzWszystkichUzytkownikow();
-        Task<List<InformacjeUzytkownik>> PobierzWszystkieInformacjeOUzrzytkownikach();
         Task<List<InformacjeUzytkownik>> PobierzUzytkownikowImieINazwiskoIIDPoLiscieID(List<string> idUzytkownikow);
         Task<InformacjeUzytkownik> PobierzInformacjeUzytkownikaPoIdLoginu(string IdUzytkownika);
+        Task<(string? imie, string? nazwisko)> PobierzImieINazwiskoPoIdUzytkownikaAsync(string IdUzytkownika);
         Task<LoginUzytkownika> PobierzUzytkownikaPoIDAsync(string IdUzytkownika);
         Task<List<UzytkownikZRolamiDto>> PobierzUzytkownikowPoRolachAsync(List<string> role);
         Task<bool> SprawdzCzyInformacjeUzytkownikaIstniejaPoIdUzytkownikaAsync(string idUzytkownika);

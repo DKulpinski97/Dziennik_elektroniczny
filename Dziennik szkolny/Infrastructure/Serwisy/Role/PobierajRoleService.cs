@@ -102,7 +102,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
 
             return rola?.Id;
         }
-        public async Task<List<string>> PobierzRoleUzytkownikaPoIdAsync(string idUzytkownika)
+        public async Task<List<string>> PobierzRoleUzytkownikaPoIdUzytkownikaAsync(string idUzytkownika)
         {
             var uzytkownik = await _userManager.FindByIdAsync(idUzytkownika);
 
