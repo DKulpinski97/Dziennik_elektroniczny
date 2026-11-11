@@ -65,7 +65,7 @@ namespace Dziennik_szkolny.Controllers.APIRole
             {
                 return Problem(detail: wynik.Komunikat, statusCode: StatusCodes.Status409Conflict);
             }
-            var rola = await _pobierajRole.PobierzRolePoNazwieAsync(noweDaneRoli.Nazwa);
+            var rola = await _pobierajRole.PobierzRolePoNazwieAsync(wynik.ZnormalizowanaNazwa);
             if (rola == null)
             {
                 return Problem(detail: "Nie udało się odczytać utworzonej roli.", statusCode: StatusCodes.Status500InternalServerError);
@@ -73,7 +73,7 @@ namespace Dziennik_szkolny.Controllers.APIRole
             var daneRoli = new DaneRoli
             {
                 Id = rola.Id,
-                Nazwa = rola.Name
+                Nazwa = wynik.ZnormalizowanaNazwa
             };
             return CreatedAtAction(nameof(PobierzRole), new { id = rola.Id }, daneRoli);
         }
