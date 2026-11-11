@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Dziennik_szkolny.Domain;
+using System.ComponentModel.DataAnnotations;
 
 namespace Dziennik_szkolny.Application.ObiektyTransferuDanych
 {
@@ -7,7 +8,7 @@ namespace Dziennik_szkolny.Application.ObiektyTransferuDanych
         private string _nazwa = string.Empty;
 
         [Required(ErrorMessage = "To pole jest wymagane.")]
-        [StringLength(50, MinimumLength = 2, ErrorMessage = "Nazwa roli musi mieć od 2 do 50 znaków. Nie liczymy znaków białych na początku i na końcu.")]
+        [StringLength(OgraniczeniaNazwyRoli.MaksymalnaDlugosc, MinimumLength = OgraniczeniaNazwyRoli.MinimalnaDlugosc, ErrorMessage = OgraniczeniaNazwyRoli.KomunikatBledu)]
         public string Nazwa
         {
             get => _nazwa;
