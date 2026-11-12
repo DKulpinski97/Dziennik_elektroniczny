@@ -11,6 +11,7 @@ System zarządzania użytkownikami i rolami w środowisku szkolnym z wielopoziom
 - **Backend:** ASP.NET Core MVC (.NET 10)
 - **Baza danych:** MySQL, EF Core 9 (Pomelo.EntityFrameworkCore.MySql)
 - **Uwierzytelnianie i autoryzacja:** ASP.NET Core Identity
+- **Web API:** kontroler REST dla ról (`/api/role`), błędy w formacie ProblemDetails
 - **Testy:** xUnit, Moq
 - **Architektura:** podział na warstwy Domain / Application / Infrastructure / Controllers / Views
 
@@ -38,7 +39,8 @@ Konto `Nauczyciel1` ma role Nauczyciel i Rodzic, jest wychowawcą klas A i B, pr
 - Hierarchiczny model uprawnień: użytkownik widzi i zarządza tylko osobami, których role są mu podporządkowane w hierarchii (widoczność: co najmniej jedna rola podległa, zarządzanie: wszystkie role podległe).
 - Walidacja danych użytkownika: m.in. suma kontrolna numeru PESEL, telefon, unikalność loginu, e-maila i numeru PESEL.
 - Reguły haseł: co najmniej 8 znaków, cyfra, mała i wielka litera oraz znak specjalny. Reguły są zapisane w jednym miejscu (`Domain/reguly/OgraniczeniaHasla.cs`) i używane przez konfigurację Identity, walidację i widoki.
-- Reguły nazw ról: po przycięciu 2–50 znaków, słowa łączone bez spacji i pisane wielką literą (np. „it specjalista” daje „ItSpecjalista”), duplikaty odrzucane. Role systemowe z danych startowych nie mogą być usunięte ani przemianowane. Nie można też usunąć roli, która uczestniczy w hierarchii poza relacją z rolą Admin, ani roli będącej jedyną rolą jakiegoś użytkownika.
+- Reguły nazw ról: po przycięciu 2–50 znaków, słowa łączone bez spacji i pisane wielką literą (np. „it specjalista” daje „ItSpecjalista”), duplikaty odrzucane. Do limitu 50 znaków liczą się też spacje wewnątrz nazwy (przycinane są tylko brzegi), np. „a b” ma 3 znaki i daje „AB”. Role systemowe z danych startowych nie mogą być usunięte ani przemianowane. Nie można też usunąć roli, która uczestniczy w hierarchii poza relacją z rolą Admin, ani roli będącej jedyną rolą jakiegoś użytkownika.
+- Web API ról dla Admina: lista zarządzanych ról, odczyt roli po Id, dodawanie i usuwanie roli z tymi samymi regułami co w panelu (opis w sekcji „Web API ról”).
 - Reguła ostatniego administratora: nie można usunąć jedynego użytkownika z rolą Admin.
 - Ochrona powiązań użytkownika: nie można usunąć użytkownika, który jest opiekunem ucznia, prowadzi przedmiot albo jest wychowawcą klasy. W edycji nie można odebrać roli Rodzic opiekunowi ucznia ani roli Nauczyciel nauczycielowi, który prowadzi przedmiot lub jest wychowawcą. Zmiana samych danych i dodawanie ról są dozwolone.
 
@@ -60,6 +62,47 @@ Celem było praktyczne zastosowanie zasad bezpiecznego dostępu do danych (broke
 - Ochrona przed bezpośrednią edycją bazy danych jest poza zakresem aplikacji (wymaga dostępu do całego systemu); właściwą odpowiedzią są logi działań administratorów.
 
 **Zasada kont administracyjnych.** Konta administracyjne powinny być oddzielone od kont codziennych, imienne (a nie wspólne), z rozdzieleniem obowiązków (`SuperAdmin` zarządza administratorami, `Admin` rolami szkolnymi) i z niezależnością awaryjną (reguła ostatniego administratora). Wspólne konta `Admin` i `SuperAdmin` w danych startowych są wyjątkiem demonstracyjnym.
+
+## Web API ról
+
+Kontroler `RoleApiController` (`/api/role`) udostępnia zarządzanie rolami przez REST. Wymaga zalogowania z rolą Admin (ciasteczko Identity `.AspNetCore.Identity.Application`).
+
+| Metoda | Adres | Opis | Odpowiedzi |
+|---|---|---|---|
+| GET | `/api/role` | lista ról, którymi zarządza zalogowany Admin | 200, 401 |
+| GET | `/api/role/{id}` | rola po Id | 200, 404, 401 |
+| POST | `/api/role` | dodanie roli, ciało: `{"nazwa":"it specjalista"}` | 201 (nagłówek `Location`, treść `{id, nazwa}`), 400, 409, 401 |
+| DELETE | `/api/role/{id}` | usunięcie roli | 204, 404, 409, 401 |
+
+Zasady odpowiedzi:
+
+- 401: brak uwierzytelnienia (bez ciasteczka). Inna rola niż Admin (np. SuperAdmin) dostaje 403, co wynika z atrybutu `[Authorize(Roles = Admin)]` i nie było sprawdzane ręcznie.
+- 400: nazwa nie spełnia reguł (2 do 50 znaków po przycięciu, pole wymagane); walidacja modelu zatrzymuje żądanie, zanim wykona się logika serwisu.
+- 404: rola nie istnieje lub nie jest zarządzana przez zalogowanego Admina (rola spoza zakresu jest ukrywana, nie ujawniamy jej istnienia).
+- 409: konflikt biznesowy (rola o takiej nazwie już istnieje, rola systemowa, rola będąca jedyną rolą użytkownika, rola w hierarchii).
+- Nazwa roli jest normalizowana tak jak w panelu („it specjalista” daje `ItSpecjalista`, „NOWA” daje `Nowa`, „nowaRola” daje `NowaRola`); odpowiedź 201 zawiera nazwę faktycznie zapisaną.
+- Błędy mają format ProblemDetails (RFC 9110).
+
+Przykład wywołania (w PowerShellu `curl.exe`; wartość ciasteczka z przeglądarki, zakładka Application, po zalogowaniu jako Admin; nie zapisywać jej w repozytorium):
+
+```
+curl.exe -k -i -H "Cookie: .AspNetCore.Identity.Application=WARTOSC" https://localhost:7100/api/role
+```
+
+Ciasteczko wygasa po 5 minutach bezczynności. Zmiana hasła lub ról użytkownika unieważnia jego sesję, więc po takiej zmianie trzeba zalogować się ponownie i użyć nowej wartości ciasteczka.
+
+Testy ręczne (`curl`, localhost, 11.11.2026), wszystkie zgodne z oczekiwaniem:
+
+| Przypadek | Wynik |
+|---|---|
+| POST `it specjalista` / `NOWA` / `nowaRola` | 201, zapisane `ItSpecjalista` / `Nowa` / `NowaRola` |
+| POST ` a ` / pusta nazwa | 400 (walidacja `NoweDaneRoli`), rola nie powstaje |
+| POST duplikat (także `ITSPECJALISTA`) | 409 „Rola o takiej nazwie już istnieje.” |
+| GET rola po Id / nieistniejący Id / rola poza zakresem Admina | 200 / 404 / 404 |
+| DELETE roli | 204; ponownie ten sam Id: 404 |
+| DELETE roli systemowej | 409 „Nie można usunąć roli, która jest systemowa.” |
+| DELETE roli będącej jedyną rolą użytkownika | 409 „Nie można usunąć roli, która jest jedyną rolą użytkownika.” |
+| dowolne żądanie bez ciasteczka | 401 |
 
 ## Architektura
 
@@ -86,7 +129,7 @@ Szczegółowy opis jest w pliku `Hierarchia.txt` w katalogu głównym repozytori
 
 ## Testy
 
-Testy jednostkowe (xUnit, Moq) obejmują walidację danych użytkownika (w tym siłę hasła i PESEL) oraz serwis zarządzania rolami. Dwa testy usuwania roli są pominięte, bo wymagają bazy w pamięci.
+Testy jednostkowe (xUnit, Moq) obejmują walidację danych użytkownika (w tym siłę hasła i PESEL) oraz serwis zarządzania rolami: zmianę nazwy, dodawanie (wykrywanie duplikatów, normalizacja nazwy, granice długości 2 i 50 znaków) i usuwanie (odmowy: rola nieistniejąca, systemowa, mająca powiązania w hierarchii, jedyna rola użytkownika). Dwa testy pomyślnego i nieudanego usunięcia roli są pominięte, bo wymagają bazy w pamięci. Web API ról sprawdzono ręcznie (tabela w sekcji „Web API ról”); nie ma testów automatycznych kontrolera.
 
 ## Znane ograniczenia
 
@@ -98,6 +141,7 @@ Testy jednostkowe (xUnit, Moq) obejmują walidację danych użytkownika (w tym s
 - Panel nie pozwala tworzyć relacji hierarchii między rolami; powstają one tylko z danych startowych.
 - Po zmianie hasła lub ról użytkownika jego sesja jest unieważniana; walidacja stempla zabezpieczeń odbywa się przy każdym żądaniu, co dodaje zapytania do bazy (kompromis na korzyść bezpieczeństwa w projekcie demonstracyjnym).
 - Dane startowe, w tym konta demonstracyjne ze wspólnym hasłem, są dodawane do każdej pustej bazy, w każdym środowisku (także produkcyjnym); aktualizacja bazy po zmianie danych startowych wymaga jej odtworzenia.
+- Web API ról nie ma testów automatycznych (tylko ręczne zapytania `curl`); odpowiedź 403 dla roli innej niż Admin wynika z atrybutu autoryzacji i nie była sprawdzana ręcznie.
 
 ## Planowane dalsze prace
 
@@ -105,7 +149,6 @@ Testy jednostkowe (xUnit, Moq) obejmują walidację danych użytkownika (w tym s
 - testy Any/All i usuwania ról z bazą w pamięci
 - logi działań administratorów i odmów dostępu
 - ujednolicenie sprawdzania powiązań użytkownika (opiekun, przedmiot, wychowawca) w jednym miejscu dla edycji i usuwania oraz przeniesienie tych reguł do serwisu z testami jednostkowymi
-- Web API ról (osobna gałąź)
 
 **Funkcjonalne:**
 - edycja własnego hasła i podgląd własnych danych
