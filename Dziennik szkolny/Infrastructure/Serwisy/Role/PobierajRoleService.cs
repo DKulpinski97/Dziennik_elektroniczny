@@ -60,7 +60,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
         {
             return await _roleManager.FindByIdAsync(idRoli);
         }
-        public async Task<IdentityRole?> PobierzRolePoNazwie(string nazwa)
+        public async Task<IdentityRole?> PobierzRolePoNazwieAsync(string nazwa)
         {
             return await _roleManager.FindByNameAsync(nazwa);
         }

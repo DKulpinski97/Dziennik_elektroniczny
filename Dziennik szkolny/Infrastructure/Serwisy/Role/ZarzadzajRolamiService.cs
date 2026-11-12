@@ -107,12 +107,12 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
             }
             return false;
         }
-        public async Task<(bool Sukces, string Komunikat)> KontrolaDodawaRoliAsync(string iDZarzadzajacaRola, string nazwaNowejRoli)
+        public async Task<(bool Sukces, string Komunikat,string? ZnormalizowanaNazwa)> KontrolaDodawaRoliAsync(string iDZarzadzajacaRola, string nazwaNowejRoli)
         {
             nazwaNowejRoli = SprawdzDlugoscIPrzygotujNapis(nazwaNowejRoli);
             if (nazwaNowejRoli == null)
             {
-                return (false, OgraniczeniaNazwyRoli.KomunikatBledu);
+                return (false, OgraniczeniaNazwyRoli.KomunikatBledu, nazwaNowejRoli);
             }
             await _jednostkaPracy.RozpocznijTransakcjeAsync();
             try
@@ -121,21 +121,21 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
                 if (!tmp.Sukces)
                 {
                     await _jednostkaPracy.CofnijAsync();
-                    return (false, tmp.Komunikat);
+                    return (false, tmp.Komunikat, nazwaNowejRoli);
                 }
                 var zarzadzanaRola = await _roleManager.FindByNameAsync(nazwaNowejRoli);
                 if (!await PolaczRoleZarzadzanaZZarzadzajacaAsync(iDZarzadzajacaRola, zarzadzanaRola.Id))
                 {
                     await _jednostkaPracy.CofnijAsync();
-                    return (false, "Takie połączenie ról już istnieje.");
+                    return (false, "Takie połączenie ról już istnieje.", nazwaNowejRoli);
                 }
                 await _jednostkaPracy.ZatwierdzAsync();
-                return (true, "Rola dodana pomyślnie.");
+                return (true, "Rola dodana pomyślnie.", nazwaNowejRoli);
             }
             catch
             {
                 await _jednostkaPracy.CofnijAsync();
-                return (false, "Wystąpił błąd podczas dodawania roli.");
+                return (false, "Wystąpił błąd podczas dodawania roli.", nazwaNowejRoli);
             }
 
         }

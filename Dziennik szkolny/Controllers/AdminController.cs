@@ -91,7 +91,6 @@ namespace Dziennik_szkolny.Controllers
                 var tmp = _roleService.PodzierRoleNaSystemoweIPozostale(User, role);
                 return View("ZarzadzajRolami", tmp.PozostaleRole);
             }
-
             string idZarzadzajacejRoli = await _pobierajRole.PobierzIdRoliPoNazwieAsync(NazwyRoli.Admin);
             var wynik = await _roleService.KontrolaDodawaRoliAsync(idZarzadzajacejRoli, nazwaRoli);
 

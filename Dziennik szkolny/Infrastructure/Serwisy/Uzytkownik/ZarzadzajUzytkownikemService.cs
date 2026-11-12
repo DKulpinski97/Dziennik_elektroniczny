@@ -67,7 +67,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Uzytkownik
 
             foreach (var NazwaRoli in NazwayRoli)
             {
-                var rola = await _pobierajRole.PobierzRolePoNazwie(NazwaRoli);
+                var rola = await _pobierajRole.PobierzRolePoNazwieAsync(NazwaRoli);
 
                 if (rola == null)
                 {

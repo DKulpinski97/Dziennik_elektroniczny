@@ -19,10 +19,10 @@ namespace Dziennik_szkolny.Infrastructure.DaneStartowe
             foreach (var uprawnienie in _daneStartowe.UprawnieniaRoli)
             {
                 var rolaZarzadzajaca =
-                    await _pobierajRole.PobierzRolePoNazwie(uprawnienie.RolaZarzadzajaca);
+                    await _pobierajRole.PobierzRolePoNazwieAsync(uprawnienie.RolaZarzadzajaca);
 
                 var rolaZarzadzana =
-                    await _pobierajRole.PobierzRolePoNazwie(uprawnienie.RolaZarzadzana);
+                    await _pobierajRole.PobierzRolePoNazwieAsync(uprawnienie.RolaZarzadzana);
 
                 if (rolaZarzadzajaca == null || rolaZarzadzana == null)
                 {
