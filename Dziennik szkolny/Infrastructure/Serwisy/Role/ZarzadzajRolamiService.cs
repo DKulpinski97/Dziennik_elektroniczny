@@ -107,7 +107,7 @@ namespace Dziennik_szkolny.Infrastructure.Serwisy.Role
             }
             return false;
         }
-        public async Task<(bool Sukces, string Komunikat,string ZnormalizowanaNazwa)> KontrolaDodawaRoliAsync(string iDZarzadzajacaRola, string nazwaNowejRoli)
+        public async Task<(bool Sukces, string Komunikat,string? ZnormalizowanaNazwa)> KontrolaDodawaRoliAsync(string iDZarzadzajacaRola, string nazwaNowejRoli)
         {
             nazwaNowejRoli = SprawdzDlugoscIPrzygotujNapis(nazwaNowejRoli);
             if (nazwaNowejRoli == null)
